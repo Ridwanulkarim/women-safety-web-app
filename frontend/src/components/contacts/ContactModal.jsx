@@ -14,48 +14,48 @@ const ContactModal = ({ isOpen, onClose, onSave }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
-      <div className="relative max-w-md w-full glass-card p-6 sm:p-8 rounded-3xl space-y-6">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm">
+      <div className="relative max-w-md w-full human-card p-6 sm:p-8 space-y-6 shadow-2xl">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-2 text-slate-400 hover:text-white rounded-full bg-slate-800/50"
+          className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-200 rounded-lg bg-slate-100 dark:bg-slate-800"
         >
-          <FiX className="w-5 h-5" />
+          <FiX className="w-4 h-4" />
         </button>
 
         <div className="space-y-1">
-          <h3 className="text-xl font-bold text-slate-100 font-heading">Add Emergency Contact</h3>
-          <p className="text-xs text-slate-400">Enter a trusted person's contact details (Max 5 contacts).</p>
+          <h3 className="text-xl font-extrabold text-slate-900 dark:text-white font-heading">Add Emergency Contact</h3>
+          <p className="text-xs text-slate-500 dark:text-slate-400">Enter a trusted person's contact details (Max 5 contacts).</p>
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">Full Name</label>
+            <label className="human-label">Full Name</label>
             <input
               type="text"
               placeholder="e.g. Sarah Connor"
               {...register('name', { required: 'Name is required' })}
-              className="w-full px-4 py-3 rounded-xl bg-slate-900/80 border border-slate-700 text-slate-100 focus:outline-none focus:border-pink-500 text-sm"
+              className={`human-input ${errors.name ? 'human-input-error' : ''}`}
             />
-            {errors.name && <p className="text-[11px] text-red-400 mt-1">{errors.name.message}</p>}
+            {errors.name && <p className="text-[11px] font-medium text-rose-500 mt-1">{errors.name.message}</p>}
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">Phone Number</label>
+            <label className="human-label">Phone Number</label>
             <input
               type="tel"
               placeholder="e.g. +8801700000000"
               {...register('phone', { required: 'Phone number is required' })}
-              className="w-full px-4 py-3 rounded-xl bg-slate-900/80 border border-slate-700 text-slate-100 focus:outline-none focus:border-pink-500 text-sm"
+              className={`human-input ${errors.phone ? 'human-input-error' : ''}`}
             />
-            {errors.phone && <p className="text-[11px] text-red-400 mt-1">{errors.phone.message}</p>}
+            {errors.phone && <p className="text-[11px] font-medium text-rose-500 mt-1">{errors.phone.message}</p>}
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">Relationship</label>
+            <label className="human-label">Relationship</label>
             <select
               {...register('relationship', { required: 'Relationship is required' })}
-              className="w-full px-4 py-3 rounded-xl bg-slate-900/80 border border-slate-700 text-slate-100 focus:outline-none focus:border-pink-500 text-sm"
+              className="human-input"
             >
               <option value="Mother">Mother</option>
               <option value="Father">Father</option>
@@ -67,27 +67,29 @@ const ContactModal = ({ isOpen, onClose, onSave }) => {
             </select>
           </div>
 
-          <div className="flex items-center gap-2 pt-2">
+          <div className="flex items-center gap-2 pt-1">
             <input
               type="checkbox"
               id="isPrimary"
               {...register('isPrimary')}
-              className="w-4 h-4 accent-pink-600 rounded"
+              className="w-4 h-4 accent-rose-600 rounded cursor-pointer"
             />
-            <label htmlFor="isPrimary" className="text-xs font-medium text-slate-300">Set as Primary Emergency Contact</label>
+            <label htmlFor="isPrimary" className="text-xs font-semibold text-slate-700 dark:text-slate-300 cursor-pointer">
+              Set as Primary Emergency Contact
+            </label>
           </div>
 
           <div className="flex gap-3 pt-2">
             <button
               type="button"
               onClick={onClose}
-              className="w-1/2 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs"
+              className="w-1/2 btn-secondary"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="w-1/2 py-3 rounded-xl bg-pink-600 hover:bg-pink-700 text-white font-bold text-xs uppercase flex items-center justify-center gap-2 shadow-lg shadow-pink-600/30"
+              className="w-1/2 btn-primary"
             >
               <FiPlusCircle /> Save Contact
             </button>
