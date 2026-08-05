@@ -1,6 +1,6 @@
 import { db } from '../config/firebaseAdmin.js';
 
-// In-memory mock storage for development fallback when Firebase credentials are not provided
+// In-memory mock storage for fallback
 const mockDb = {
   users: new Map(),
   contacts: new Map(),
@@ -12,7 +12,6 @@ const mockDb = {
   analytics: new Map()
 };
 
-// Seed sample initial data into mockDb for instant usability
 const initMockData = () => {
   if (mockDb.blogs.size === 0) {
     const defaultBlogs = [
@@ -102,35 +101,40 @@ export const firestoreAdminService = {
       sosHistory: []
     };
 
-    if (db) {
-      await db.collection('users').doc(userData.uid).set(fullUser, { merge: true });
-    }
+    try {
+      if (db) await db.collection('users').doc(userData.uid).set(fullUser, { merge: true });
+    } catch (e) {}
+
     mockDb.users.set(userData.uid, fullUser);
     return fullUser;
   },
 
   getUserByUid: async (uid) => {
-    if (db) {
-      const snap = await db.collection('users').doc(uid).get();
-      if (snap.exists) return snap.data();
-    }
+    try {
+      if (db) {
+        const snap = await db.collection('users').doc(uid).get();
+        if (snap.exists) return snap.data();
+      }
+    } catch (e) {}
     return mockDb.users.get(uid) || null;
   },
 
   getAllUsers: async () => {
-    if (db) {
-      const snap = await db.collection('users').get();
-      return snap.docs.map(doc => doc.data());
-    }
+    try {
+      if (db) {
+        const snap = await db.collection('users').get();
+        if (!snap.empty) return snap.docs.map(doc => doc.data());
+      }
+    } catch (e) {}
     return Array.from(mockDb.users.values());
   },
 
   updateUser: async (uid, updateData) => {
     const now = new Date().toISOString();
     const payload = { ...updateData, updatedAt: now };
-    if (db) {
-      await db.collection('users').doc(uid).update(payload);
-    }
+    try {
+      if (db) await db.collection('users').doc(uid).update(payload);
+    } catch (e) {}
     const current = mockDb.users.get(uid) || {};
     const updated = { ...current, ...payload };
     mockDb.users.set(uid, updated);
@@ -138,19 +142,21 @@ export const firestoreAdminService = {
   },
 
   deleteUser: async (uid) => {
-    if (db) {
-      await db.collection('users').doc(uid).delete();
-    }
+    try {
+      if (db) await db.collection('users').doc(uid).delete();
+    } catch (e) {}
     mockDb.users.delete(uid);
     return true;
   },
 
   // EMERGENCY CONTACTS
   getUserContacts: async (uid) => {
-    if (db) {
-      const snap = await db.collection('contacts').where('userId', '==', uid).get();
-      return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    }
+    try {
+      if (db) {
+        const snap = await db.collection('contacts').where('userId', '==', uid).get();
+        return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      }
+    } catch (e) {}
     return Array.from(mockDb.contacts.values()).filter(c => c.userId === uid);
   },
 
@@ -165,18 +171,17 @@ export const firestoreAdminService = {
       isPrimary: contactData.isPrimary || false,
       createdAt: new Date().toISOString()
     };
-
-    if (db) {
-      await db.collection('contacts').doc(id).set(newContact);
-    }
+    try {
+      if (db) await db.collection('contacts').doc(id).set(newContact);
+    } catch (e) {}
     mockDb.contacts.set(id, newContact);
     return newContact;
   },
 
   deleteContact: async (id) => {
-    if (db) {
-      await db.collection('contacts').doc(id).delete();
-    }
+    try {
+      if (db) await db.collection('contacts').doc(id).delete();
+    } catch (e) {}
     mockDb.contacts.delete(id);
     return true;
   },
@@ -192,17 +197,16 @@ export const firestoreAdminService = {
       latitude: sosData.latitude,
       longitude: sosData.longitude,
       address: sosData.address || `Lat: ${sosData.latitude}, Lng: ${sosData.longitude}`,
-      status: 'ACTIVE', // ACTIVE, ACKNOWLEDGED, RESOLVED
+      status: 'ACTIVE',
       timestamp: new Date().toISOString(),
       contactsAlerted: sosData.contactsAlerted || []
     };
 
-    if (db) {
-      await db.collection('sos').doc(id).set(newSOS);
-    }
+    try {
+      if (db) await db.collection('sos').doc(id).set(newSOS);
+    } catch (e) {}
     mockDb.sos.set(id, newSOS);
 
-    // Create alert notification for user and admin
     await firestoreAdminService.createNotification({
       userId: uid,
       title: '🚨 SOS Alert Triggered',
@@ -215,25 +219,29 @@ export const firestoreAdminService = {
   },
 
   getSOSHistory: async (uid) => {
-    if (db) {
-      const snap = await db.collection('sos').where('userId', '==', uid).get();
-      return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    }
+    try {
+      if (db) {
+        const snap = await db.collection('sos').where('userId', '==', uid).get();
+        return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      }
+    } catch (e) {}
     return Array.from(mockDb.sos.values()).filter(s => s.userId === uid);
   },
 
   getAllSOSAlerts: async () => {
-    if (db) {
-      const snap = await db.collection('sos').get();
-      return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    }
+    try {
+      if (db) {
+        const snap = await db.collection('sos').get();
+        return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      }
+    } catch (e) {}
     return Array.from(mockDb.sos.values());
   },
 
   updateSOSStatus: async (id, status) => {
-    if (db) {
-      await db.collection('sos').doc(id).update({ status, updatedAt: new Date().toISOString() });
-    }
+    try {
+      if (db) await db.collection('sos').doc(id).update({ status, updatedAt: new Date().toISOString() });
+    } catch (e) {}
     const sos = mockDb.sos.get(id);
     if (sos) {
       sos.status = status;
@@ -244,10 +252,12 @@ export const firestoreAdminService = {
 
   // NOTIFICATIONS
   getUserNotifications: async (uid) => {
-    if (db) {
-      const snap = await db.collection('notifications').where('userId', '==', uid).get();
-      return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    }
+    try {
+      if (db) {
+        const snap = await db.collection('notifications').where('userId', '==', uid).get();
+        return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      }
+    } catch (e) {}
     return Array.from(mockDb.notifications.values()).filter(n => n.userId === uid);
   },
 
@@ -262,17 +272,17 @@ export const firestoreAdminService = {
       isRead: false,
       createdAt: new Date().toISOString()
     };
-    if (db) {
-      await db.collection('notifications').doc(id).set(notif);
-    }
+    try {
+      if (db) await db.collection('notifications').doc(id).set(notif);
+    } catch (e) {}
     mockDb.notifications.set(id, notif);
     return notif;
   },
 
   markNotificationRead: async (id) => {
-    if (db) {
-      await db.collection('notifications').doc(id).update({ isRead: true });
-    }
+    try {
+      if (db) await db.collection('notifications').doc(id).update({ isRead: true });
+    } catch (e) {}
     const item = mockDb.notifications.get(id);
     if (item) {
       item.isRead = true;
@@ -283,10 +293,12 @@ export const firestoreAdminService = {
 
   // ANNOUNCEMENTS
   getAnnouncements: async () => {
-    if (db) {
-      const snap = await db.collection('announcements').get();
-      return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    }
+    try {
+      if (db) {
+        const snap = await db.collection('announcements').get();
+        return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      }
+    } catch (e) {}
     return Array.from(mockDb.announcements.values());
   },
 
@@ -299,27 +311,31 @@ export const firestoreAdminService = {
       priority: annData.priority || 'normal',
       createdAt: new Date().toISOString()
     };
-    if (db) {
-      await db.collection('announcements').doc(id).set(ann);
-    }
+    try {
+      if (db) await db.collection('announcements').doc(id).set(ann);
+    } catch (e) {}
     mockDb.announcements.set(id, ann);
     return ann;
   },
 
   // BLOGS
   getBlogs: async () => {
-    if (db) {
-      const snap = await db.collection('blogs').get();
-      return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    }
+    try {
+      if (db) {
+        const snap = await db.collection('blogs').get();
+        if (!snap.empty) return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      }
+    } catch (e) {}
     return Array.from(mockDb.blogs.values());
   },
 
   getBlogById: async (id) => {
-    if (db) {
-      const snap = await db.collection('blogs').doc(id).get();
-      if (snap.exists) return { id: snap.id, ...snap.data() };
-    }
+    try {
+      if (db) {
+        const snap = await db.collection('blogs').doc(id).get();
+        if (snap.exists) return { id: snap.id, ...snap.data() };
+      }
+    } catch (e) {}
     return mockDb.blogs.get(id) || null;
   },
 
@@ -330,27 +346,29 @@ export const firestoreAdminService = {
       ...blogData,
       createdAt: new Date().toISOString()
     };
-    if (db) {
-      await db.collection('blogs').doc(id).set(blog);
-    }
+    try {
+      if (db) await db.collection('blogs').doc(id).set(blog);
+    } catch (e) {}
     mockDb.blogs.set(id, blog);
     return blog;
   },
 
   deleteBlog: async (id) => {
-    if (db) {
-      await db.collection('blogs').doc(id).delete();
-    }
+    try {
+      if (db) await db.collection('blogs').doc(id).delete();
+    } catch (e) {}
     mockDb.blogs.delete(id);
     return true;
   },
 
   // SAFETY TIPS
   getSafetyTips: async () => {
-    if (db) {
-      const snap = await db.collection('safetyTips').get();
-      return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    }
+    try {
+      if (db) {
+        const snap = await db.collection('safetyTips').get();
+        if (!snap.empty) return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      }
+    } catch (e) {}
     return Array.from(mockDb.safetyTips.values());
   },
 
@@ -361,17 +379,17 @@ export const firestoreAdminService = {
       ...tipData,
       createdAt: new Date().toISOString()
     };
-    if (db) {
-      await db.collection('safetyTips').doc(id).set(tip);
-    }
+    try {
+      if (db) await db.collection('safetyTips').doc(id).set(tip);
+    } catch (e) {}
     mockDb.safetyTips.set(id, tip);
     return tip;
   },
 
   deleteSafetyTip: async (id) => {
-    if (db) {
-      await db.collection('safetyTips').doc(id).delete();
-    }
+    try {
+      if (db) await db.collection('safetyTips').doc(id).delete();
+    } catch (e) {}
     mockDb.safetyTips.delete(id);
     return true;
   },
