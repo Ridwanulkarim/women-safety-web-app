@@ -67,9 +67,9 @@ app.use('/api/*', (req, res) => {
 // Global Error Handler
 app.use(errorHandler);
 
-if (process.env.NODE_ENV !== 'test') {
-  app.listen(PORT, '127.0.0.1', () => {
-    console.log(`🚀 Women Safety Backend Server listening on http://127.0.0.1:${PORT}`);
+if (process.env.NODE_ENV !== 'test' && !process.env.VERCEL) {
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`🚀 Women Safety Backend Server listening on http://0.0.0.0:${PORT}`);
   });
 }
 

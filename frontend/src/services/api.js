@@ -4,8 +4,15 @@ const getBaseUrl = () => {
   if (import.meta.env.VITE_API_BASE_URL) {
     return import.meta.env.VITE_API_BASE_URL;
   }
-  if (typeof window !== 'undefined' && window.location.hostname.includes('vercel.app')) {
-    return '/api';
+  if (typeof window !== 'undefined') {
+    const host = window.location.hostname;
+    if (host.includes('vercel.app')) {
+      return '/api';
+    }
+    if (host !== 'localhost' && host !== '127.0.0.1') {
+      // Mobile local Wi-Fi testing: point to host computer's backend API port 5001
+      return `http://${host}:5001/api`;
+    }
   }
   return 'http://127.0.0.1:5001/api';
 };
