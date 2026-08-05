@@ -36,8 +36,8 @@ app.use(morgan('dev'));
 // Rate limiting
 app.use('/api', apiRateLimiter);
 
-// Health check endpoint
-app.get('/api/health', (req, res) => {
+// Health check endpoints
+app.get(['/api/health', '/health'], (req, res) => {
   res.status(200).json({
     status: 'online',
     service: 'Women Safety Web Application API',
@@ -45,24 +45,21 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// API Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/users', userRoutes);
-app.use('/api/contacts', contactRoutes);
-app.use('/api/sos', sosRoutes);
-app.use('/api/notifications', notificationRoutes);
-app.use('/api/announcements', announcementRoutes);
-app.use('/api/blogs', blogRoutes);
-app.use('/api/safety-tips', tipRoutes);
-app.use('/api/analytics', analyticsRoutes);
+// Register API Routes with both /api prefix and root prefix to support Vercel rewrites seamlessly
+const registerRoutes = (prefix = '') => {
+  app.use(`${prefix}/auth`, authRoutes);
+  app.use(`${prefix}/users`, userRoutes);
+  app.use(`${prefix}/contacts`, contactRoutes);
+  app.use(`${prefix}/sos`, sosRoutes);
+  app.use(`${prefix}/notifications`, notificationRoutes);
+  app.use(`${prefix}/announcements`, announcementRoutes);
+  app.use(`${prefix}/blogs`, blogRoutes);
+  app.use(`${prefix}/safety-tips`, tipRoutes);
+  app.use(`${prefix}/analytics`, analyticsRoutes);
+};
 
-// Global 404 Handler for undefined API routes
-app.use('/api/*', (req, res) => {
-  res.status(404).json({
-    success: false,
-    message: 'API route not found'
-  });
-});
+registerRoutes('/api');
+registerRoutes('');
 
 // Global Error Handler
 app.use(errorHandler);
