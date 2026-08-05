@@ -1,8 +1,9 @@
 {
-  "name": "women-safety-app-monorepo",
+  "name": "women-safety-web-app",
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build": "npm run build --prefix frontend"
+    "vercel-build": "npm install --prefix frontend && npm run build --prefix frontend",
+    "build": "npm install --prefix frontend && npm run build --prefix frontend"
   }
 }
