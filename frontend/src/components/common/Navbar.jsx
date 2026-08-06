@@ -6,13 +6,13 @@ import { useNotifications } from '../../context/NotificationContext';
 import ThemeToggle from './ThemeToggle';
 import LanguageToggle from './LanguageToggle';
 import { useSOS } from '../../context/SOSContext';
-import { useTranslation } from 'react-i18next';
+import { useLanguage } from '../../context/LanguageContext';
 
 const Navbar = () => {
   const { user, logoutUser, isAdmin } = useAuth();
   const { unreadCount } = useNotifications();
   const { openSOSModal } = useSOS();
-  const { t } = useTranslation();
+  const { t } = useLanguage();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
 

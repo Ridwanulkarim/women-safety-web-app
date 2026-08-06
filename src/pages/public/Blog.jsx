@@ -14,7 +14,7 @@ const Blog = () => {
     const fetchBlogs = async () => {
       try {
         const res = await api.get('/blogs');
-        if (res.data?.data && res.data.data.length > 0) {
+        if (res.data?.data && Array.isArray(res.data.data) && res.data.data.length > 0) {
           setBlogs(res.data.data);
         }
       } catch (e) {
@@ -38,7 +38,11 @@ const Blog = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {blogs.map((blog) => (
-          <div key={blog.id} className="product-card rounded-xl overflow-hidden flex flex-col justify-between group">
+          <Link
+            key={blog.id}
+            to={`/blog/${blog.id}`}
+            className="product-card rounded-xl overflow-hidden flex flex-col justify-between group hover:border-rose-500/50 transition duration-300 block"
+          >
             <div className="relative h-52 overflow-hidden">
               <img
                 src={blog.imageUrl}
@@ -64,14 +68,11 @@ const Blog = () => {
                 </p>
               </div>
 
-              <Link
-                to={`/blog/${blog.id}`}
-                className="inline-flex items-center gap-2 text-xs font-mono font-bold text-rose-600 dark:text-rose-400 hover:underline pt-2"
-              >
+              <div className="inline-flex items-center gap-2 text-xs font-mono font-bold text-rose-600 dark:text-rose-400 group-hover:underline pt-2">
                 Read Article <FiArrowRight />
-              </Link>
+              </div>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
     </div>

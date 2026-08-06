@@ -1,15 +1,9 @@
 import React from 'react';
-import { useTranslation } from 'react-i18next';
+import { useLanguage } from '../../context/LanguageContext';
 import { FiGlobe } from 'react-icons/fi';
 
 const LanguageToggle = () => {
-  const { i18n } = useTranslation();
-  const currentLang = i18n.language || 'en';
-
-  const toggleLanguage = () => {
-    const nextLang = currentLang.startsWith('bn') ? 'en' : 'bn';
-    i18n.changeLanguage(nextLang);
-  };
+  const { language, toggleLanguage } = useLanguage();
 
   return (
     <button
@@ -20,7 +14,7 @@ const LanguageToggle = () => {
       title="Switch Language / ভাষা পরিবর্তন করুন"
     >
       <FiGlobe className="w-4 h-4 text-rose-600 dark:text-rose-400" />
-      <span>{currentLang.startsWith('bn') ? 'ENGLISH' : 'বাংলা'}</span>
+      <span>{language === 'en' ? 'ENGLISH' : 'বাংলা'}</span>
     </button>
   );
 };

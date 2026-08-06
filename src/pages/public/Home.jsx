@@ -5,11 +5,11 @@ import { FiShield, FiAlertCircle, FiPhoneCall, FiMapPin, FiArrowRight, FiActivit
 import SOSButton from '../../components/sos/SOSButton';
 import LiveMap from '../../components/map/LiveMap';
 import { EMERGENCY_NUMBERS } from '../../utils/constants';
-import { useTranslation } from 'react-i18next';
+import { useLanguage } from '../../context/LanguageContext';
 import LanguageToggle from '../../components/common/LanguageToggle';
 
 const Home = () => {
-  const { t } = useTranslation();
+  const { t } = useLanguage();
 
   return (
     <div className="space-y-12 pb-20">

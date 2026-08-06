@@ -8,26 +8,38 @@ import toast from 'react-hot-toast';
 
 const BlogDetail = () => {
   const { id } = useParams();
-  const [blog, setBlog] = useState(() => {
-    return BLOG_POSTS.find((b) => b.id === id) || BLOG_POSTS[0];
-  });
+  
+  const localArticle = BLOG_POSTS.find((b) => b.id === id) || BLOG_POSTS[0];
+  const [blog, setBlog] = useState(localArticle);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+
     const fetchDetail = async () => {
       try {
         const res = await api.get(`/blogs/${id}`);
-        if (res.data?.data) {
+        if (res.data?.data && typeof res.data.data === 'object' && res.data.data.title) {
           setBlog(res.data.data);
+        } else {
+          setBlog(localArticle);
         }
       } catch (e) {
-        const fallback = BLOG_POSTS.find((b) => b.id === id) || BLOG_POSTS[0];
-        setBlog(fallback);
+        setBlog(localArticle);
       }
     };
     fetchDetail();
   }, [id]);
 
-  if (!blog) return null;
+  if (!blog) {
+    return (
+      <div className="max-w-4xl mx-auto px-4 py-12 text-center space-y-4">
+        <h2 className="text-xl font-bold text-zinc-900 dark:text-white">Article Not Found</h2>
+        <Link to="/blog" className="btn-solid text-xs py-2 px-4 inline-flex items-center gap-2">
+          <FiArrowLeft /> Back to Journal
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8">
