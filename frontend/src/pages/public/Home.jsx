@@ -78,16 +78,16 @@ const Home = () => {
             {/* Technical Specs Footer */}
             <div className="pt-6 border-t border-zinc-200 dark:border-zinc-800 grid grid-cols-3 gap-4 font-mono text-xs">
               <div>
-                <span className="block text-[10px] text-zinc-500 dark:text-zinc-400 uppercase font-semibold">Response Time</span>
-                <span className="font-bold text-zinc-900 dark:text-zinc-100">&lt; 3.0 Seconds</span>
+                <span className="block text-[10px] text-zinc-500 dark:text-zinc-400 uppercase font-semibold">{t('responseTime')}</span>
+                <span className="font-bold text-zinc-900 dark:text-zinc-100">{t('responseVal')}</span>
               </div>
               <div>
-                <span className="block text-[10px] text-zinc-500 dark:text-zinc-400 uppercase font-semibold">Priority Contacts</span>
-                <span className="font-bold text-zinc-900 dark:text-zinc-100">Up to 5 Persons</span>
+                <span className="block text-[10px] text-zinc-500 dark:text-zinc-400 uppercase font-semibold">{t('priorityContactsSpec')}</span>
+                <span className="font-bold text-zinc-900 dark:text-zinc-100">{t('priorityContactsVal')}</span>
               </div>
               <div>
-                <span className="block text-[10px] text-zinc-500 dark:text-zinc-400 uppercase font-semibold">Dispatch Protocol</span>
-                <span className="font-bold text-zinc-900 dark:text-zinc-100">SMS + Webhook</span>
+                <span className="block text-[10px] text-zinc-500 dark:text-zinc-400 uppercase font-semibold">{t('dispatchProtocol')}</span>
+                <span className="font-bold text-zinc-900 dark:text-zinc-100">{t('dispatchVal')}</span>
               </div>
             </div>
           </motion.div>
@@ -115,7 +115,7 @@ const Home = () => {
 
             <div className="p-3 rounded-lg bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-[11px] font-mono text-zinc-600 dark:text-zinc-400 flex items-center justify-between text-left">
               <span className="flex items-center gap-1.5 text-rose-600 dark:text-rose-400 font-bold">
-                <FiMapPin /> GPS TELEMETRY
+                <FiMapPin /> {t('gpsTelemetry')}
               </span>
               <span className="text-zinc-800 dark:text-zinc-300 font-semibold">23.8103° N, 90.4125° E</span>
             </div>
@@ -176,7 +176,7 @@ const Home = () => {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
         <div className="border-b border-zinc-200 dark:border-zinc-800 pb-3">
           <h2 className="text-base font-bold text-zinc-900 dark:text-white font-heading">{t('systemCapabilities')}</h2>
-          <p className="text-xs text-zinc-500">Core safety mechanics engineered for minimal latency and high availability.</p>
+          <p className="text-xs text-zinc-500">{t('capabilitiesSub')}</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -184,9 +184,9 @@ const Home = () => {
             <div className="w-8 h-8 rounded-lg bg-rose-500/10 text-rose-600 dark:text-rose-400 flex items-center justify-center text-lg font-bold">
               <FiAlertCircle />
             </div>
-            <h3 className="text-sm font-bold text-zinc-900 dark:text-white">SOS Distress Broadcasting</h3>
+            <h3 className="text-sm font-bold text-zinc-900 dark:text-white">{t('cap1Title')}</h3>
             <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed font-normal">
-              Dispatches multi-channel distress alerts containing real-time GPS coordinates to your 5 designated priority emergency contacts.
+              {t('cap1Desc')}
             </p>
           </div>
 
@@ -194,9 +194,9 @@ const Home = () => {
             <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-lg font-bold">
               <FiCheckCircle />
             </div>
-            <h3 className="text-sm font-bold text-zinc-900 dark:text-white">Priority Contact Management</h3>
+            <h3 className="text-sm font-bold text-zinc-900 dark:text-white">{t('cap2Title')}</h3>
             <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed font-normal">
-              Store and manage emergency contacts with custom relationship tags, speed-dial links, and priority SMS notification rules.
+              {t('cap2Desc')}
             </p>
           </div>
 
@@ -204,9 +204,9 @@ const Home = () => {
             <div className="w-8 h-8 rounded-lg bg-zinc-500/10 text-zinc-600 dark:text-zinc-400 flex items-center justify-center text-lg font-bold">
               <FiShield />
             </div>
-            <h3 className="text-sm font-bold text-zinc-900 dark:text-white">Safety Operations Manual</h3>
+            <h3 className="text-sm font-bold text-zinc-900 dark:text-white">{t('cap3Title')}</h3>
             <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed font-normal">
-              Comprehensive tactical self-defense strategies, travel security checklists, digital privacy guidelines, and legal rights handbook.
+              {t('cap3Desc')}
             </p>
           </div>
         </div>
