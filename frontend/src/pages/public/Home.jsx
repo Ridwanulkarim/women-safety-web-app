@@ -1,12 +1,15 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { FiShield, FiAlertCircle, FiPhoneCall, FiMapPin, FiArrowRight, FiActivity, FiCheckCircle, FiLock, FiRadio, FiCpu, FiServer } from 'react-icons/fi';
+import { FiShield, FiAlertCircle, FiPhoneCall, FiMapPin, FiArrowRight, FiActivity, FiCheckCircle, FiLock, FiRadio, FiCpu } from 'react-icons/fi';
 import SOSButton from '../../components/sos/SOSButton';
 import LiveMap from '../../components/map/LiveMap';
 import { EMERGENCY_NUMBERS } from '../../utils/constants';
+import { useLanguage } from '../../context/LanguageContext';
 
 const Home = () => {
+  const { t } = useLanguage();
+
   return (
     <div className="space-y-12 pb-20">
       
@@ -15,15 +18,15 @@ const Home = () => {
         <div className="max-w-7xl mx-auto flex items-center justify-between overflow-x-auto gap-6 whitespace-nowrap">
           <div className="flex items-center gap-4">
             <span className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-semibold">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 telemetry-dot"></span> SYSTEM OPERATIONAL
+              <span className="w-2 h-2 rounded-full bg-emerald-500 telemetry-dot"></span> {t('systemOperational')}
             </span>
             <span className="text-zinc-400 dark:text-zinc-600">|</span>
-            <span>GPS: ACCURACY 99.8%</span>
+            <span>{t('gpsAccuracy')}</span>
             <span className="text-zinc-400 dark:text-zinc-600">|</span>
-            <span>ENCRYPTION: AES-256</span>
+            <span>{t('encryption')}</span>
           </div>
           <div className="flex items-center gap-4 text-zinc-500 dark:text-zinc-400">
-            <span>NATIONAL DISPATCH: ACTIVE (999)</span>
+            <span>{t('nationalDispatch')}</span>
             <span className="text-zinc-400 dark:text-zinc-600">|</span>
             <span>LATENCY: &lt;15ms</span>
           </div>
@@ -44,7 +47,7 @@ const Home = () => {
             <div className="space-y-4">
               <div className="flex items-center gap-2">
                 <span className="mono-tag mono-tag-zinc">
-                  <FiCpu className="w-3 h-3 text-zinc-500" /> Platform Architecture v2.4
+                  <FiCpu className="w-3 h-3 text-zinc-500" /> Platform v2.4
                 </span>
                 <span className="mono-tag mono-tag-emerald">
                   24/7 Protection
@@ -52,21 +55,21 @@ const Home = () => {
               </div>
 
               <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-zinc-900 dark:text-white font-heading leading-tight">
-                Instant Personal Safety & <br className="hidden sm:block" />
-                <span className="text-rose-600 dark:text-rose-500">Distress Telemetry Network</span>.
+                {t('heroTitlePrefix')} <br className="hidden sm:block" />
+                <span className="text-rose-600 dark:text-rose-500">{t('heroTitleSuffix')}</span>.
               </h1>
 
               <p className="text-sm sm:text-base text-zinc-600 dark:text-zinc-400 max-w-2xl font-normal leading-relaxed">
-                SafeHaven is a mission-critical personal protection platform providing real-time SOS distress broadcasting, live GPS telemetry, and automated priority emergency dispatch.
+                {t('heroSub')}
               </p>
             </div>
 
             <div className="flex flex-wrap items-center gap-3 pt-2">
               <Link to="/register" className="btn-solid text-xs py-2.5 px-5">
-                Create Free Account <FiArrowRight />
+                {t('createAccount')} <FiArrowRight />
               </Link>
               <Link to="/emergency-help" className="btn-outline text-xs py-2.5 px-5">
-                Emergency Directory
+                {t('emergencyDirectory')}
               </Link>
             </div>
 
@@ -96,8 +99,8 @@ const Home = () => {
           >
             <div className="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 pb-3 text-left">
               <div>
-                <span className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 dark:text-zinc-400 font-semibold">PANIC BEACON</span>
-                <h3 className="text-xs font-bold text-zinc-900 dark:text-white uppercase tracking-wider">SOS Distress Trigger</h3>
+                <span className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 dark:text-zinc-400 font-semibold">{t('panicBeacon')}</span>
+                <h3 className="text-xs font-bold text-zinc-900 dark:text-white uppercase tracking-wider">{t('sosDistressTrigger')}</h3>
               </div>
               <span className="mono-tag mono-tag-emerald py-0.5 text-[10px]">
                 Active
@@ -126,11 +129,11 @@ const Home = () => {
             <div className="flex items-center gap-2">
               <FiPhoneCall className="text-rose-600 dark:text-rose-500" />
               <h2 className="text-sm font-bold uppercase tracking-wider text-zinc-900 dark:text-white font-heading">
-                National Emergency Speed Dial
+                {t('speedDialTitle')}
               </h2>
             </div>
             <Link to="/emergency-help" className="text-xs font-mono font-semibold text-rose-600 dark:text-rose-400 hover:underline flex items-center gap-1">
-              View All Hotlines <FiArrowRight />
+              {t('viewAllHotlines')} <FiArrowRight />
             </Link>
           </div>
 
@@ -157,7 +160,7 @@ const Home = () => {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <FiRadio className="text-emerald-500" />
-            <h2 className="text-base font-bold text-zinc-900 dark:text-white font-heading">Live Geolocation Monitoring Radar</h2>
+            <h2 className="text-base font-bold text-zinc-900 dark:text-white font-heading">{t('monitoringRadar')}</h2>
           </div>
           <span className="mono-tag mono-tag-zinc hidden sm:inline-flex">
             Leaflet / OpenStreetMap Dual Engine
@@ -170,7 +173,7 @@ const Home = () => {
       {/* Product Architecture Features Grid */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
         <div className="border-b border-zinc-200 dark:border-zinc-800 pb-3">
-          <h2 className="text-base font-bold text-zinc-900 dark:text-white font-heading">System Capabilities</h2>
+          <h2 className="text-base font-bold text-zinc-900 dark:text-white font-heading">{t('systemCapabilities')}</h2>
           <p className="text-xs text-zinc-500">Core safety mechanics engineered for minimal latency and high availability.</p>
         </div>
 

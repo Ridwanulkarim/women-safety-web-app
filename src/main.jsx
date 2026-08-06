@@ -5,6 +5,7 @@ import { Toaster } from 'react-hot-toast';
 
 import AppRoutes from './routes/AppRoutes';
 import { ThemeProvider } from './context/ThemeContext';
+import { LanguageProvider } from './context/LanguageContext';
 import { AuthProvider } from './context/AuthContext';
 import { NotificationProvider } from './context/NotificationContext';
 import { SOSProvider } from './context/SOSContext';
@@ -17,27 +18,29 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     <ErrorBoundary>
       <BrowserRouter>
         <ThemeProvider>
-          <AuthProvider>
-            <NotificationProvider>
-              <SOSProvider>
-                <AppRoutes />
-                <Toaster
-                  position="top-right"
-                  toastOptions={{
-                    duration: 4000,
-                    style: {
-                      background: '#1E293B',
-                      color: '#F8FAFC',
-                      border: '1px solid rgba(233, 30, 99, 0.3)',
-                      borderRadius: '16px',
-                      fontSize: '13px',
-                      fontWeight: '600'
-                    }
-                  }}
-                />
-              </SOSProvider>
-            </NotificationProvider>
-          </AuthProvider>
+          <LanguageProvider>
+            <AuthProvider>
+              <NotificationProvider>
+                <SOSProvider>
+                  <AppRoutes />
+                  <Toaster
+                    position="top-right"
+                    toastOptions={{
+                      duration: 4000,
+                      style: {
+                        background: '#121215',
+                        color: '#F8FAFC',
+                        border: '1px solid rgba(225, 29, 72, 0.3)',
+                        borderRadius: '12px',
+                        fontSize: '13px',
+                        fontWeight: '600'
+                      }
+                    }}
+                  />
+                </SOSProvider>
+              </NotificationProvider>
+            </AuthProvider>
+          </LanguageProvider>
         </ThemeProvider>
       </BrowserRouter>
     </ErrorBoundary>
