@@ -9,7 +9,7 @@ import AdminLayout from '../layouts/AdminLayout';
 // Route Guards
 import { ProtectedRoute, AdminRoute } from './RouteGuards';
 
-// Public Pages
+// Pages
 import Home from '../pages/public/Home';
 import About from '../pages/public/About';
 import Features from '../pages/public/Features';
@@ -44,19 +44,78 @@ import AdminSettings from '../pages/admin/AdminSettings';
 const AppRoutes = () => {
   return (
     <Routes>
-      {/* Public Pages */}
+      {/* UNAUTHENTICATED PUBLIC ROUTES: Accessible without login */}
       <Route element={<PublicLayout />}>
-        <Route path="/" element={<Home />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/features" element={<Features />} />
-        <Route path="/safety-tips" element={<SafetyTips />} />
-        <Route path="/emergency-help" element={<EmergencyHelp />} />
-        <Route path="/blog" element={<Blog />} />
-        <Route path="/blog/:id" element={<BlogDetail />} />
-        <Route path="/contact" element={<Contact />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
+
+        {/* AUTHENTICATED PROTECTED APPLICATION ROUTES: Requires Login */}
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <Home />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/about"
+          element={
+            <ProtectedRoute>
+              <About />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/features"
+          element={
+            <ProtectedRoute>
+              <Features />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/safety-tips"
+          element={
+            <ProtectedRoute>
+              <SafetyTips />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/emergency-help"
+          element={
+            <ProtectedRoute>
+              <EmergencyHelp />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/blog"
+          element={
+            <ProtectedRoute>
+              <Blog />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/blog/:id"
+          element={
+            <ProtectedRoute>
+              <BlogDetail />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/contact"
+          element={
+            <ProtectedRoute>
+              <Contact />
+            </ProtectedRoute>
+          }
+        />
+
         <Route path="*" element={<NotFound />} />
       </Route>
 
