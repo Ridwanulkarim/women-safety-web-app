@@ -7,7 +7,7 @@ import ScrollToTop from '../components/common/ScrollToTop';
 
 const PublicLayout = () => {
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 selection:bg-pink-500 selection:text-white transition-colors duration-300">
+    <div className="min-h-screen flex flex-col bg-[#fafafa] dark:bg-[#09090b] text-zinc-900 dark:text-zinc-100 selection:bg-rose-500/20 selection:text-rose-500 transition-colors duration-200">
       <ScrollToTop />
       <Navbar />
       <main className="flex-grow">

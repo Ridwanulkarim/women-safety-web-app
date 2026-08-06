@@ -33,16 +33,16 @@ const DashboardLayout = () => {
   const isActive = (path) => location.pathname === path;
 
   return (
-    <div className="min-h-screen flex bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100">
+    <div className="min-h-screen flex bg-[#fafafa] dark:bg-[#09090b] text-zinc-900 dark:text-zinc-100 transition-colors duration-200">
       <ScrollToTop />
 
       {/* Sidebar Desktop */}
-      <aside className="hidden lg:flex flex-col w-64 glass-panel border-r border-slate-200/50 dark:border-slate-800/50 p-5 sticky top-0 h-screen z-30">
-        <Link to="/" className="flex items-center gap-3 mb-8">
-          <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-pink-600 to-purple-600 flex items-center justify-center text-white font-bold shadow-md">
-            <FiShield className="w-5 h-5" />
+      <aside className="hidden lg:flex flex-col w-64 bg-white dark:bg-[#121215] border-r border-zinc-200 dark:border-zinc-800 p-5 sticky top-0 h-screen z-30">
+        <Link to="/" className="flex items-center gap-3 mb-6">
+          <div className="w-8 h-8 rounded-lg bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 flex items-center justify-center font-bold">
+            <FiShield className="w-4 h-4" />
           </div>
-          <span className="text-xl font-black font-heading bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">
+          <span className="text-base font-bold font-heading text-zinc-900 dark:text-white">
             SafeHaven
           </span>
         </Link>
@@ -50,13 +50,13 @@ const DashboardLayout = () => {
         {/* SOS Quick Button */}
         <button
           onClick={openSOSModal}
-          className="w-full py-3 mb-6 rounded-2xl bg-pink-600 hover:bg-pink-700 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-pink-600/30 animate-pulse transition"
+          className="w-full btn-danger mb-6 font-mono text-xs"
         >
-          <FiAlertCircle className="w-4 h-4" /> Trigger SOS
+          <FiAlertCircle className="w-4 h-4" /> SOS DISPATCH
         </button>
 
         {/* Nav Links */}
-        <nav className="flex-1 space-y-1.5 overflow-y-auto">
+        <nav className="flex-1 space-y-1 overflow-y-auto">
           {menuItems.map((item) => {
             const Icon = item.icon;
             const active = isActive(item.path);
@@ -64,18 +64,18 @@ const DashboardLayout = () => {
               <Link
                 key={item.path}
                 to={item.path}
-                className={`flex items-center justify-between px-4 py-3 rounded-2xl text-xs font-semibold transition ${
+                className={`flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition ${
                   active
-                    ? 'bg-pink-600 text-white shadow-lg shadow-pink-600/20'
-                    : 'text-slate-600 dark:text-slate-400 hover:bg-slate-200/60 dark:hover:bg-slate-800/60 hover:text-pink-600 dark:hover:text-pink-400'
+                    ? 'bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 font-bold'
+                    : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-white'
                 }`}
               >
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2.5">
                   <Icon className="w-4 h-4" />
                   <span>{item.name}</span>
                 </div>
                 {item.badge > 0 && (
-                  <span className="px-2 py-0.5 rounded-full bg-pink-500 text-white text-[10px] font-extrabold">
+                  <span className="px-1.5 py-0.5 rounded bg-rose-600 text-white text-[10px] font-mono font-bold">
                     {item.badge}
                   </span>
                 )}
@@ -85,16 +85,16 @@ const DashboardLayout = () => {
         </nav>
 
         {/* User Footer */}
-        <div className="pt-4 border-t border-slate-200/50 dark:border-slate-800/50 flex items-center justify-between">
+        <div className="pt-4 border-t border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <img
               src={user?.profileImage || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80'}
               alt={user?.fullName}
-              className="w-8 h-8 rounded-xl object-cover"
+              className="w-8 h-8 rounded-lg object-cover"
             />
             <div className="text-left max-w-[100px] truncate">
-              <p className="text-xs font-bold truncate">{user?.fullName}</p>
-              <p className="text-[10px] text-slate-400 truncate">{user?.email}</p>
+              <p className="text-xs font-bold text-zinc-900 dark:text-white truncate">{user?.fullName}</p>
+              <p className="text-[10px] text-zinc-500 truncate font-mono">{user?.email}</p>
             </div>
           </div>
           <button
@@ -102,7 +102,7 @@ const DashboardLayout = () => {
               logoutUser();
               navigate('/login');
             }}
-            className="p-2 rounded-xl text-slate-400 hover:text-red-500 transition"
+            className="p-1.5 rounded-lg text-zinc-400 hover:text-rose-600 hover:bg-rose-500/10 transition"
             title="Logout"
           >
             <FiLogOut className="w-4 h-4" />
@@ -114,40 +114,40 @@ const DashboardLayout = () => {
       <div className="flex-1 flex flex-col min-w-0">
         
         {/* Mobile / Header Bar */}
-        <header className="glass-panel border-b border-slate-200/50 dark:border-slate-800/50 px-4 py-3 flex items-center justify-between sticky top-0 z-20">
+        <header className="bg-white/95 dark:bg-[#09090b]/95 backdrop-blur-sm border-b border-zinc-200 dark:border-zinc-800 px-4 py-3 flex items-center justify-between sticky top-0 z-20">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="p-2 rounded-xl lg:hidden bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-200"
+              className="p-2 rounded-lg lg:hidden bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700"
             >
-              {sidebarOpen ? <FiX className="w-5 h-5" /> : <FiMenu className="w-5 h-5" />}
+              {sidebarOpen ? <FiX className="w-4 h-4" /> : <FiMenu className="w-4 h-4" />}
             </button>
-            <h1 className="text-base font-bold font-heading">User Dashboard</h1>
+            <h1 className="text-sm font-bold font-heading text-zinc-900 dark:text-white">User Control Panel</h1>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5">
             <ThemeToggle />
             <button
               onClick={openSOSModal}
-              className="px-3 py-1.5 rounded-xl bg-pink-600 text-white font-bold text-[11px] uppercase flex items-center gap-1.5 shadow-md shadow-pink-600/30"
+              className="btn-danger !py-1.5 !px-3 font-mono text-[11px]"
             >
-              <FiAlertCircle /> SOS
+              <FiAlertCircle /> SOS DISPATCH
             </button>
           </div>
         </header>
 
         {/* Mobile Navigation Drawer */}
         {sidebarOpen && (
-          <div className="lg:hidden glass-panel border-b border-slate-200/50 dark:border-slate-800/50 p-4 space-y-1">
+          <div className="lg:hidden bg-white dark:bg-[#09090b] border-b border-zinc-200 dark:border-zinc-800 p-4 space-y-1">
             {menuItems.map((item) => (
               <Link
                 key={item.path}
                 to={item.path}
                 onClick={() => setSidebarOpen(false)}
-                className={`flex items-center justify-between px-4 py-2.5 rounded-xl text-xs font-semibold ${
+                className={`flex items-center justify-between px-4 py-2.5 rounded-lg text-xs font-medium ${
                   isActive(item.path)
-                    ? 'bg-pink-600 text-white'
-                    : 'text-slate-700 dark:text-slate-300'
+                    ? 'bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 font-bold'
+                    : 'text-zinc-700 dark:text-zinc-300'
                 }`}
               >
                 <span>{item.name}</span>
