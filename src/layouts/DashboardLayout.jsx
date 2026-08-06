@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   FiLayout, FiUser, FiSettings, FiPhoneCall, FiClock,
-  FiMapPin, FiBell, FiShield, FiLogOut, FiMenu, FiX, FiAlertCircle
+  FiMapPin, FiBell, FiShield, FiLogOut, FiMenu, FiX, FiAlertCircle, FiCamera
 } from 'react-icons/fi';
 import { useAuth } from '../context/AuthContext';
 import { useNotifications } from '../context/NotificationContext';
@@ -22,6 +22,7 @@ const DashboardLayout = () => {
 
   const menuItems = [
     { name: 'Dashboard', path: '/dashboard', icon: FiLayout },
+    { name: 'Evidence Vault', path: '/dashboard/evidence', icon: FiCamera },
     { name: 'Profile', path: '/dashboard/profile', icon: FiUser },
     { name: 'Emergency Contacts', path: '/dashboard/contacts', icon: FiPhoneCall },
     { name: 'SOS History', path: '/dashboard/sos-history', icon: FiClock },

@@ -31,6 +31,7 @@ import EmergencyContacts from '../pages/user/EmergencyContacts';
 import SOSHistoryPage from '../pages/user/SOSHistoryPage';
 import LiveLocationPage from '../pages/user/LiveLocationPage';
 import NotificationsPage from '../pages/user/NotificationsPage';
+import EvidenceVaultPage from '../pages/user/EvidenceVaultPage';
 
 // Admin Dashboard Pages
 import AdminDashboard from '../pages/admin/AdminDashboard';
@@ -135,6 +136,7 @@ const AppRoutes = () => {
         <Route path="sos-history" element={<SOSHistoryPage />} />
         <Route path="live-location" element={<LiveLocationPage />} />
         <Route path="notifications" element={<NotificationsPage />} />
+        <Route path="evidence" element={<EvidenceVaultPage />} />
       </Route>
 
       {/* Admin Dashboard Protected Routes */}

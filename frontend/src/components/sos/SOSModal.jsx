@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiAlertTriangle, FiX, FiCheckCircle, FiMapPin, FiPhone } from 'react-icons/fi';
+import { FiAlertTriangle, FiX, FiCheckCircle, FiMapPin, FiPhone, FiMic, FiCamera } from 'react-icons/fi';
 import { useSOS } from '../../context/SOSContext';
 import { useGeolocation } from '../../hooks/useGeolocation';
+import { useNavigate } from 'react-router-dom';
 
 const SOSModal = () => {
   const { sosModalOpen, closeSOSModal, sendSOSAlert, isSOSActive, resolveSOS, activeSOSData } = useSOS();
   const location = useGeolocation(true);
   const [countdown, setCountdown] = useState(3);
   const [isBroadcasting, setIsBroadcasting] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     let timer;
@@ -35,46 +37,58 @@ const SOSModal = () => {
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/80 backdrop-blur-md">
         <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
+          initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.9 }}
-          className="relative max-w-md w-full glass-card p-6 sm:p-8 rounded-3xl border-2 border-pink-500/30 text-center shadow-2xl space-y-6"
+          exit={{ opacity: 0, scale: 0.95 }}
+          className="relative max-w-md w-full product-card p-6 sm:p-8 border-2 border-rose-500/30 text-center shadow-2xl space-y-6"
         >
           {/* Close Button */}
           <button
             onClick={closeSOSModal}
-            className="absolute top-4 right-4 p-2 text-slate-400 hover:text-white rounded-full bg-slate-800/50"
+            className="absolute top-4 right-4 p-1.5 text-zinc-400 hover:text-zinc-200 rounded-lg bg-zinc-100 dark:bg-zinc-800"
           >
-            <FiX className="w-5 h-5" />
+            <FiX className="w-4 h-4" />
           </button>
 
           {isSOSActive ? (
             /* Active SOS Status State */
             <div className="space-y-6">
-              <div className="w-20 h-20 mx-auto bg-red-600/20 text-red-500 rounded-full flex items-center justify-center text-4xl animate-pulse ring-8 ring-red-500/20">
+              <div className="w-16 h-16 mx-auto bg-rose-500/20 text-rose-500 rounded-full flex items-center justify-center text-3xl animate-pulse ring-8 ring-rose-500/20">
                 <FiAlertTriangle />
               </div>
-              <div className="space-y-2">
-                <h3 className="text-2xl font-bold text-red-500 font-heading">🚨 SOS BROADCAST ACTIVE</h3>
-                <p className="text-sm text-slate-300">
+              <div className="space-y-1">
+                <span className="mono-tag mono-tag-rose">Emergency Telemetry Live</span>
+                <h3 className="text-xl font-extrabold text-rose-600 dark:text-rose-500 font-heading">🚨 SOS BROADCAST ACTIVE</h3>
+                <p className="text-xs text-zinc-500 dark:text-zinc-400">
                   Distress signal has been sent. Emergency contacts and command center have received your live location.
                 </p>
               </div>
 
-              <div className="p-4 rounded-2xl bg-slate-900/80 text-left space-y-2 text-xs text-slate-300">
-                <div className="flex items-center gap-2 text-pink-400 font-semibold">
-                  <FiMapPin /> <span>Live Location Captured</span>
+              <div className="p-3 rounded-lg bg-zinc-50 dark:bg-zinc-900 text-left space-y-1 text-xs text-zinc-700 dark:text-zinc-300 font-mono border border-zinc-200 dark:border-zinc-800">
+                <div className="flex items-center gap-1.5 text-rose-600 dark:text-rose-400 font-bold">
+                  <FiMapPin /> Live GPS Location Captured
                 </div>
-                <p>{location.address || 'Dhaka, Bangladesh'}</p>
-                <p className="text-[10px] text-slate-400">Lat: {location.latitude.toFixed(4)}, Lng: {location.longitude.toFixed(4)}</p>
+                <p className="text-zinc-800 dark:text-zinc-200">{location.address || 'Dhaka, Bangladesh'}</p>
+                <p className="text-[10px] text-zinc-400">Lat: {location.latitude.toFixed(4)}, Lng: {location.longitude.toFixed(4)}</p>
               </div>
 
-              <div className="flex flex-col gap-3">
+              {/* Emergency Evidence Action */}
+              <button
+                onClick={() => {
+                  closeSOSModal();
+                  navigate('/dashboard/evidence');
+                }}
+                className="w-full btn-solid py-2.5 text-xs font-mono flex items-center justify-center gap-2"
+              >
+                <FiCamera /> OPEN EVIDENCE VAULT (RECORD AUDIO/VIDEO)
+              </button>
+
+              <div className="flex flex-col gap-2 pt-2">
                 <a
                   href="tel:999"
-                  className="w-full py-3 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-sm uppercase flex items-center justify-center gap-2 shadow-lg shadow-red-600/40"
+                  className="w-full btn-danger py-3 text-xs uppercase font-mono font-bold"
                 >
                   <FiPhone /> Call 999 Police Dispatch
                 </a>
@@ -83,7 +97,7 @@ const SOSModal = () => {
                     resolveSOS(activeSOSData?.id);
                     closeSOSModal();
                   }}
-                  className="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm flex items-center justify-center gap-2"
+                  className="w-full btn-outline py-2.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400 border-emerald-500/30"
                 >
                   <FiCheckCircle /> Mark Myself Safe & Resolve
                 </button>
@@ -92,19 +106,19 @@ const SOSModal = () => {
           ) : isBroadcasting ? (
             /* Countdown Confirmation State */
             <div className="space-y-6">
-              <div className="w-24 h-24 mx-auto rounded-full bg-pink-600 text-white flex items-center justify-center text-5xl font-black font-heading animate-ping">
+              <div className="w-20 h-20 mx-auto rounded-full bg-rose-600 text-white flex items-center justify-center text-4xl font-black font-mono animate-bounce">
                 {countdown}
               </div>
-              <div className="space-y-2">
-                <h3 className="text-2xl font-bold text-slate-100 font-heading">Broadcasting SOS in {countdown}s</h3>
-                <p className="text-xs text-slate-400">
+              <div className="space-y-1">
+                <h3 className="text-xl font-bold text-zinc-900 dark:text-white font-heading">Broadcasting SOS in {countdown}s</h3>
+                <p className="text-xs text-zinc-500">
                   Tap cancel if this was an accidental trigger.
                 </p>
               </div>
 
               <button
                 onClick={handleCancelCountdown}
-                className="w-full py-3.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-sm uppercase tracking-wider"
+                className="w-full btn-outline py-3 text-xs font-mono font-bold uppercase tracking-wider"
               >
                 Cancel Broadcast
               </button>
@@ -112,31 +126,31 @@ const SOSModal = () => {
           ) : (
             /* Initial Trigger State */
             <div className="space-y-6">
-              <div className="w-20 h-20 mx-auto bg-pink-500/20 text-pink-500 rounded-full flex items-center justify-center text-4xl">
+              <div className="w-16 h-16 mx-auto bg-rose-500/10 text-rose-600 dark:text-rose-400 rounded-full flex items-center justify-center text-3xl">
                 <FiAlertTriangle />
               </div>
-              <div className="space-y-2">
-                <h3 className="text-2xl font-bold text-slate-100 font-heading">Confirm Emergency SOS</h3>
-                <p className="text-xs text-slate-400">
+              <div className="space-y-1">
+                <h3 className="text-xl font-bold text-zinc-900 dark:text-white font-heading">Confirm Emergency SOS</h3>
+                <p className="text-xs text-zinc-500">
                   This will transmit your live GPS location and alert all 5 emergency contacts immediately.
                 </p>
               </div>
 
-              <div className="p-3 rounded-2xl bg-slate-900/60 text-left text-xs space-y-1 text-slate-300">
-                <p className="font-semibold text-pink-400 flex items-center gap-1.5"><FiMapPin /> Current GPS Coordinates:</p>
+              <div className="p-3 rounded-lg bg-zinc-50 dark:bg-zinc-900 text-left text-xs font-mono border border-zinc-200 dark:border-zinc-800 space-y-1 text-zinc-600 dark:text-zinc-300">
+                <p className="font-bold text-rose-600 dark:text-rose-400 flex items-center gap-1.5"><FiMapPin /> GPS Location:</p>
                 <p>{location.address}</p>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <button
                   onClick={closeSOSModal}
-                  className="py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs"
+                  className="btn-outline text-xs"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleStartBroadcast}
-                  className="py-3 rounded-xl bg-pink-600 hover:bg-pink-700 text-white font-bold text-xs uppercase tracking-wider shadow-lg shadow-pink-600/30"
+                  className="btn-danger text-xs font-mono font-bold uppercase tracking-wider"
                 >
                   Trigger SOS
                 </button>
