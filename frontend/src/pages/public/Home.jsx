@@ -5,11 +5,11 @@ import { FiShield, FiAlertCircle, FiPhoneCall, FiMapPin, FiArrowRight, FiActivit
 import SOSButton from '../../components/sos/SOSButton';
 import LiveMap from '../../components/map/LiveMap';
 import { EMERGENCY_NUMBERS } from '../../utils/constants';
-import { useLanguage } from '../../context/LanguageContext';
+import { useTranslation } from 'react-i18next';
 import LanguageToggle from '../../components/common/LanguageToggle';
 
 const Home = () => {
-  const { t } = useLanguage();
+  const { t } = useTranslation();
 
   return (
     <div className="space-y-12 pb-20">
@@ -19,16 +19,16 @@ const Home = () => {
         <div className="max-w-7xl mx-auto flex items-center justify-between overflow-x-auto gap-6 whitespace-nowrap">
           <div className="flex items-center gap-4">
             <span className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-semibold">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 telemetry-dot"></span> {t('systemOperational')}
+              <span className="w-2 h-2 rounded-full bg-emerald-500 telemetry-dot"></span> {t('common.systemOperational')}
             </span>
             <span className="text-zinc-400 dark:text-zinc-600">|</span>
-            <span>{t('gpsAccuracy')}</span>
+            <span>{t('common.gpsAccuracy')}</span>
             <span className="text-zinc-400 dark:text-zinc-600">|</span>
-            <span>{t('encryption')}</span>
+            <span>{t('common.encryption')}</span>
           </div>
           <div className="flex items-center gap-4 text-zinc-500 dark:text-zinc-400">
             <LanguageToggle />
-            <span>{t('nationalDispatch')}</span>
+            <span>{t('common.nationalDispatch')}</span>
             <span className="text-zinc-400 dark:text-zinc-600">|</span>
             <span>LATENCY: &lt;15ms</span>
           </div>
@@ -57,37 +57,37 @@ const Home = () => {
               </div>
 
               <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-zinc-900 dark:text-white font-heading leading-tight">
-                {t('heroTitlePrefix')} <br className="hidden sm:block" />
-                <span className="text-rose-600 dark:text-rose-500">{t('heroTitleSuffix')}</span>.
+                {t('home.heroTitlePrefix')} <br className="hidden sm:block" />
+                <span className="text-rose-600 dark:text-rose-500">{t('home.heroTitleSuffix')}</span>.
               </h1>
 
               <p className="text-sm sm:text-base text-zinc-600 dark:text-zinc-400 max-w-2xl font-normal leading-relaxed">
-                {t('heroSub')}
+                {t('home.heroSub')}
               </p>
             </div>
 
             <div className="flex flex-wrap items-center gap-3 pt-2">
               <Link to="/register" className="btn-solid text-xs py-2.5 px-5">
-                {t('createAccount')} <FiArrowRight />
+                {t('home.createAccount')} <FiArrowRight />
               </Link>
               <Link to="/emergency-help" className="btn-outline text-xs py-2.5 px-5">
-                {t('emergencyDirectory')}
+                {t('home.emergencyDirectory')}
               </Link>
             </div>
 
             {/* Technical Specs Footer */}
             <div className="pt-6 border-t border-zinc-200 dark:border-zinc-800 grid grid-cols-3 gap-4 font-mono text-xs">
               <div>
-                <span className="block text-[10px] text-zinc-500 dark:text-zinc-400 uppercase font-semibold">{t('responseTime')}</span>
-                <span className="font-bold text-zinc-900 dark:text-zinc-100">{t('responseVal')}</span>
+                <span className="block text-[10px] text-zinc-500 dark:text-zinc-400 uppercase font-semibold">{t('home.responseTime')}</span>
+                <span className="font-bold text-zinc-900 dark:text-zinc-100">{t('home.responseVal')}</span>
               </div>
               <div>
-                <span className="block text-[10px] text-zinc-500 dark:text-zinc-400 uppercase font-semibold">{t('priorityContactsSpec')}</span>
-                <span className="font-bold text-zinc-900 dark:text-zinc-100">{t('priorityContactsVal')}</span>
+                <span className="block text-[10px] text-zinc-500 dark:text-zinc-400 uppercase font-semibold">{t('home.priorityContactsSpec')}</span>
+                <span className="font-bold text-zinc-900 dark:text-zinc-100">{t('home.priorityContactsVal')}</span>
               </div>
               <div>
-                <span className="block text-[10px] text-zinc-500 dark:text-zinc-400 uppercase font-semibold">{t('dispatchProtocol')}</span>
-                <span className="font-bold text-zinc-900 dark:text-zinc-100">{t('dispatchVal')}</span>
+                <span className="block text-[10px] text-zinc-500 dark:text-zinc-400 uppercase font-semibold">{t('home.dispatchProtocol')}</span>
+                <span className="font-bold text-zinc-900 dark:text-zinc-100">{t('home.dispatchVal')}</span>
               </div>
             </div>
           </motion.div>
@@ -101,11 +101,11 @@ const Home = () => {
           >
             <div className="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 pb-3 text-left">
               <div>
-                <span className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 dark:text-zinc-400 font-semibold">{t('panicBeacon')}</span>
-                <h3 className="text-xs font-bold text-zinc-900 dark:text-white uppercase tracking-wider">{t('sosDistressTrigger')}</h3>
+                <span className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 dark:text-zinc-400 font-semibold">{t('home.panicBeacon')}</span>
+                <h3 className="text-xs font-bold text-zinc-900 dark:text-white uppercase tracking-wider">{t('home.sosDistressTrigger')}</h3>
               </div>
               <span className="mono-tag mono-tag-emerald py-0.5 text-[10px]">
-                Active
+                {t('common.active')}
               </span>
             </div>
 
@@ -115,7 +115,7 @@ const Home = () => {
 
             <div className="p-3 rounded-lg bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-[11px] font-mono text-zinc-600 dark:text-zinc-400 flex items-center justify-between text-left">
               <span className="flex items-center gap-1.5 text-rose-600 dark:text-rose-400 font-bold">
-                <FiMapPin /> {t('gpsTelemetry')}
+                <FiMapPin /> {t('home.gpsTelemetry')}
               </span>
               <span className="text-zinc-800 dark:text-zinc-300 font-semibold">23.8103° N, 90.4125° E</span>
             </div>
@@ -131,11 +131,11 @@ const Home = () => {
             <div className="flex items-center gap-2">
               <FiPhoneCall className="text-rose-600 dark:text-rose-500" />
               <h2 className="text-sm font-bold uppercase tracking-wider text-zinc-900 dark:text-white font-heading">
-                {t('speedDialTitle')}
+                {t('home.speedDialTitle')}
               </h2>
             </div>
             <Link to="/emergency-help" className="text-xs font-mono font-semibold text-rose-600 dark:text-rose-400 hover:underline flex items-center gap-1">
-              {t('viewAllHotlines')} <FiArrowRight />
+              {t('home.viewAllHotlines')} <FiArrowRight />
             </Link>
           </div>
 
@@ -162,7 +162,7 @@ const Home = () => {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <FiRadio className="text-emerald-500" />
-            <h2 className="text-base font-bold text-zinc-900 dark:text-white font-heading">{t('monitoringRadar')}</h2>
+            <h2 className="text-base font-bold text-zinc-900 dark:text-white font-heading">{t('home.monitoringRadar')}</h2>
           </div>
           <span className="mono-tag mono-tag-zinc hidden sm:inline-flex">
             Leaflet / OpenStreetMap Dual Engine
@@ -175,8 +175,8 @@ const Home = () => {
       {/* Product Architecture Features Grid */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
         <div className="border-b border-zinc-200 dark:border-zinc-800 pb-3">
-          <h2 className="text-base font-bold text-zinc-900 dark:text-white font-heading">{t('systemCapabilities')}</h2>
-          <p className="text-xs text-zinc-500">{t('capabilitiesSub')}</p>
+          <h2 className="text-base font-bold text-zinc-900 dark:text-white font-heading">{t('home.systemCapabilities')}</h2>
+          <p className="text-xs text-zinc-500">{t('home.capabilitiesSub')}</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -184,9 +184,9 @@ const Home = () => {
             <div className="w-8 h-8 rounded-lg bg-rose-500/10 text-rose-600 dark:text-rose-400 flex items-center justify-center text-lg font-bold">
               <FiAlertCircle />
             </div>
-            <h3 className="text-sm font-bold text-zinc-900 dark:text-white">{t('cap1Title')}</h3>
+            <h3 className="text-sm font-bold text-zinc-900 dark:text-white">{t('home.cap1Title')}</h3>
             <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed font-normal">
-              {t('cap1Desc')}
+              {t('home.cap1Desc')}
             </p>
           </div>
 
@@ -194,9 +194,9 @@ const Home = () => {
             <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-lg font-bold">
               <FiCheckCircle />
             </div>
-            <h3 className="text-sm font-bold text-zinc-900 dark:text-white">{t('cap2Title')}</h3>
+            <h3 className="text-sm font-bold text-zinc-900 dark:text-white">{t('home.cap2Title')}</h3>
             <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed font-normal">
-              {t('cap2Desc')}
+              {t('home.cap2Desc')}
             </p>
           </div>
 
@@ -204,9 +204,9 @@ const Home = () => {
             <div className="w-8 h-8 rounded-lg bg-zinc-500/10 text-zinc-600 dark:text-zinc-400 flex items-center justify-center text-lg font-bold">
               <FiShield />
             </div>
-            <h3 className="text-sm font-bold text-zinc-900 dark:text-white">{t('cap3Title')}</h3>
+            <h3 className="text-sm font-bold text-zinc-900 dark:text-white">{t('home.cap3Title')}</h3>
             <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed font-normal">
-              {t('cap3Desc')}
+              {t('home.cap3Desc')}
             </p>
           </div>
         </div>

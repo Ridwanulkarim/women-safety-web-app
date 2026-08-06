@@ -6,13 +6,13 @@ import { useNotifications } from '../../context/NotificationContext';
 import ThemeToggle from './ThemeToggle';
 import LanguageToggle from './LanguageToggle';
 import { useSOS } from '../../context/SOSContext';
-import { useLanguage } from '../../context/LanguageContext';
+import { useTranslation } from 'react-i18next';
 
 const Navbar = () => {
   const { user, logoutUser, isAdmin } = useAuth();
   const { unreadCount } = useNotifications();
   const { openSOSModal } = useSOS();
-  const { t } = useLanguage();
+  const { t } = useTranslation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
 
@@ -20,13 +20,13 @@ const Navbar = () => {
   const location = useLocation();
 
   const navLinks = [
-    { name: t('home'), path: '/' },
-    { name: t('about'), path: '/about' },
-    { name: t('features'), path: '/features' },
-    { name: t('safetyTips'), path: '/safety-tips' },
-    { name: t('emergencyHelp'), path: '/emergency-help' },
-    { name: t('blog'), path: '/blog' },
-    { name: t('contact'), path: '/contact' }
+    { name: t('nav.home'), path: '/' },
+    { name: t('nav.about'), path: '/about' },
+    { name: t('nav.features'), path: '/features' },
+    { name: t('nav.safetyTips'), path: '/safety-tips' },
+    { name: t('nav.emergencyHelp'), path: '/emergency-help' },
+    { name: t('nav.blog'), path: '/blog' },
+    { name: t('nav.contact'), path: '/contact' }
   ];
 
   const isActive = (path) => location.pathname === path;
@@ -44,11 +44,11 @@ const Navbar = () => {
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-sm font-bold tracking-tight text-zinc-900 dark:text-white font-heading">
-                  {t('brandName')}
+                  {t('nav.brandName')}
                 </span>
                 {user && (
                   <span className="hidden md:inline-flex mono-tag mono-tag-emerald py-0 text-[10px]">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 telemetry-dot"></span> {t('onlineStatus')}
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 telemetry-dot"></span> {t('nav.onlineStatus')}
                   </span>
                 )}
               </div>
@@ -91,7 +91,7 @@ const Navbar = () => {
                   className="hidden sm:inline-flex btn-danger !py-1.5 !px-3 font-mono text-[11px]"
                 >
                   <FiAlertCircle className="w-3.5 h-3.5" />
-                  <span>{t('sosDispatch')}</span>
+                  <span>{t('nav.sosDispatch')}</span>
                 </button>
 
                 {/* Notifications Button */}
@@ -135,7 +135,7 @@ const Navbar = () => {
                         onClick={() => setProfileDropdownOpen(false)}
                         className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 transition"
                       >
-                        <FiLayout /> {t('dashboard')}
+                        <FiLayout /> {t('nav.dashboard')}
                       </Link>
 
                       <Link
@@ -143,7 +143,7 @@ const Navbar = () => {
                         onClick={() => setProfileDropdownOpen(false)}
                         className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 transition"
                       >
-                        <FiCamera /> {t('evidenceVault')}
+                        <FiCamera /> {t('nav.evidenceVault')}
                       </Link>
 
                       <Link
@@ -151,7 +151,7 @@ const Navbar = () => {
                         onClick={() => setProfileDropdownOpen(false)}
                         className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 transition"
                       >
-                        <FiUser /> {t('profile')}
+                        <FiUser /> {t('nav.profile')}
                       </Link>
 
                       <Link
@@ -159,7 +159,7 @@ const Navbar = () => {
                         onClick={() => setProfileDropdownOpen(false)}
                         className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 transition"
                       >
-                        <FiPhone /> {t('emergencyContacts')}
+                        <FiPhone /> {t('nav.emergencyContacts')}
                       </Link>
 
                       <Link
@@ -167,7 +167,7 @@ const Navbar = () => {
                         onClick={() => setProfileDropdownOpen(false)}
                         className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 transition"
                       >
-                        <FiClock /> {t('sosHistory')}
+                        <FiClock /> {t('nav.sosHistory')}
                       </Link>
 
                       <Link
@@ -175,7 +175,7 @@ const Navbar = () => {
                         onClick={() => setProfileDropdownOpen(false)}
                         className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 transition"
                       >
-                        <FiMapPin /> {t('liveLocation')}
+                        <FiMapPin /> {t('nav.liveLocation')}
                       </Link>
 
                       <Link
@@ -183,7 +183,7 @@ const Navbar = () => {
                         onClick={() => setProfileDropdownOpen(false)}
                         className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 transition"
                       >
-                        <FiBell /> {t('notifications')}
+                        <FiBell /> {t('nav.notifications')}
                       </Link>
 
                       <Link
@@ -191,7 +191,7 @@ const Navbar = () => {
                         onClick={() => setProfileDropdownOpen(false)}
                         className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 transition"
                       >
-                        <FiSettings /> {t('settings')}
+                        <FiSettings /> {t('nav.settings')}
                       </Link>
 
                       {isAdmin && (
@@ -200,7 +200,7 @@ const Navbar = () => {
                           onClick={() => setProfileDropdownOpen(false)}
                           className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 transition"
                         >
-                          <FiShield /> Admin Panel
+                          <FiShield /> {t('nav.adminPanel')}
                         </Link>
                       )}
 
@@ -212,7 +212,7 @@ const Navbar = () => {
                         }}
                         className="w-full flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md text-rose-600 hover:bg-rose-500/10 transition"
                       >
-                        <FiLogOut /> {t('logout')}
+                        <FiLogOut /> {t('nav.logout')}
                       </button>
                     </div>
                   )}
@@ -233,13 +233,13 @@ const Navbar = () => {
                   to="/login"
                   className="px-3 py-1.5 text-xs font-semibold text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition"
                 >
-                  {t('signIn')}
+                  {t('nav.signIn')}
                 </Link>
                 <Link
                   to="/register"
                   className="btn-solid text-xs py-1.5 px-3"
                 >
-                  {t('getStarted')}
+                  {t('nav.getStarted')}
                 </Link>
               </div>
             )}
@@ -275,7 +275,7 @@ const Navbar = () => {
               }}
               className="w-full btn-danger font-mono text-xs"
             >
-              <FiAlertCircle /> {t('sosDispatch')}
+              <FiAlertCircle /> {t('nav.sosDispatch')}
             </button>
           </div>
         </div>
