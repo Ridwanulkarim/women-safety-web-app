@@ -36,7 +36,7 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-14 sm:h-16">
           
-          {/* Logo */}
+          {/* Logo & Desktop Links */}
           <div className="flex items-center gap-6">
             <Link to={user ? "/" : "/login"} className="flex items-center gap-2.5 group">
               <div className="w-8 h-8 rounded-lg bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 flex items-center justify-center font-bold transition">
@@ -74,183 +74,176 @@ const Navbar = () => {
             )}
           </div>
 
-          {/* Right Controls */}
-          {user ? (
-            /* AFTER LOGIN NAVBAR CONTROLS */
-            <div className="hidden sm:flex items-center gap-2">
-              
-              {/* SOS Dispatch Button */}
-              <button
-                onClick={openSOSModal}
-                className="btn-danger !py-1.5 !px-3 font-mono text-[11px]"
-              >
-                <FiAlertCircle className="w-3.5 h-3.5" />
-                <span>{t('sosDispatch')}</span>
-              </button>
+          {/* Right Controls - ALWAYS VISIBLE ON ALL SCREENS */}
+          <div className="flex items-center gap-2">
+            
+            {/* Always Visible Language Toggle Switch */}
+            <LanguageToggle />
 
-              {/* Language Switcher */}
-              <LanguageToggle />
+            {/* Dark Mode Toggle */}
+            <ThemeToggle />
 
-              {/* Dark Mode Toggle */}
-              <ThemeToggle />
-
-              {/* Notifications Button */}
-              <Link
-                to="/dashboard/notifications"
-                className="relative p-2 rounded-lg bg-zinc-100 dark:bg-zinc-800/80 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition border border-zinc-200 dark:border-zinc-700"
-              >
-                <FiBell className="w-3.5 h-3.5" />
-                {unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-rose-600 text-white text-[9px] font-bold rounded-full flex items-center justify-center font-mono">
-                    {unreadCount}
-                  </span>
-                )}
-              </Link>
-
-              {/* User Dropdown */}
-              <div className="relative">
+            {user ? (
+              /* AFTER LOGIN CONTROLS */
+              <>
                 <button
-                  onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-                  className="flex items-center gap-2 p-1 pr-2.5 rounded-lg bg-zinc-100 dark:bg-zinc-800/80 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition border border-zinc-200 dark:border-zinc-700"
+                  onClick={openSOSModal}
+                  className="hidden sm:inline-flex btn-danger !py-1.5 !px-3 font-mono text-[11px]"
                 >
-                  <img
-                    src={user.profileImage || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80'}
-                    alt={user.fullName}
-                    className="w-6 h-6 rounded-md object-cover"
-                  />
-                  <span className="text-xs font-medium text-zinc-800 dark:text-zinc-200 max-w-[80px] truncate">
-                    {user.fullName}
-                  </span>
+                  <FiAlertCircle className="w-3.5 h-3.5" />
+                  <span>{t('sosDispatch')}</span>
                 </button>
 
-                {profileDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-56 product-card p-1.5 shadow-xl z-50 space-y-0.5">
-                    <div className="px-3 py-2 border-b border-zinc-200 dark:border-zinc-800">
-                      <p className="text-xs font-bold text-zinc-900 dark:text-white">{user.fullName}</p>
-                      <p className="text-[11px] text-zinc-500 truncate font-mono">{user.email}</p>
-                    </div>
+                {/* Notifications Button */}
+                <Link
+                  to="/dashboard/notifications"
+                  className="relative p-2 rounded-lg bg-zinc-100 dark:bg-zinc-800/80 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition border border-zinc-200 dark:border-zinc-700"
+                >
+                  <FiBell className="w-3.5 h-3.5" />
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-rose-600 text-white text-[9px] font-bold rounded-full flex items-center justify-center font-mono">
+                      {unreadCount}
+                    </span>
+                  )}
+                </Link>
 
-                    <Link
-                      to="/dashboard"
-                      onClick={() => setProfileDropdownOpen(false)}
-                      className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 transition"
-                    >
-                      <FiLayout /> {t('dashboard')}
-                    </Link>
+                {/* User Dropdown */}
+                <div className="relative">
+                  <button
+                    onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
+                    className="flex items-center gap-2 p-1 pr-2 rounded-lg bg-zinc-100 dark:bg-zinc-800/80 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition border border-zinc-200 dark:border-zinc-700"
+                  >
+                    <img
+                      src={user.profileImage || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80'}
+                      alt={user.fullName}
+                      className="w-6 h-6 rounded-md object-cover"
+                    />
+                    <span className="hidden md:inline-block text-xs font-medium text-zinc-800 dark:text-zinc-200 max-w-[80px] truncate">
+                      {user.fullName}
+                    </span>
+                  </button>
 
-                    <Link
-                      to="/dashboard/evidence"
-                      onClick={() => setProfileDropdownOpen(false)}
-                      className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 transition"
-                    >
-                      <FiCamera /> {t('evidenceVault')}
-                    </Link>
+                  {profileDropdownOpen && (
+                    <div className="absolute right-0 mt-2 w-56 product-card p-1.5 shadow-xl z-50 space-y-0.5">
+                      <div className="px-3 py-2 border-b border-zinc-200 dark:border-zinc-800">
+                        <p className="text-xs font-bold text-zinc-900 dark:text-white">{user.fullName}</p>
+                        <p className="text-[11px] text-zinc-500 truncate font-mono">{user.email}</p>
+                      </div>
 
-                    <Link
-                      to="/dashboard/profile"
-                      onClick={() => setProfileDropdownOpen(false)}
-                      className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 transition"
-                    >
-                      <FiUser /> {t('profile')}
-                    </Link>
-
-                    <Link
-                      to="/dashboard/contacts"
-                      onClick={() => setProfileDropdownOpen(false)}
-                      className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 transition"
-                    >
-                      <FiPhone /> {t('emergencyContacts')}
-                    </Link>
-
-                    <Link
-                      to="/dashboard/sos-history"
-                      onClick={() => setProfileDropdownOpen(false)}
-                      className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 transition"
-                    >
-                      <FiClock /> {t('sosHistory')}
-                    </Link>
-
-                    <Link
-                      to="/dashboard/live-location"
-                      onClick={() => setProfileDropdownOpen(false)}
-                      className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 transition"
-                    >
-                      <FiMapPin /> {t('liveLocation')}
-                    </Link>
-
-                    <Link
-                      to="/dashboard/notifications"
-                      onClick={() => setProfileDropdownOpen(false)}
-                      className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 transition"
-                    >
-                      <FiBell /> {t('notifications')}
-                    </Link>
-
-                    <Link
-                      to="/dashboard/settings"
-                      onClick={() => setProfileDropdownOpen(false)}
-                      className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 transition"
-                    >
-                      <FiSettings /> {t('settings')}
-                    </Link>
-
-                    {isAdmin && (
                       <Link
-                        to="/admin"
+                        to="/dashboard"
                         onClick={() => setProfileDropdownOpen(false)}
                         className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 transition"
                       >
-                        <FiShield /> Admin Panel
+                        <FiLayout /> {t('dashboard')}
                       </Link>
-                    )}
 
-                    <button
-                      onClick={() => {
-                        setProfileDropdownOpen(false);
-                        logoutUser();
-                        navigate('/login');
-                      }}
-                      className="w-full flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md text-rose-600 hover:bg-rose-500/10 transition"
-                    >
-                      <FiLogOut /> {t('logout')}
-                    </button>
-                  </div>
-                )}
+                      <Link
+                        to="/dashboard/evidence"
+                        onClick={() => setProfileDropdownOpen(false)}
+                        className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 transition"
+                      >
+                        <FiCamera /> {t('evidenceVault')}
+                      </Link>
+
+                      <Link
+                        to="/dashboard/profile"
+                        onClick={() => setProfileDropdownOpen(false)}
+                        className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 transition"
+                      >
+                        <FiUser /> {t('profile')}
+                      </Link>
+
+                      <Link
+                        to="/dashboard/contacts"
+                        onClick={() => setProfileDropdownOpen(false)}
+                        className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 transition"
+                      >
+                        <FiPhone /> {t('emergencyContacts')}
+                      </Link>
+
+                      <Link
+                        to="/dashboard/sos-history"
+                        onClick={() => setProfileDropdownOpen(false)}
+                        className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 transition"
+                      >
+                        <FiClock /> {t('sosHistory')}
+                      </Link>
+
+                      <Link
+                        to="/dashboard/live-location"
+                        onClick={() => setProfileDropdownOpen(false)}
+                        className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 transition"
+                      >
+                        <FiMapPin /> {t('liveLocation')}
+                      </Link>
+
+                      <Link
+                        to="/dashboard/notifications"
+                        onClick={() => setProfileDropdownOpen(false)}
+                        className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 transition"
+                      >
+                        <FiBell /> {t('notifications')}
+                      </Link>
+
+                      <Link
+                        to="/dashboard/settings"
+                        onClick={() => setProfileDropdownOpen(false)}
+                        className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 transition"
+                      >
+                        <FiSettings /> {t('settings')}
+                      </Link>
+
+                      {isAdmin && (
+                        <Link
+                          to="/admin"
+                          onClick={() => setProfileDropdownOpen(false)}
+                          className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 transition"
+                        >
+                          <FiShield /> Admin Panel
+                        </Link>
+                      )}
+
+                      <button
+                        onClick={() => {
+                          setProfileDropdownOpen(false);
+                          logoutUser();
+                          navigate('/login');
+                        }}
+                        className="w-full flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md text-rose-600 hover:bg-rose-500/10 transition"
+                      >
+                        <FiLogOut /> {t('logout')}
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {/* Mobile Menu Hamburger */}
+                <button
+                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                  className="p-1.5 rounded-lg lg:hidden bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700"
+                >
+                  {mobileMenuOpen ? <FiX className="w-5 h-5" /> : <FiMenu className="w-5 h-5" />}
+                </button>
+              </>
+            ) : (
+              /* BEFORE LOGIN CONTROLS */
+              <div className="flex items-center gap-2">
+                <Link
+                  to="/login"
+                  className="px-3 py-1.5 text-xs font-semibold text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition"
+                >
+                  {t('signIn')}
+                </Link>
+                <Link
+                  to="/register"
+                  className="btn-solid text-xs py-1.5 px-3"
+                >
+                  {t('getStarted')}
+                </Link>
               </div>
-            </div>
-          ) : (
-            /* BEFORE LOGIN NAVBAR: DISPLAY LOGO, SIGN IN, GET STARTED & LANGUAGE SWITCHER */
-            <div className="flex items-center gap-2.5">
-              <LanguageToggle />
-              <ThemeToggle />
-              <Link
-                to="/login"
-                className="px-3.5 py-1.5 text-xs font-semibold text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition"
-              >
-                {t('signIn')}
-              </Link>
-              <Link
-                to="/register"
-                className="btn-solid"
-              >
-                {t('getStarted')}
-              </Link>
-            </div>
-          )}
-
-          {/* Mobile Hamburger (Only if logged in) */}
-          {user && (
-            <div className="flex items-center gap-2 sm:hidden">
-              <LanguageToggle />
-              <ThemeToggle />
-              <button
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="p-1.5 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700"
-              >
-                {mobileMenuOpen ? <FiX className="w-5 h-5" /> : <FiMenu className="w-5 h-5" />}
-              </button>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
 
