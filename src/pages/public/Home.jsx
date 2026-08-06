@@ -11,20 +11,20 @@ const Home = () => {
     <div className="space-y-12 pb-20">
       
       {/* Real-Time Security Telemetry Marquee Bar */}
-      <div className="bg-zinc-900 text-zinc-300 dark:bg-[#121215] dark:text-zinc-400 py-2 px-4 border-b border-zinc-800 text-xs font-mono">
+      <div className="bg-zinc-100 text-zinc-700 dark:bg-[#121215] dark:text-zinc-400 py-2 px-4 border-b border-zinc-200 dark:border-zinc-800 text-xs font-mono transition-colors">
         <div className="max-w-7xl mx-auto flex items-center justify-between overflow-x-auto gap-6 whitespace-nowrap">
           <div className="flex items-center gap-4">
-            <span className="flex items-center gap-2 text-emerald-400 font-semibold">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 telemetry-dot"></span> SYSTEM OPERATIONAL
+            <span className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-semibold">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 telemetry-dot"></span> SYSTEM OPERATIONAL
             </span>
-            <span className="text-zinc-600">|</span>
+            <span className="text-zinc-400 dark:text-zinc-600">|</span>
             <span>GPS: ACCURACY 99.8%</span>
-            <span className="text-zinc-600">|</span>
+            <span className="text-zinc-400 dark:text-zinc-600">|</span>
             <span>ENCRYPTION: AES-256</span>
           </div>
-          <div className="flex items-center gap-4 text-zinc-400">
+          <div className="flex items-center gap-4 text-zinc-500 dark:text-zinc-400">
             <span>NATIONAL DISPATCH: ACTIVE (999)</span>
-            <span className="text-zinc-600">|</span>
+            <span className="text-zinc-400 dark:text-zinc-600">|</span>
             <span>LATENCY: &lt;15ms</span>
           </div>
         </div>
@@ -73,15 +73,15 @@ const Home = () => {
             {/* Technical Specs Footer */}
             <div className="pt-6 border-t border-zinc-200 dark:border-zinc-800 grid grid-cols-3 gap-4 font-mono text-xs">
               <div>
-                <span className="block text-[10px] text-zinc-400 uppercase font-semibold">Response Time</span>
+                <span className="block text-[10px] text-zinc-500 dark:text-zinc-400 uppercase font-semibold">Response Time</span>
                 <span className="font-bold text-zinc-900 dark:text-zinc-100">&lt; 3.0 Seconds</span>
               </div>
               <div>
-                <span className="block text-[10px] text-zinc-400 uppercase font-semibold">Priority Contacts</span>
+                <span className="block text-[10px] text-zinc-500 dark:text-zinc-400 uppercase font-semibold">Priority Contacts</span>
                 <span className="font-bold text-zinc-900 dark:text-zinc-100">Up to 5 Persons</span>
               </div>
               <div>
-                <span className="block text-[10px] text-zinc-400 uppercase font-semibold">Dispatch Protocol</span>
+                <span className="block text-[10px] text-zinc-500 dark:text-zinc-400 uppercase font-semibold">Dispatch Protocol</span>
                 <span className="font-bold text-zinc-900 dark:text-zinc-100">SMS + Webhook</span>
               </div>
             </div>
@@ -92,12 +92,12 @@ const Home = () => {
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.1 }}
-            className="lg:col-span-4 product-card p-6 sm:p-8 flex flex-col justify-between text-center space-y-6 bg-zinc-950 text-white dark:bg-[#121215] border-zinc-800"
+            className="lg:col-span-4 product-card p-6 sm:p-8 flex flex-col justify-between text-center space-y-6 bg-white dark:bg-[#121215] border-zinc-200 dark:border-zinc-800"
           >
-            <div className="flex items-center justify-between border-b border-zinc-800 pb-3 text-left">
+            <div className="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 pb-3 text-left">
               <div>
-                <span className="text-[10px] font-mono uppercase tracking-widest text-zinc-400 font-semibold">PANIC BEACON</span>
-                <h3 className="text-xs font-bold text-white uppercase tracking-wider">SOS Distress Trigger</h3>
+                <span className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 dark:text-zinc-400 font-semibold">PANIC BEACON</span>
+                <h3 className="text-xs font-bold text-zinc-900 dark:text-white uppercase tracking-wider">SOS Distress Trigger</h3>
               </div>
               <span className="mono-tag mono-tag-emerald py-0.5 text-[10px]">
                 Active
@@ -108,11 +108,11 @@ const Home = () => {
               <SOSButton size="large" />
             </div>
 
-            <div className="p-3 rounded-lg bg-zinc-900 border border-zinc-800 text-[11px] font-mono text-zinc-400 flex items-center justify-between text-left">
-              <span className="flex items-center gap-1.5 text-rose-400">
+            <div className="p-3 rounded-lg bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-[11px] font-mono text-zinc-600 dark:text-zinc-400 flex items-center justify-between text-left">
+              <span className="flex items-center gap-1.5 text-rose-600 dark:text-rose-400 font-bold">
                 <FiMapPin /> GPS TELEMETRY
               </span>
-              <span className="text-zinc-300 font-semibold">23.8103° N, 90.4125° E</span>
+              <span className="text-zinc-800 dark:text-zinc-300 font-semibold">23.8103° N, 90.4125° E</span>
             </div>
           </motion.div>
 

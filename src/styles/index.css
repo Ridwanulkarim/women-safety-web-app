@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@variant dark (&:where(.dark, .dark *));
+
 @layer base {
   :root {
     --color-surface-light: #ffffff;
@@ -9,16 +11,16 @@
 
   /* Default Light Mode */
   body {
-    background-color: #fafafa;
-    color: #18181b;
+    background-color: #fafafa !important;
+    color: #18181b !important;
     font-family: system-ui, -apple-system, sans-serif;
     -webkit-font-smoothing: antialiased;
   }
 
   /* Tailwind Class-Based Dark Mode */
   .dark body {
-    background-color: #09090b;
-    color: #f4f4f5;
+    background-color: #09090b !important;
+    color: #f4f4f5 !important;
   }
 }
 
