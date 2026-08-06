@@ -6,6 +6,7 @@ import SOSButton from '../../components/sos/SOSButton';
 import LiveMap from '../../components/map/LiveMap';
 import { EMERGENCY_NUMBERS } from '../../utils/constants';
 import { useLanguage } from '../../context/LanguageContext';
+import LanguageToggle from '../../components/common/LanguageToggle';
 
 const Home = () => {
   const { t } = useLanguage();
@@ -26,6 +27,7 @@ const Home = () => {
             <span>{t('encryption')}</span>
           </div>
           <div className="flex items-center gap-4 text-zinc-500 dark:text-zinc-400">
+            <LanguageToggle />
             <span>{t('nationalDispatch')}</span>
             <span className="text-zinc-400 dark:text-zinc-600">|</span>
             <span>LATENCY: &lt;15ms</span>
