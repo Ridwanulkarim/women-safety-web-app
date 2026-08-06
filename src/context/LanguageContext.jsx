@@ -123,8 +123,6 @@ export const translations = {
   }
 };
 
-const LanguageContext = createContext();
-
 export const LanguageProvider = ({ children }) => {
   const [language, setLanguage] = useState(() => {
     const saved = localStorage.getItem('safehaven_lang');
