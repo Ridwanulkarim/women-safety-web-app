@@ -4,13 +4,13 @@ import { useForm } from 'react-hook-form';
 import { FiShield, FiLock, FiMail } from 'react-icons/fi';
 import { FcGoogle } from 'react-icons/fc';
 import { useAuth } from '../../context/AuthContext';
-import { useTranslation } from 'react-i18next';
+import { useLanguage } from '../../context/LanguageContext';
 
 const Login = () => {
   const { loginUser, loginWithGoogle } = useAuth();
   const { register, handleSubmit, formState: { errors } } = useForm();
   const [loading, setLoading] = useState(false);
-  const { t } = useTranslation();
+  const { t } = useLanguage();
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -23,7 +23,7 @@ const Login = () => {
       navigate(from, { replace: true });
     } catch (e) {
       // toast shown in context
-    } fontally {
+    } finally {
       setLoading(false);
     }
   };
