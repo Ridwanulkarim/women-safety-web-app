@@ -119,6 +119,49 @@ export const firestoreAdminService = {
     return mockDb.users.get(uid) || null;
   },
 
+  getUserByEmail: async (email) => {
+    if (!email) return null;
+    const cleanEmail = email.toLowerCase().trim();
+    try {
+      if (db) {
+        const snap = await db.collection('users').where('email', '==', cleanEmail).limit(1).get();
+        if (!snap.empty) return snap.docs[0].data();
+      }
+    } catch (e) {}
+    for (const u of mockDb.users.values()) {
+      if (u.email && u.email.toLowerCase() === cleanEmail) return u;
+    }
+    return null;
+  },
+
+  getUserByResetToken: async (token) => {
+    if (!token) return null;
+    try {
+      if (db) {
+        const snap = await db.collection('users').where('resetPasswordToken', '==', token).limit(1).get();
+        if (!snap.empty) return snap.docs[0].data();
+      }
+    } catch (e) {}
+    for (const u of mockDb.users.values()) {
+      if (u.resetPasswordToken === token) return u;
+    }
+    return null;
+  },
+
+  getUserByVerificationToken: async (token) => {
+    if (!token) return null;
+    try {
+      if (db) {
+        const snap = await db.collection('users').where('verificationToken', '==', token).limit(1).get();
+        if (!snap.empty) return snap.docs[0].data();
+      }
+    } catch (e) {}
+    for (const u of mockDb.users.values()) {
+      if (u.verificationToken === token) return u;
+    }
+    return null;
+  },
+
   getAllUsers: async () => {
     try {
       if (db) {

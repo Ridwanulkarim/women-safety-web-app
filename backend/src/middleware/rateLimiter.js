@@ -11,6 +11,17 @@ export const apiRateLimiter = rateLimit({
   }
 });
 
+export const authRateLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 10, // Strict limit for authentication endpoint per IP
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    message: 'Too many authentication attempts from this IP. Please try again after 15 minutes.'
+  }
+});
+
 export const sosRateLimiter = rateLimit({
   windowMs: 1 * 60 * 1000, // 1 minute
   max: 10, // Allow max 10 SOS distress triggers per minute to prevent flooding

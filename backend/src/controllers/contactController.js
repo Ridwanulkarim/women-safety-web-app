@@ -16,7 +16,18 @@ export const addContact = async (req, res, next) => {
     if (contacts.length >= 5) {
       return errorResponse(res, 400, 'Maximum limit of 5 emergency contacts reached');
     }
-    const newContact = await firestoreAdminService.addContact(req.user.uid, req.body);
+
+    // Security Hardening: Enforce server-side userId binding; ignore any client-supplied userId
+    const contactPayload = {
+      name: req.body.name,
+      phone: req.body.phone,
+      email: req.body.email || '',
+      relationship: req.body.relationship || 'Emergency Contact',
+      isPrimary: req.body.isPrimary || false,
+      userId: req.user.uid
+    };
+
+    const newContact = await firestoreAdminService.addContact(req.user.uid, contactPayload);
     return successResponse(res, 201, 'Emergency contact added', newContact);
   } catch (error) {
     next(error);
@@ -25,7 +36,17 @@ export const addContact = async (req, res, next) => {
 
 export const deleteContact = async (req, res, next) => {
   try {
-    await firestoreAdminService.deleteContact(req.params.id);
+    const contactId = req.params.id;
+
+    // Security Hardening: IDOR protection on contact deletion
+    const userContacts = await firestoreAdminService.getUserContacts(req.user.uid);
+    const existing = userContacts.find(c => c.id === contactId);
+
+    if (!existing && req.user.role !== 'admin') {
+      return errorResponse(res, 404, 'Emergency contact not found or access denied');
+    }
+
+    await firestoreAdminService.deleteContact(contactId);
     return successResponse(res, 200, 'Contact deleted successfully');
   } catch (error) {
     next(error);

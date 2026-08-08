@@ -113,7 +113,13 @@ export const sendSOSOutboundAlert = async (contact, alertData) => {
     return { smsSent, emailSent };
   }
 
-  // Fallback: If no external SMS/Email API keys are set in dev environment, log delivery attempt
-  logger.warn(`No Twilio/Resend API keys configured. Simulating outbound notification to ${contact.name} (${contact.phone || contact.email || 'N/A'}). Alert Message: ${smsText}`);
+  // Production Safety Enforcement: Fail fast if running in production without outbound provider keys
+  if (process.env.NODE_ENV === 'production') {
+    logger.error('CRITICAL PRODUCTION CONFIGURATION ERROR: No Twilio, Resend, or SendGrid API keys configured for emergency outbound notifications.');
+    throw new Error('Emergency outbound alert delivery failed: Notification provider keys missing in production.');
+  }
+
+  // Development Fallback: Log simulation in non-production environments
+  logger.warn(`[DEV SIMULATION] No Twilio/Resend API keys configured. Simulating outbound notification to ${contact.name} (${contact.phone || contact.email || 'N/A'}). Alert Message: ${smsText}`);
   return { smsSent: true, emailSent: false, simulated: true };
 };
