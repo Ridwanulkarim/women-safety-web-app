@@ -11,6 +11,7 @@ import { SOSProvider } from './context/SOSContext';
 import { LanguageProvider } from './context/LanguageContext';
 import ErrorBoundary from './components/common/ErrorBoundary';
 
+import 'leaflet/dist/leaflet.css';
 import './styles/index.css';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
