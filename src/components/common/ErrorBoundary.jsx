@@ -19,7 +19,7 @@ class ErrorBoundary extends Component {
     if (this.state.hasError) {
       return (
         <div className="min-h-screen flex items-center justify-center p-6 bg-slate-900 text-white">
-          <div className="max-w-md w-full glass-card p-8 rounded-3xl text-center space-y-6">
+          <div className="max-w-lg w-full glass-card p-8 rounded-3xl text-center space-y-6">
             <div className="w-16 h-16 mx-auto bg-pink-500/20 text-pink-500 rounded-full flex items-center justify-center text-3xl">
               <FiAlertTriangle />
             </div>
@@ -27,9 +27,19 @@ class ErrorBoundary extends Component {
             <p className="text-sm text-slate-400">
               An unexpected interface error occurred. Don't worry, your safety features remain operational.
             </p>
+
+            {this.state.error && (
+              <div className="text-left bg-black/50 p-4 rounded-xl text-xs font-mono text-rose-300 overflow-auto max-h-36 border border-rose-500/20">
+                {this.state.error.toString()}
+              </div>
+            )}
+
             <button
-              onClick={() => window.location.reload()}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-pink-600 hover:bg-pink-700 rounded-xl font-semibold transition"
+              onClick={() => {
+                this.setState({ hasError: false, error: null });
+                window.location.reload();
+              }}
+              className="inline-flex items-center gap-2 px-6 py-3 bg-pink-600 hover:bg-pink-700 rounded-xl font-semibold transition text-white"
             >
               <FiRefreshCw /> Reload Application
             </button>

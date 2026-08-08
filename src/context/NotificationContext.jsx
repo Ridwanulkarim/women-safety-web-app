@@ -21,7 +21,7 @@ export const NotificationProvider = ({ children }) => {
     if (!user) return;
     try {
       const res = await api.get('/notifications');
-      if (res.data?.data) {
+      if (Array.isArray(res.data?.data)) {
         setNotifications(res.data.data);
       }
     } catch (error) {
@@ -38,20 +38,20 @@ export const NotificationProvider = ({ children }) => {
       await api.patch(`/notifications/${id}/read`);
     } catch (e) {}
     setNotifications(prev =>
-      prev.map(n => n.id === id ? { ...n, isRead: true } : n)
+      (Array.isArray(prev) ? prev : []).map(n => n.id === id ? { ...n, isRead: true } : n)
     );
   };
 
   const deleteNotification = (id) => {
-    setNotifications(prev => prev.filter(n => n.id !== id));
+    setNotifications(prev => (Array.isArray(prev) ? prev : []).filter(n => n.id !== id));
   };
 
-  const unreadCount = notifications.filter(n => !n.isRead).length;
+  const unreadCount = (Array.isArray(notifications) ? notifications : []).filter(n => !n?.isRead).length;
 
   return (
     <NotificationContext.Provider
       value={{
-        notifications,
+        notifications: Array.isArray(notifications) ? notifications : [],
         unreadCount,
         markAsRead,
         deleteNotification,
