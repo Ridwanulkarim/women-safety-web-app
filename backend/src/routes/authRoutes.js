@@ -8,12 +8,13 @@ import { validateRequest } from '../middleware/validateMiddleware.js';
 import { verifyAuth } from '../middleware/authMiddleware.js';
 import { requireAdmin } from '../middleware/adminMiddleware.js';
 import { authRateLimiter } from '../middleware/rateLimiter.js';
+import { verifyCaptcha } from '../middleware/captchaMiddleware.js';
 
 const router = express.Router();
 
-router.post('/register', authRateLimiter, registerValidation, validateRequest, register);
-router.post('/login', authRateLimiter, loginValidation, validateRequest, login);
-router.post('/forgot-password', authRateLimiter, forgotPassword);
+router.post('/register', authRateLimiter, verifyCaptcha, registerValidation, validateRequest, register);
+router.post('/login', authRateLimiter, verifyCaptcha, loginValidation, validateRequest, login);
+router.post('/forgot-password', authRateLimiter, verifyCaptcha, forgotPassword);
 router.post('/reset-password', authRateLimiter, resetPassword);
 router.post('/verify-email', authRateLimiter, verifyEmail);
 

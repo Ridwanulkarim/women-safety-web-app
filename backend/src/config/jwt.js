@@ -15,7 +15,17 @@ if (!JWT_SECRET) {
 const JWT_EXPIRES_IN = '7d';
 
 export const generateToken = (payload) => {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
+  return jwt.sign(
+    {
+      uid: payload.uid,
+      email: payload.email,
+      role: payload.role,
+      fullName: payload.fullName,
+      tokenVersion: payload.tokenVersion || 1
+    },
+    JWT_SECRET,
+    { expiresIn: JWT_EXPIRES_IN }
+  );
 };
 
 export const verifyToken = (token) => {

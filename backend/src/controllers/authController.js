@@ -30,7 +30,6 @@ const generateTotpCode = (secret, timeStep = Math.floor(Date.now() / 1000 / 30))
 const verifyTotpCode = (secret, code) => {
   if (!secret || !code) return false;
   const currentStep = Math.floor(Date.now() / 1000 / 30);
-  // Allow a 1-step window before and after for clock drift tolerance
   for (let step = currentStep - 1; step <= currentStep + 1; step++) {
     if (generateTotpCode(secret, step) === code.toString().trim()) {
       return true;
@@ -79,7 +78,8 @@ export const register = async (req, res, next) => {
       isVerified: false,
       verificationToken,
       verificationTokenExpires,
-      isTwoFactorEnabled: false
+      isTwoFactorEnabled: false,
+      tokenVersion: 1
     });
 
     // Outbound Verification Email Dispatch
@@ -99,14 +99,15 @@ export const register = async (req, res, next) => {
       htmlContent: emailHtml
     });
 
-    // Sanitize user object for response — DO NOT leak verificationToken in HTTP body
+    // Sanitize user object — DO NOT leak verificationToken in HTTP body
     const { passwordHash: _, verificationToken: __, verificationTokenExpires: ___, ...sanitizedUser } = user;
 
     const token = generateToken({
       uid: sanitizedUser.uid,
       email: sanitizedUser.email,
       role: sanitizedUser.role,
-      fullName: sanitizedUser.fullName
+      fullName: sanitizedUser.fullName,
+      tokenVersion: sanitizedUser.tokenVersion || 1
     });
 
     return successResponse(res, 201, 'Registration successful! Verification email has been sent.', {
@@ -144,7 +145,8 @@ export const login = async (req, res, next) => {
             email: decodedToken.email.toLowerCase().trim(),
             fullName: decodedToken.name || decodedToken.email.split('@')[0],
             role: 'user',
-            isVerified: true
+            isVerified: true,
+            tokenVersion: 1
           });
         }
       } catch (err) {
@@ -169,7 +171,7 @@ export const login = async (req, res, next) => {
       }
     }
 
-    // Two-Factor Authentication (2FA) Check
+    // Two-Factor Authentication (2FA) & Single-Use Backup Recovery Code Check
     if (user.isTwoFactorEnabled) {
       if (!twoFactorCode) {
         return res.status(401).json({
@@ -179,10 +181,33 @@ export const login = async (req, res, next) => {
         });
       }
 
-      const is2faValid = verifyTotpCode(user.twoFactorSecret, twoFactorCode);
+      let is2faValid = verifyTotpCode(user.twoFactorSecret, twoFactorCode);
+
+      // Backup recovery code fallback
+      if (!is2faValid && Array.isArray(user.twoFactorBackupCodes)) {
+        const matchIndex = user.twoFactorBackupCodes.findIndex(
+          b => !b.used && b.code === twoFactorCode.trim().toLowerCase()
+        );
+
+        if (matchIndex !== -1) {
+          is2faValid = true;
+          user.twoFactorBackupCodes[matchIndex].used = true;
+          user.twoFactorBackupCodes[matchIndex].usedAt = new Date().toISOString();
+          await firestoreAdminService.updateUser(user.uid, { twoFactorBackupCodes: user.twoFactorBackupCodes });
+
+          await firestoreAdminService.createAuditLog({
+            performedByUid: user.uid,
+            performedByName: user.fullName || user.email,
+            action: '2FA_BACKUP_CODE_USED',
+            targetId: user.uid,
+            details: { remainingBackupCodes: user.twoFactorBackupCodes.filter(b => !b.used).length }
+          });
+        }
+      }
+
       if (!is2faValid) {
         await firestoreAdminService.recordFailedLogin(user.email);
-        return errorResponse(res, 401, 'Invalid Two-Factor Authentication code');
+        return errorResponse(res, 401, 'Invalid Two-Factor Authentication or Backup Recovery code');
       }
     }
 
@@ -194,13 +219,14 @@ export const login = async (req, res, next) => {
     await firestoreAdminService.clearAccountLockout(user.email);
     await firestoreAdminService.updateUser(user.uid, { lastLogin: new Date().toISOString() });
 
-    const { passwordHash: _, resetPasswordToken: __, verificationToken: ___, twoFactorSecret: ____, ...sanitizedUser } = user;
+    const { passwordHash: _, resetPasswordToken: __, verificationToken: ___, twoFactorSecret: ____, twoFactorBackupCodes: _____, ...sanitizedUser } = user;
 
     const token = generateToken({
       uid: sanitizedUser.uid,
       email: sanitizedUser.email,
       role: sanitizedUser.role,
-      fullName: sanitizedUser.fullName
+      fullName: sanitizedUser.fullName,
+      tokenVersion: sanitizedUser.tokenVersion || 1
     });
 
     return successResponse(res, 200, 'Login successful', { user: sanitizedUser, token });
@@ -231,7 +257,7 @@ export const verifyEmail = async (req, res, next) => {
       verificationTokenExpires: null
     });
 
-    const { passwordHash: _, twoFactorSecret: __, ...sanitizedUser } = updatedUser;
+    const { passwordHash: _, twoFactorSecret: __, twoFactorBackupCodes: ___, ...sanitizedUser } = updatedUser;
     return successResponse(res, 200, 'Email address verified successfully!', sanitizedUser);
   } catch (error) {
     next(error);
@@ -299,16 +325,25 @@ export const resetPassword = async (req, res, next) => {
 
     const salt = await bcrypt.genSalt(10);
     const passwordHash = await bcrypt.hash(newPassword, salt);
+    const newTokenVersion = (user.tokenVersion || 1) + 1; // Revoke all active sessions on password reset
 
     await firestoreAdminService.updateUser(user.uid, {
       passwordHash,
       resetPasswordToken: null,
-      resetPasswordExpires: null
+      resetPasswordExpires: null,
+      tokenVersion: newTokenVersion
     });
 
     await firestoreAdminService.clearAccountLockout(user.email);
 
-    return successResponse(res, 200, 'Password has been reset successfully! You can now log in with your new password.');
+    await firestoreAdminService.createAuditLog({
+      performedByUid: user.uid,
+      performedByName: user.fullName || user.email,
+      action: 'PASSWORD_RESET_SUCCESS',
+      targetId: user.uid
+    });
+
+    return successResponse(res, 200, 'Password has been reset successfully! All active sessions have been revoked.');
   } catch (error) {
     next(error);
   }
@@ -323,6 +358,13 @@ export const generateTwoFactorSecret = async (req, res, next) => {
     await firestoreAdminService.updateUser(req.user.uid, { twoFactorTempSecret: secretHex });
 
     const otpauthUrl = `otpauth://totp/SafeHaven:${encodeURIComponent(req.user.email)}?secret=${secretHex}&issuer=SafeHaven`;
+
+    await firestoreAdminService.createAuditLog({
+      performedByUid: req.user.uid,
+      performedByName: req.user.fullName || req.user.email,
+      action: '2FA_GENERATE',
+      targetId: req.user.uid
+    });
 
     return successResponse(res, 200, '2FA secret generated. Scan QR or enter secret into your authenticator app.', {
       secret: secretHex,
@@ -347,13 +389,34 @@ export const enableTwoFactor = async (req, res, next) => {
       return errorResponse(res, 400, 'Invalid 2FA verification code');
     }
 
+    // Generate 8 single-use backup recovery codes
+    const plainBackupCodes = Array.from({ length: 8 }, () => crypto.randomBytes(4).toString('hex'));
+    const backupCodeObjects = plainBackupCodes.map(code => ({
+      code,
+      used: false,
+      createdAt: new Date().toISOString()
+    }));
+
+    const newTokenVersion = (user.tokenVersion || 1) + 1; // Revoke old sessions
+
     await firestoreAdminService.updateUser(req.user.uid, {
       isTwoFactorEnabled: true,
       twoFactorSecret: user.twoFactorTempSecret,
-      twoFactorTempSecret: null
+      twoFactorTempSecret: null,
+      twoFactorBackupCodes: backupCodeObjects,
+      tokenVersion: newTokenVersion
     });
 
-    return successResponse(res, 200, 'Two-Factor Authentication (2FA) successfully enabled!');
+    await firestoreAdminService.createAuditLog({
+      performedByUid: req.user.uid,
+      performedByName: req.user.fullName || req.user.email,
+      action: '2FA_ENABLE',
+      targetId: req.user.uid
+    });
+
+    return successResponse(res, 200, 'Two-Factor Authentication (2FA) successfully enabled!', {
+      backupCodes: plainBackupCodes
+    });
   } catch (error) {
     next(error);
   }
@@ -373,9 +436,20 @@ export const disableTwoFactor = async (req, res, next) => {
       return errorResponse(res, 400, 'Invalid 2FA verification code');
     }
 
+    const newTokenVersion = (user.tokenVersion || 1) + 1;
+
     await firestoreAdminService.updateUser(req.user.uid, {
       isTwoFactorEnabled: false,
-      twoFactorSecret: null
+      twoFactorSecret: null,
+      twoFactorBackupCodes: null,
+      tokenVersion: newTokenVersion
+    });
+
+    await firestoreAdminService.createAuditLog({
+      performedByUid: req.user.uid,
+      performedByName: req.user.fullName || req.user.email,
+      action: '2FA_DISABLE',
+      targetId: req.user.uid
     });
 
     return successResponse(res, 200, 'Two-Factor Authentication (2FA) disabled.');
@@ -399,7 +473,7 @@ export const getMe = async (req, res, next) => {
     if (!user) {
       return errorResponse(res, 404, 'User profile not found');
     }
-    const { passwordHash: _, resetPasswordToken: __, verificationToken: ___, twoFactorSecret: ____, ...sanitizedUser } = user;
+    const { passwordHash: _, resetPasswordToken: __, verificationToken: ___, twoFactorSecret: ____, twoFactorBackupCodes: _____, ...sanitizedUser } = user;
     return successResponse(res, 200, 'Profile retrieved', sanitizedUser);
   } catch (error) {
     next(error);

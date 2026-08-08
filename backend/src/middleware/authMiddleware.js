@@ -1,5 +1,6 @@
 import { auth, db } from '../config/firebaseAdmin.js';
 import { verifyToken } from '../config/jwt.js';
+import { firestoreAdminService } from '../services/firestoreAdminService.js';
 import { errorResponse } from '../utils/apiResponse.js';
 import { logger } from '../utils/logger.js';
 
@@ -15,7 +16,26 @@ export const verifyAuth = async (req, res, next) => {
     // 1. Try custom JWT verification first
     const decodedJwt = verifyToken(token);
     if (decodedJwt) {
-      req.user = decodedJwt;
+      const user = await firestoreAdminService.getUserByUid(decodedJwt.uid);
+      if (!user) {
+        return errorResponse(res, 401, 'Unauthorized: User account does not exist');
+      }
+      if (user.status === 'suspended') {
+        return errorResponse(res, 403, 'Account has been suspended. Please contact support.');
+      }
+
+      // Session Revocation Check via tokenVersion
+      const currentTokenVersion = user.tokenVersion || 1;
+      const tokenVersionInJwt = decodedJwt.tokenVersion || 1;
+      if (tokenVersionInJwt < currentTokenVersion) {
+        return errorResponse(res, 401, 'Session expired or revoked. Please log in again.');
+      }
+
+      req.user = {
+        ...user,
+        role: user.role || decodedJwt.role || 'user',
+        uid: user.uid || decodedJwt.uid
+      };
       return next();
     }
 
