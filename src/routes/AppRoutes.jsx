@@ -21,6 +21,8 @@ import Contact from '../pages/public/Contact';
 import Login from '../pages/public/Login';
 import Register from '../pages/public/Register';
 import ForgotPassword from '../pages/public/ForgotPassword';
+import ResetPassword from '../pages/public/ResetPassword';
+import VerifyEmail from '../pages/public/VerifyEmail';
 import NotFound from '../pages/public/NotFound';
 
 // User Dashboard Pages
