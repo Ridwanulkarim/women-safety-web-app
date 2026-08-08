@@ -4,11 +4,11 @@ import { FiClock, FiUser, FiArrowRight } from 'react-icons/fi';
 import api from '../../services/api';
 import { formatDate, truncateText } from '../../utils/helpers';
 import { BLOG_POSTS } from '../../data/blogData';
-import { useTranslation } from 'react-i18next';
+import { useLanguage } from '../../context/LanguageContext';
 
 const Blog = () => {
   const [blogs, setBlogs] = useState(BLOG_POSTS);
-  const { t } = useTranslation();
+  const { t } = useLanguage();
 
   useEffect(() => {
     const fetchBlogs = async () => {
