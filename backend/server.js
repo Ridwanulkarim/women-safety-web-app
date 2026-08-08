@@ -7,6 +7,7 @@ import cookieParser from 'cookie-parser';
 import corsMiddleware from './src/config/corsConfig.js';
 import { apiRateLimiter } from './src/middleware/rateLimiter.js';
 import { errorHandler } from './src/middleware/errorHandler.js';
+import { checkNotificationConfig } from './src/services/notificationService.js';
 
 import authRoutes from './src/routes/authRoutes.js';
 import userRoutes from './src/routes/userRoutes.js';
@@ -24,6 +25,9 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5001;
+
+// Run startup configuration audit for notification providers
+checkNotificationConfig();
 
 // Security & Parsing Middlewares
 app.use(helmet());

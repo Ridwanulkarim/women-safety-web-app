@@ -3,85 +3,104 @@ import bcrypt from 'bcryptjs';
 import { generateToken } from '../config/jwt.js';
 import { firestoreAdminService } from '../services/firestoreAdminService.js';
 import { successResponse, errorResponse } from '../utils/apiResponse.js';
+import { sendTransactionalEmail } from '../services/notificationService.js';
 import { auth } from '../config/firebaseAdmin.js';
 import { logger } from '../utils/logger.js';
 
-// Per-account brute-force lockout tracking
-const failedLoginAttempts = new Map(); // email -> { count, lockUntil }
-const MAX_FAILED_ATTEMPTS = 5;
-const LOCK_TIME_MS = 15 * 60 * 1000; // 15 minutes lockout
-
-const checkAccountLockout = (email) => {
-  if (!email) return null;
-  const key = email.toLowerCase().trim();
-  const record = failedLoginAttempts.get(key);
-  if (record) {
-    if (record.lockUntil && Date.now() < record.lockUntil) {
-      const remainingSecs = Math.ceil((record.lockUntil - Date.now()) / 1000);
-      return `Account is temporarily locked due to repeated failed login attempts. Try again in ${remainingSecs} seconds.`;
-    }
-    if (record.lockUntil && Date.now() >= record.lockUntil) {
-      failedLoginAttempts.delete(key);
-    }
+/**
+ * TOTP Helper (HMAC-SHA1 RFC 6238 implementation)
+ */
+const generateTotpCode = (secret, timeStep = Math.floor(Date.now() / 1000 / 30)) => {
+  const key = Buffer.from(secret, 'hex');
+  const buffer = Buffer.alloc(8);
+  let tmp = timeStep;
+  for (let i = 7; i >= 0; i--) {
+    buffer[i] = tmp & 0xff;
+    tmp = tmp >> 8;
   }
-  return null;
+  const hmac = crypto.createHmac('sha1', key).update(buffer).digest();
+  const offset = hmac[hmac.length - 1] & 0xf;
+  const code = ((hmac[offset] & 0x7f) << 24) |
+               ((hmac[offset + 1] & 0xff) << 16) |
+               ((hmac[offset + 2] & 0xff) << 8) |
+               (hmac[offset + 3] & 0xff);
+  return (code % 1000000).toString().padStart(6, '0');
 };
 
-const recordFailedAttempt = (email) => {
-  if (!email) return;
-  const key = email.toLowerCase().trim();
-  const record = failedLoginAttempts.get(key) || { count: 0, lockUntil: null };
-  record.count += 1;
-  if (record.count >= MAX_FAILED_ATTEMPTS) {
-    record.lockUntil = Date.now() + LOCK_TIME_MS;
-    logger.warn(`[SECURITY LOCKOUT] Account ${key} locked for 15 minutes after ${MAX_FAILED_ATTEMPTS} failed attempts.`);
+const verifyTotpCode = (secret, code) => {
+  if (!secret || !code) return false;
+  const currentStep = Math.floor(Date.now() / 1000 / 30);
+  // Allow a 1-step window before and after for clock drift tolerance
+  for (let step = currentStep - 1; step <= currentStep + 1; step++) {
+    if (generateTotpCode(secret, step) === code.toString().trim()) {
+      return true;
+    }
   }
-  failedLoginAttempts.set(key, record);
-};
-
-const resetFailedAttempts = (email) => {
-  if (!email) return;
-  failedLoginAttempts.delete(email.toLowerCase().trim());
+  return false;
 };
 
 export const register = async (req, res, next) => {
   try {
-    const { uid, email, password, fullName, phone } = req.body;
+    const { uid, email, password, fullName, phone, honeypot, website } = req.body;
 
-    if (!password || password.length < 6) {
-      return errorResponse(res, 400, 'Password is required and must be at least 6 characters long');
+    // Bot Protection / Honeypot Enforcement
+    if (honeypot || website) {
+      logger.warn(`Bot registration attempt rejected for email: ${email}`);
+      return errorResponse(res, 400, 'Invalid registration payload');
     }
 
-    // Direct indexed query by email (No collection scan)
-    const existingUser = await firestoreAdminService.getUserByEmail(email);
-    if (existingUser) {
+    if (!email || !password || password.length < 6) {
+      return errorResponse(res, 400, 'Email and password (min 6 chars) are required');
+    }
+
+    const cleanEmail = email.toLowerCase().trim();
+    const userId = uid || 'user_' + Date.now();
+
+    // Atomic Database-Level Email Claim (Prevents TOCTOU Race Condition)
+    try {
+      await firestoreAdminService.claimEmailAtomic(cleanEmail, userId);
+    } catch (err) {
       return errorResponse(res, 400, 'A user with this email address already exists');
     }
 
     const salt = await bcrypt.genSalt(10);
     const passwordHash = await bcrypt.hash(password, salt);
-    const userId = uid || 'user_' + Date.now();
 
-    // Generate cryptographic email verification token
     const verificationToken = crypto.randomBytes(32).toString('hex');
     const verificationTokenExpires = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
 
-    // Security Hardening: Force role to 'user' and isVerified to false upon initial registration
     const user = await firestoreAdminService.createUser({
       uid: userId,
-      email: email.toLowerCase().trim(),
+      email: cleanEmail,
       passwordHash,
-      fullName: fullName || email.split('@')[0],
+      fullName: fullName || cleanEmail.split('@')[0],
       phone: phone || '',
       role: 'user',
       isVerified: false,
       verificationToken,
-      verificationTokenExpires
+      verificationTokenExpires,
+      isTwoFactorEnabled: false
     });
 
-    logger.info(`Verification email dispatched to ${user.email} with token: ${verificationToken}`);
+    // Outbound Verification Email Dispatch
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+    const verifyLink = `${frontendUrl}/verify-email?token=${verificationToken}`;
+    const emailHtml = `
+      <div style="font-family: sans-serif; padding: 20px; background: #09090b; color: #fff;">
+        <h2 style="color: #e11d48;">Welcome to SafeHaven</h2>
+        <p>Please click the button below to verify your email address:</p>
+        <p><a href="${verifyLink}" style="background: #e11d48; color: white; padding: 10px 20px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">Verify Email Address</a></p>
+      </div>
+    `;
 
-    const { passwordHash: _, verificationToken: __, ...sanitizedUser } = user;
+    await sendTransactionalEmail({
+      to: cleanEmail,
+      subject: 'Verify Your SafeHaven Account',
+      htmlContent: emailHtml
+    });
+
+    // Sanitize user object for response — DO NOT leak verificationToken in HTTP body
+    const { passwordHash: _, verificationToken: __, verificationTokenExpires: ___, ...sanitizedUser } = user;
 
     const token = generateToken({
       uid: sanitizedUser.uid,
@@ -90,10 +109,9 @@ export const register = async (req, res, next) => {
       fullName: sanitizedUser.fullName
     });
 
-    return successResponse(res, 201, 'Registration successful! Verification email dispatched.', {
+    return successResponse(res, 201, 'Registration successful! Verification email has been sent.', {
       user: sanitizedUser,
-      token,
-      verificationToken // Included for development/testing ease
+      token
     });
   } catch (error) {
     next(error);
@@ -102,19 +120,19 @@ export const register = async (req, res, next) => {
 
 export const login = async (req, res, next) => {
   try {
-    const { email, password, idToken } = req.body;
+    const { email, password, idToken, twoFactorCode } = req.body;
 
-    // Check for account lockout before processing
+    // Persistent Firestore Lockout Check
     if (email) {
-      const lockoutMsg = checkAccountLockout(email);
-      if (lockoutMsg) {
-        return errorResponse(res, 429, lockoutMsg);
+      const lockout = await firestoreAdminService.getAccountLockout(email);
+      if (lockout && lockout.lockUntil && new Date() < new Date(lockout.lockUntil)) {
+        const remainingSecs = Math.ceil((new Date(lockout.lockUntil) - new Date()) / 1000);
+        return errorResponse(res, 429, `Account is temporarily locked due to repeated failed login attempts. Try again in ${remainingSecs} seconds.`);
       }
     }
 
     let user = null;
 
-    // Firebase Auth ID Token authentication path
     if (idToken && auth) {
       try {
         const decodedToken = await auth.verifyIdToken(idToken);
@@ -133,23 +151,38 @@ export const login = async (req, res, next) => {
         return errorResponse(res, 401, 'Invalid Firebase Auth token');
       }
     } else {
-      // Custom Email + Password authentication path
       if (!email || !password) {
         return errorResponse(res, 400, 'Email and password are required');
       }
 
-      // Direct indexed query by email
       user = await firestoreAdminService.getUserByEmail(email);
 
       if (!user || !user.passwordHash) {
-        recordFailedAttempt(email);
+        await firestoreAdminService.recordFailedLogin(email);
         return errorResponse(res, 401, 'Invalid credentials');
       }
 
       const isMatch = await bcrypt.compare(password, user.passwordHash);
       if (!isMatch) {
-        recordFailedAttempt(email);
+        await firestoreAdminService.recordFailedLogin(email);
         return errorResponse(res, 401, 'Invalid credentials');
+      }
+    }
+
+    // Two-Factor Authentication (2FA) Check
+    if (user.isTwoFactorEnabled) {
+      if (!twoFactorCode) {
+        return res.status(401).json({
+          success: false,
+          requiresTwoFactor: true,
+          message: 'Two-Factor Authentication (2FA) code is required'
+        });
+      }
+
+      const is2faValid = verifyTotpCode(user.twoFactorSecret, twoFactorCode);
+      if (!is2faValid) {
+        await firestoreAdminService.recordFailedLogin(user.email);
+        return errorResponse(res, 401, 'Invalid Two-Factor Authentication code');
       }
     }
 
@@ -157,13 +190,11 @@ export const login = async (req, res, next) => {
       return errorResponse(res, 403, 'Account has been suspended. Please contact support.');
     }
 
-    // Reset failed login attempts on success
-    resetFailedAttempts(user.email);
-
-    // Update lastLogin timestamp
+    // Clear failed login attempts on clean login
+    await firestoreAdminService.clearAccountLockout(user.email);
     await firestoreAdminService.updateUser(user.uid, { lastLogin: new Date().toISOString() });
 
-    const { passwordHash: _, resetPasswordToken: __, verificationToken: ___, ...sanitizedUser } = user;
+    const { passwordHash: _, resetPasswordToken: __, verificationToken: ___, twoFactorSecret: ____, ...sanitizedUser } = user;
 
     const token = generateToken({
       uid: sanitizedUser.uid,
@@ -200,7 +231,7 @@ export const verifyEmail = async (req, res, next) => {
       verificationTokenExpires: null
     });
 
-    const { passwordHash: _, ...sanitizedUser } = updatedUser;
+    const { passwordHash: _, twoFactorSecret: __, ...sanitizedUser } = updatedUser;
     return successResponse(res, 200, 'Email address verified successfully!', sanitizedUser);
   } catch (error) {
     next(error);
@@ -215,19 +246,32 @@ export const forgotPassword = async (req, res, next) => {
     }
 
     const user = await firestoreAdminService.getUserByEmail(email);
-    // Generic response to prevent user enumeration
-    const genericResponseMsg = 'If an account with that email exists, a password reset link has been dispatched.';
+    const genericResponseMsg = 'If an account with that email exists, a password reset link has been sent.';
 
     if (user && user.passwordHash) {
       const resetToken = crypto.randomBytes(32).toString('hex');
-      const resetExpires = new Date(Date.now() + 60 * 60 * 1000).toISOString(); // 1 hour
+      const resetExpires = new Date(Date.now() + 60 * 60 * 1000).toISOString();
 
       await firestoreAdminService.updateUser(user.uid, {
         resetPasswordToken: resetToken,
         resetPasswordExpires: resetExpires
       });
 
-      logger.info(`Password reset token generated for ${user.email}: ${resetToken}`);
+      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+      const resetLink = `${frontendUrl}/reset-password?token=${resetToken}`;
+      const emailHtml = `
+        <div style="font-family: sans-serif; padding: 20px; background: #09090b; color: #fff;">
+          <h2 style="color: #e11d48;">SafeHaven Password Reset</h2>
+          <p>Click the link below to reset your account password (expires in 1 hour):</p>
+          <p><a href="${resetLink}" style="background: #e11d48; color: white; padding: 10px 20px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">Reset Password</a></p>
+        </div>
+      `;
+
+      await sendTransactionalEmail({
+        to: user.email,
+        subject: 'Reset Your SafeHaven Password',
+        htmlContent: emailHtml
+      });
     }
 
     return successResponse(res, 200, genericResponseMsg);
@@ -262,10 +306,88 @@ export const resetPassword = async (req, res, next) => {
       resetPasswordExpires: null
     });
 
-    // Reset lockout counters for this account
-    resetFailedAttempts(user.email);
+    await firestoreAdminService.clearAccountLockout(user.email);
 
     return successResponse(res, 200, 'Password has been reset successfully! You can now log in with your new password.');
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * 2FA (Two-Factor Authentication) Handlers
+ */
+export const generateTwoFactorSecret = async (req, res, next) => {
+  try {
+    const secretHex = crypto.randomBytes(20).toString('hex');
+    await firestoreAdminService.updateUser(req.user.uid, { twoFactorTempSecret: secretHex });
+
+    const otpauthUrl = `otpauth://totp/SafeHaven:${encodeURIComponent(req.user.email)}?secret=${secretHex}&issuer=SafeHaven`;
+
+    return successResponse(res, 200, '2FA secret generated. Scan QR or enter secret into your authenticator app.', {
+      secret: secretHex,
+      otpauthUrl
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const enableTwoFactor = async (req, res, next) => {
+  try {
+    const { twoFactorCode } = req.body;
+    const user = await firestoreAdminService.getUserByUid(req.user.uid);
+
+    if (!user || !user.twoFactorTempSecret) {
+      return errorResponse(res, 400, 'Please generate 2FA secret first');
+    }
+
+    const isValid = verifyTotpCode(user.twoFactorTempSecret, twoFactorCode);
+    if (!isValid) {
+      return errorResponse(res, 400, 'Invalid 2FA verification code');
+    }
+
+    await firestoreAdminService.updateUser(req.user.uid, {
+      isTwoFactorEnabled: true,
+      twoFactorSecret: user.twoFactorTempSecret,
+      twoFactorTempSecret: null
+    });
+
+    return successResponse(res, 200, 'Two-Factor Authentication (2FA) successfully enabled!');
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const disableTwoFactor = async (req, res, next) => {
+  try {
+    const { twoFactorCode } = req.body;
+    const user = await firestoreAdminService.getUserByUid(req.user.uid);
+
+    if (!user || !user.isTwoFactorEnabled) {
+      return errorResponse(res, 400, '2FA is not enabled on this account');
+    }
+
+    const isValid = verifyTotpCode(user.twoFactorSecret, twoFactorCode);
+    if (!isValid) {
+      return errorResponse(res, 400, 'Invalid 2FA verification code');
+    }
+
+    await firestoreAdminService.updateUser(req.user.uid, {
+      isTwoFactorEnabled: false,
+      twoFactorSecret: null
+    });
+
+    return successResponse(res, 200, 'Two-Factor Authentication (2FA) disabled.');
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const cleanupUnverified = async (req, res, next) => {
+  try {
+    const count = await firestoreAdminService.cleanupUnverifiedAccounts();
+    return successResponse(res, 200, `Purged ${count} expired unverified accounts`, { purgedCount: count });
   } catch (error) {
     next(error);
   }
@@ -277,7 +399,7 @@ export const getMe = async (req, res, next) => {
     if (!user) {
       return errorResponse(res, 404, 'User profile not found');
     }
-    const { passwordHash: _, resetPasswordToken: __, verificationToken: ___, ...sanitizedUser } = user;
+    const { passwordHash: _, resetPasswordToken: __, verificationToken: ___, twoFactorSecret: ____, ...sanitizedUser } = user;
     return successResponse(res, 200, 'Profile retrieved', sanitizedUser);
   } catch (error) {
     next(error);

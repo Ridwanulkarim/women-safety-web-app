@@ -109,6 +109,109 @@ export const firestoreAdminService = {
     return fullUser;
   },
 
+  // Atomic database-level email claim using Firestore transactions (TOCTOU protection)
+  claimEmailAtomic: async (email, userId) => {
+    const cleanEmail = email.toLowerCase().trim();
+    if (db) {
+      const emailDocRef = db.collection('emailIndexes').doc(cleanEmail);
+      return await db.runTransaction(async (transaction) => {
+        const doc = await transaction.get(emailDocRef);
+        if (doc.exists) {
+          throw new Error('EMAIL_EXISTS');
+        }
+        transaction.set(emailDocRef, {
+          userId,
+          email: cleanEmail,
+          createdAt: new Date().toISOString()
+        });
+        return true;
+      });
+    }
+
+    if (!mockDb.emailIndexes) mockDb.emailIndexes = new Map();
+    if (mockDb.emailIndexes.has(cleanEmail)) {
+      throw new Error('EMAIL_EXISTS');
+    }
+    mockDb.emailIndexes.set(cleanEmail, { userId, email: cleanEmail });
+    return true;
+  },
+
+  // Persistent Firestore-backed Lockout State Tracking
+  getAccountLockout: async (email) => {
+    if (!email) return null;
+    const cleanEmail = email.toLowerCase().trim();
+    try {
+      if (db) {
+        const snap = await db.collection('lockouts').doc(cleanEmail).get();
+        if (snap.exists) return snap.data();
+      }
+    } catch (e) {}
+    if (!mockDb.lockouts) mockDb.lockouts = new Map();
+    return mockDb.lockouts.get(cleanEmail) || null;
+  },
+
+  recordFailedLogin: async (email) => {
+    if (!email) return null;
+    const cleanEmail = email.toLowerCase().trim();
+    const current = (await firestoreAdminService.getAccountLockout(cleanEmail)) || { count: 0, lockUntil: null };
+    const newCount = (current.count || 0) + 1;
+    let lockUntil = null;
+    if (newCount >= 5) {
+      lockUntil = new Date(Date.now() + 15 * 60 * 1000).toISOString(); // 15 minutes lockout
+    }
+    const updated = { count: newCount, lockUntil, updatedAt: new Date().toISOString() };
+
+    try {
+      if (db) await db.collection('lockouts').doc(cleanEmail).set(updated, { merge: true });
+    } catch (e) {}
+    if (!mockDb.lockouts) mockDb.lockouts = new Map();
+    mockDb.lockouts.set(cleanEmail, updated);
+    return updated;
+  },
+
+  clearAccountLockout: async (email) => {
+    if (!email) return;
+    const cleanEmail = email.toLowerCase().trim();
+    try {
+      if (db) await db.collection('lockouts').doc(cleanEmail).delete();
+    } catch (e) {}
+    if (!mockDb.lockouts) mockDb.lockouts = new Map();
+    mockDb.lockouts.delete(cleanEmail);
+  },
+
+  // Purge Stale Unverified Accounts (>24 hours)
+  cleanupUnverifiedAccounts: async () => {
+    const now = new Date().toISOString();
+    let purgedCount = 0;
+    try {
+      if (db) {
+        const snap = await db.collection('users').where('isVerified', '==', false).get();
+        const batch = db.batch();
+        snap.docs.forEach(doc => {
+          const data = doc.data();
+          if (data.verificationTokenExpires && data.verificationTokenExpires < now) {
+            batch.delete(doc.ref);
+            if (data.email) {
+              const cleanEmail = data.email.toLowerCase().trim();
+              batch.delete(db.collection('emailIndexes').doc(cleanEmail));
+            }
+            purgedCount++;
+          }
+        });
+        if (purgedCount > 0) await batch.commit();
+      }
+    } catch (e) {}
+
+    for (const [uid, user] of mockDb.users.entries()) {
+      if (user.isVerified === false && user.verificationTokenExpires && user.verificationTokenExpires < now) {
+        mockDb.users.delete(uid);
+        if (user.email) mockDb.emailIndexes?.delete(user.email.toLowerCase().trim());
+        purgedCount++;
+      }
+    }
+    return purgedCount;
+  },
+
   getUserByUid: async (uid) => {
     try {
       if (db) {

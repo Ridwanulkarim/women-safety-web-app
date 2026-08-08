@@ -1,6 +1,74 @@
 import axios from 'axios';
 import { logger } from '../utils/logger.js';
 
+export const checkNotificationConfig = () => {
+  const hasTwilio = Boolean(process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN && process.env.TWILIO_PHONE_NUMBER);
+  const hasResend = Boolean(process.env.RESEND_API_KEY);
+  const hasSendGrid = Boolean(process.env.SENDGRID_API_KEY);
+
+  console.log('====================================================');
+  console.log('🚨 SAFEHAVEN EMERGENCY NOTIFICATION ENGINE STATUS');
+  console.log(`• Twilio SMS Provider: ${hasTwilio ? '✅ ACTIVE' : '⚠️ NOT CONFIGURED'}`);
+  console.log(`• Resend Email Provider: ${hasResend ? '✅ ACTIVE' : '⚠️ NOT CONFIGURED'}`);
+  console.log(`• SendGrid Email Provider: ${hasSendGrid ? '✅ ACTIVE' : '⚠️ NOT CONFIGURED'}`);
+  if (!hasTwilio && !hasResend && !hasSendGrid) {
+    if (process.env.NODE_ENV === 'production') {
+      console.error('⛔ CRITICAL ERROR: NO OUTBOUND NOTIFICATION PROVIDER KEYS SET IN PRODUCTION!');
+    } else {
+      console.log('⚠️ MODE: DEVELOPMENT SIMULATION ACTIVE (Outbound SMS/Email will log to console)');
+    }
+  }
+  console.log('====================================================');
+};
+
+/**
+ * Dispatches transactional email (Account Verification / Password Reset)
+ */
+export const sendTransactionalEmail = async ({ to, subject, htmlContent }) => {
+  const resendApiKey = process.env.RESEND_API_KEY;
+  const sendgridApiKey = process.env.SENDGRID_API_KEY;
+  const fromEmail = process.env.ALERT_FROM_EMAIL || 'no-reply@safehaven.app';
+
+  if (resendApiKey) {
+    try {
+      await axios.post(
+        'https://api.resend.com/emails',
+        { from: fromEmail, to: [to], subject, html: htmlContent },
+        { headers: { 'Authorization': `Bearer ${resendApiKey}`, 'Content-Type': 'application/json' } }
+      );
+      logger.info(`Transactional Email successfully dispatched via Resend to ${to}`);
+      return { success: true, provider: 'Resend' };
+    } catch (err) {
+      logger.error(`Resend dispatch error for ${to}: ${err.message}`);
+    }
+  } else if (sendgridApiKey) {
+    try {
+      await axios.post(
+        'https://api.sendgrid.com/v3/mail/send',
+        {
+          personalizations: [{ to: [{ email: to }] }],
+          from: { email: fromEmail },
+          subject,
+          content: [{ type: 'text/html', value: htmlContent }]
+        },
+        { headers: { 'Authorization': `Bearer ${sendgridApiKey}`, 'Content-Type': 'application/json' } }
+      );
+      logger.info(`Transactional Email successfully dispatched via SendGrid to ${to}`);
+      return { success: true, provider: 'SendGrid' };
+    } catch (err) {
+      logger.error(`SendGrid dispatch error for ${to}: ${err.message}`);
+    }
+  }
+
+  if (process.env.NODE_ENV === 'production') {
+    logger.error(`Failed to dispatch transactional email to ${to}: No email provider keys configured.`);
+    throw new Error('Email dispatch failed: No transactional email service configured in production.');
+  }
+
+  logger.warn(`[DEV TRANSACTIONAL EMAIL SIMULATION] To: ${to} | Subject: "${subject}"`);
+  return { success: true, simulated: true };
+};
+
 /**
  * Dispatches outbound SMS (via Twilio) and/or Email (via Resend or SendGrid) to emergency contacts.
  */
@@ -53,59 +121,27 @@ export const sendSOSOutboundAlert = async (contact, alertData) => {
 
   if (contact.email && (resendApiKey || sendgridApiKey)) {
     try {
-      if (resendApiKey) {
-        await axios.post(
-          'https://api.resend.com/emails',
-          {
-            from: process.env.ALERT_FROM_EMAIL || 'alerts@safehaven.app',
-            to: [contact.email],
-            subject: `🚨 EMERGENCY SOS: ${userName} Needs Assistance`,
-            html: `
-              <div style="font-family: sans-serif; padding: 20px; background: #09090b; color: #fff;">
-                <h2 style="color: #e11d48;">🚨 EMERGENCY SOS DISTRESS ALERT</h2>
-                <p><strong>User:</strong> ${userName} (${userPhone || 'N/A'})</p>
-                <p><strong>Location:</strong> ${address}</p>
-                <p><strong>GPS Coordinates:</strong> ${latitude}, ${longitude}</p>
-                <p><a href="${locationUrl}" style="background: #e11d48; color: white; padding: 10px 20px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">View Live Location on Map</a></p>
-              </div>
-            `
-          },
-          {
-            headers: {
-              'Authorization': `Bearer ${resendApiKey}`,
-              'Content-Type': 'application/json'
-            }
-          }
-        );
-        emailSent = true;
-        logger.info(`Resend Email successfully dispatched to ${contact.email}`);
-      } else if (sendgridApiKey) {
-        await axios.post(
-          'https://api.sendgrid.com/v3/mail/send',
-          {
-            personalizations: [{ to: [{ email: contact.email }] }],
-            from: { email: process.env.ALERT_FROM_EMAIL || 'alerts@safehaven.app' },
-            subject: `🚨 EMERGENCY SOS: ${userName} Needs Assistance`,
-            content: [{ type: 'text/html', value: `<p>🚨 EMERGENCY SOS: ${userName} at ${address}. Map: ${locationUrl}</p>` }]
-          },
-          {
-            headers: {
-              'Authorization': `Bearer ${sendgridApiKey}`,
-              'Content-Type': 'application/json'
-            }
-          }
-        );
-        emailSent = true;
-        logger.info(`SendGrid Email successfully dispatched to ${contact.email}`);
-      }
+      const htmlBody = `
+        <div style="font-family: sans-serif; padding: 20px; background: #09090b; color: #fff;">
+          <h2 style="color: #e11d48;">🚨 EMERGENCY SOS DISTRESS ALERT</h2>
+          <p><strong>User:</strong> ${userName} (${userPhone || 'N/A'})</p>
+          <p><strong>Location:</strong> ${address}</p>
+          <p><strong>GPS Coordinates:</strong> ${latitude}, ${longitude}</p>
+          <p><a href="${locationUrl}" style="background: #e11d48; color: white; padding: 10px 20px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">View Live Location on Map</a></p>
+        </div>
+      `;
+
+      await sendTransactionalEmail({
+        to: contact.email,
+        subject: `🚨 EMERGENCY SOS: ${userName} Needs Assistance`,
+        htmlContent: htmlBody
+      });
+      emailSent = true;
     } catch (err) {
-      const errMsg = err.response?.data?.errors?.[0]?.message || err.message;
-      logger.error(`Email dispatch failed for ${contact.email}: ${errMsg}`);
-      errors.push(`Email Error: ${errMsg}`);
+      errors.push(`Email Error: ${err.message}`);
     }
   }
 
-  // If external provider credentials are specified in environment:
   if (accountSid || resendApiKey || sendgridApiKey) {
     if (!smsSent && !emailSent) {
       throw new Error(errors.join('; ') || 'Outbound notification delivery failed');
@@ -113,13 +149,11 @@ export const sendSOSOutboundAlert = async (contact, alertData) => {
     return { smsSent, emailSent };
   }
 
-  // Production Safety Enforcement: Fail fast if running in production without outbound provider keys
   if (process.env.NODE_ENV === 'production') {
     logger.error('CRITICAL PRODUCTION CONFIGURATION ERROR: No Twilio, Resend, or SendGrid API keys configured for emergency outbound notifications.');
     throw new Error('Emergency outbound alert delivery failed: Notification provider keys missing in production.');
   }
 
-  // Development Fallback: Log simulation in non-production environments
   logger.warn(`[DEV SIMULATION] No Twilio/Resend API keys configured. Simulating outbound notification to ${contact.name} (${contact.phone || contact.email || 'N/A'}). Alert Message: ${smsText}`);
   return { smsSent: true, emailSent: false, simulated: true };
 };
