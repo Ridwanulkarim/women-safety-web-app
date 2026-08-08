@@ -198,8 +198,10 @@ export const firestoreAdminService = {
       longitude: sosData.longitude,
       address: sosData.address || `Lat: ${sosData.latitude}, Lng: ${sosData.longitude}`,
       status: 'ACTIVE',
+      alertStatus: sosData.alertStatus || 'FULLY_ALERTED',
       timestamp: new Date().toISOString(),
-      contactsAlerted: sosData.contactsAlerted || []
+      contactsAlerted: sosData.contactsAlerted || [],
+      deliveryFailures: sosData.deliveryFailures || []
     };
 
     try {
@@ -210,7 +212,7 @@ export const firestoreAdminService = {
     await firestoreAdminService.createNotification({
       userId: uid,
       title: '🚨 SOS Alert Triggered',
-      message: `Emergency distress signal sent from location: ${newSOS.address}`,
+      message: `Emergency distress signal sent from location: ${newSOS.address}. Alert Status: ${newSOS.alertStatus}`,
       type: 'SOS',
       sosId: id
     });
@@ -422,5 +424,45 @@ export const firestoreAdminService = {
         { category: 'Harassment', count: 10 }
       ]
     };
+  },
+
+  deleteAnnouncement: async (id) => {
+    try {
+      if (db) await db.collection('announcements').doc(id).delete();
+    } catch (e) {}
+    mockDb.announcements.delete(id);
+    return true;
+  },
+
+  // AUDIT LOGGING SYSTEM
+  createAuditLog: async (logData) => {
+    const id = 'audit_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7);
+    const entry = {
+      id,
+      performedByUid: logData.performedByUid,
+      performedByName: logData.performedByName || 'Admin',
+      action: logData.action,
+      targetId: logData.targetId,
+      details: logData.details || {},
+      timestamp: new Date().toISOString()
+    };
+
+    try {
+      if (db) await db.collection('auditLogs').doc(id).set(entry);
+    } catch (e) {}
+    if (!mockDb.auditLogs) mockDb.auditLogs = new Map();
+    mockDb.auditLogs.set(id, entry);
+    return entry;
+  },
+
+  getAuditLogs: async () => {
+    try {
+      if (db) {
+        const snap = await db.collection('auditLogs').orderBy('timestamp', 'desc').get();
+        if (!snap.empty) return snap.docs.map(doc => doc.data());
+      }
+    } catch (e) {}
+    if (!mockDb.auditLogs) mockDb.auditLogs = new Map();
+    return Array.from(mockDb.auditLogs.values()).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
   }
 };

@@ -1,6 +1,17 @@
 import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'safehaven_default_jwt_secret_key_2026';
+const JWT_SECRET = process.env.JWT_SECRET;
+
+if (!JWT_SECRET) {
+  const errorMsg = 'FATAL SECURITY ERROR: JWT_SECRET environment variable is not defined.';
+  console.error(errorMsg);
+  if (process.env.NODE_ENV === 'production') {
+    process.exit(1);
+  } else {
+    throw new Error(errorMsg);
+  }
+}
+
 const JWT_EXPIRES_IN = '7d';
 
 export const generateToken = (payload) => {
@@ -14,3 +25,4 @@ export const verifyToken = (token) => {
     return null;
   }
 };
+

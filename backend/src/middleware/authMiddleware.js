@@ -1,6 +1,7 @@
 import { auth, db } from '../config/firebaseAdmin.js';
 import { verifyToken } from '../config/jwt.js';
 import { errorResponse } from '../utils/apiResponse.js';
+import { logger } from '../utils/logger.js';
 
 export const verifyAuth = async (req, res, next) => {
   try {
@@ -11,14 +12,14 @@ export const verifyAuth = async (req, res, next) => {
 
     const token = authHeader.split(' ')[1];
 
-    // Try custom JWT verification first
+    // 1. Try custom JWT verification first
     const decodedJwt = verifyToken(token);
     if (decodedJwt) {
       req.user = decodedJwt;
       return next();
     }
 
-    // Try Firebase Admin ID token verification if Firebase Admin is initialized
+    // 2. Try Firebase Admin ID token verification if Firebase Admin is initialized
     if (auth) {
       try {
         const decodedToken = await auth.verifyIdToken(token);
@@ -38,12 +39,14 @@ export const verifyAuth = async (req, res, next) => {
         };
         return next();
       } catch (err) {
-        return errorResponse(res, 401, 'Unauthorized: Invalid Firebase Token');
+        logger.error('Firebase ID token verification failure:', err.message);
+        return errorResponse(res, 401, 'Unauthorized: Invalid authentication token');
       }
     }
 
     return errorResponse(res, 401, 'Unauthorized: Invalid authentication token');
   } catch (error) {
-    return errorResponse(res, 500, 'Authentication error: ' + error.message);
+    logger.error('Authentication verification internal error:', error);
+    return errorResponse(res, 500, 'An authentication error occurred. Please try again.');
   }
 };

@@ -1,10 +1,10 @@
 import express from 'express';
 import {
   getNotifications, markAsRead,
-  getAnnouncements, createAnnouncement,
+  getAnnouncements, createAnnouncement, deleteAnnouncement,
   getBlogs, getBlogById, createBlog, deleteBlog,
   getSafetyTips, createSafetyTip, deleteSafetyTip,
-  getAnalytics
+  getAnalytics, getAuditLogs
 } from '../controllers/extraControllers.js';
 import { blogValidation, tipValidation } from '../validators/schemaValidators.js';
 import { validateRequest } from '../middleware/validateMiddleware.js';
@@ -20,6 +20,7 @@ notificationRoutes.patch('/:id/read', verifyAuth, markAsRead);
 export const announcementRoutes = express.Router();
 announcementRoutes.get('/', getAnnouncements);
 announcementRoutes.post('/', verifyAuth, requireAdmin, createAnnouncement);
+announcementRoutes.delete('/:id', verifyAuth, requireAdmin, deleteAnnouncement);
 
 // BLOGS
 export const blogRoutes = express.Router();
@@ -34,6 +35,7 @@ tipRoutes.get('/', getSafetyTips);
 tipRoutes.post('/', verifyAuth, requireAdmin, tipValidation, validateRequest, createSafetyTip);
 tipRoutes.delete('/:id', verifyAuth, requireAdmin, deleteSafetyTip);
 
-// ANALYTICS
+// ANALYTICS & AUDIT LOGS
 export const analyticsRoutes = express.Router();
 analyticsRoutes.get('/dashboard', verifyAuth, requireAdmin, getAnalytics);
+analyticsRoutes.get('/audit-logs', verifyAuth, requireAdmin, getAuditLogs);

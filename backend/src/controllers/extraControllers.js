@@ -31,7 +31,34 @@ export const getAnnouncements = async (req, res, next) => {
 export const createAnnouncement = async (req, res, next) => {
   try {
     const ann = await firestoreAdminService.createAnnouncement(req.body);
+
+    await firestoreAdminService.createAuditLog({
+      performedByUid: req.user.uid,
+      performedByName: req.user.fullName || req.user.email,
+      action: 'ANNOUNCEMENT_CREATE',
+      targetId: ann.id,
+      details: { title: ann.title }
+    });
+
     return successResponse(res, 201, 'Announcement created', ann);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deleteAnnouncement = async (req, res, next) => {
+  try {
+    await firestoreAdminService.deleteAnnouncement(req.params.id);
+
+    await firestoreAdminService.createAuditLog({
+      performedByUid: req.user.uid,
+      performedByName: req.user.fullName || req.user.email,
+      action: 'ANNOUNCEMENT_DELETE',
+      targetId: req.params.id,
+      details: { deletedId: req.params.id }
+    });
+
+    return successResponse(res, 200, 'Announcement deleted');
   } catch (error) {
     next(error);
   }
@@ -104,6 +131,15 @@ export const getAnalytics = async (req, res, next) => {
   try {
     const analytics = await firestoreAdminService.getAnalytics();
     return successResponse(res, 200, 'Analytics retrieved', analytics);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getAuditLogs = async (req, res, next) => {
+  try {
+    const logs = await firestoreAdminService.getAuditLogs();
+    return successResponse(res, 200, 'Audit logs retrieved', logs);
   } catch (error) {
     next(error);
   }

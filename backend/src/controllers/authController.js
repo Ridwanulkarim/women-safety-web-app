@@ -1,23 +1,47 @@
+import bcrypt from 'bcryptjs';
 import { generateToken } from '../config/jwt.js';
 import { firestoreAdminService } from '../services/firestoreAdminService.js';
 import { successResponse, errorResponse } from '../utils/apiResponse.js';
 
 export const register = async (req, res, next) => {
   try {
-    const { uid, email, fullName, phone, role } = req.body;
+    const { uid, email, password, fullName, phone } = req.body;
+
+    if (!password || password.length < 6) {
+      return errorResponse(res, 400, 'Password is required and must be at least 6 characters long');
+    }
+
+    // Check if user already exists
+    const allUsers = await firestoreAdminService.getAllUsers();
+    const existingUser = allUsers.find(u => u.email === email);
+    if (existingUser) {
+      return errorResponse(res, 400, 'A user with this email address already exists');
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const passwordHash = await bcrypt.hash(password, salt);
     const userId = uid || 'user_' + Date.now();
 
+    // Security Hardening: Force role to 'user'. Ignore any client-supplied role.
     const user = await firestoreAdminService.createUser({
       uid: userId,
       email,
-      fullName,
+      passwordHash,
+      fullName: fullName || email.split('@')[0],
       phone: phone || '',
-      role: role || 'user'
+      role: 'user'
     });
 
-    const token = generateToken({ uid: user.uid, email: user.email, role: user.role, fullName: user.fullName });
+    const { passwordHash: _, ...sanitizedUser } = user;
 
-    return successResponse(res, 201, 'User registered successfully', { user, token });
+    const token = generateToken({
+      uid: sanitizedUser.uid,
+      email: sanitizedUser.email,
+      role: sanitizedUser.role,
+      fullName: sanitizedUser.fullName
+    });
+
+    return successResponse(res, 201, 'User registered successfully', { user: sanitizedUser, token });
   } catch (error) {
     next(error);
   }
@@ -25,34 +49,41 @@ export const register = async (req, res, next) => {
 
 export const login = async (req, res, next) => {
   try {
-    const { email, uid } = req.body;
-    let user = null;
+    const { email, password } = req.body;
 
-    if (uid) {
-      user = await firestoreAdminService.getUserByUid(uid);
+    if (!email || !password) {
+      return errorResponse(res, 400, 'Email and password are required');
     }
 
-    if (!user) {
-      // Find by email or create standard mock account
-      const allUsers = await firestoreAdminService.getAllUsers();
-      user = allUsers.find(u => u.email === email);
+    const allUsers = await firestoreAdminService.getAllUsers();
+    const user = allUsers.find(u => u.email === email);
+
+    if (!user || !user.passwordHash) {
+      return errorResponse(res, 401, 'Invalid credentials');
     }
 
-    if (!user) {
-      user = await firestoreAdminService.createUser({
-        uid: uid || 'user_' + Date.now(),
-        email,
-        fullName: email.split('@')[0],
-        role: email.includes('admin') ? 'admin' : 'user'
-      });
+    const isMatch = await bcrypt.compare(password, user.passwordHash);
+    if (!isMatch) {
+      return errorResponse(res, 401, 'Invalid credentials');
     }
 
-    // Update lastLogin
+    if (user.status === 'suspended') {
+      return errorResponse(res, 403, 'Account has been suspended. Please contact support.');
+    }
+
+    // Update lastLogin timestamp
     await firestoreAdminService.updateUser(user.uid, { lastLogin: new Date().toISOString() });
 
-    const token = generateToken({ uid: user.uid, email: user.email, role: user.role, fullName: user.fullName });
+    const { passwordHash: _, ...sanitizedUser } = user;
 
-    return successResponse(res, 200, 'Login successful', { user, token });
+    const token = generateToken({
+      uid: sanitizedUser.uid,
+      email: sanitizedUser.email,
+      role: sanitizedUser.role,
+      fullName: sanitizedUser.fullName
+    });
+
+    return successResponse(res, 200, 'Login successful', { user: sanitizedUser, token });
   } catch (error) {
     next(error);
   }
@@ -64,7 +95,8 @@ export const getMe = async (req, res, next) => {
     if (!user) {
       return errorResponse(res, 404, 'User profile not found');
     }
-    return successResponse(res, 200, 'Profile retrieved', user);
+    const { passwordHash: _, ...sanitizedUser } = user;
+    return successResponse(res, 200, 'Profile retrieved', sanitizedUser);
   } catch (error) {
     next(error);
   }
