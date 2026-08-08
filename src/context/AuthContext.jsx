@@ -18,10 +18,10 @@ export const AuthProvider = ({ children }) => {
       if (fbUser) {
         try {
           const idToken = await fbUser.getIdToken();
-          // Sync with backend API
+          // Sync with backend API using Firebase ID token
           const res = await api.post('/auth/login', {
             email: fbUser.email,
-            uid: fbUser.uid
+            idToken
           });
 
           if (res.data?.data) {
@@ -30,12 +30,12 @@ export const AuthProvider = ({ children }) => {
             localStorage.setItem('safehaven_token', res.data.data.token);
           }
         } catch (err) {
-          console.warn('Backend sync failed, constructing client session:', err.message);
+          console.warn('Backend sync warning, fallback client session:', err.message);
           setUser({
             uid: fbUser.uid,
             email: fbUser.email,
             fullName: fbUser.displayName || fbUser.email.split('@')[0],
-            role: fbUser.email?.includes('admin') ? 'admin' : 'user',
+            role: 'user', // Always default to 'user'
             profileImage: fbUser.photoURL || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80',
             status: 'active'
           });
@@ -69,6 +69,7 @@ export const AuthProvider = ({ children }) => {
       const res = await api.post('/auth/register', {
         uid: fbUser.uid,
         email: fbUser.email,
+        password,
         fullName: fullName || fbUser.displayName || email.split('@')[0]
       });
 
@@ -97,13 +98,14 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
     try {
       const fbUser = await firebaseLogin(email, password);
-      const res = await api.post('/auth/login', { email, uid: fbUser.uid });
+      const idToken = await fbUser.getIdToken();
+      const res = await api.post('/auth/login', { email, password, idToken });
 
       const loggedUser = res.data?.data?.user || {
         uid: fbUser.uid,
         email,
         fullName: fbUser.displayName || email.split('@')[0],
-        role: email.includes('admin') ? 'admin' : 'user'
+        role: 'user'
       };
       const newToken = res.data?.data?.token || 'mock_jwt_token';
 
@@ -124,7 +126,8 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
     try {
       const fbUser = await firebaseGoogleLogin();
-      const res = await api.post('/auth/login', { email: fbUser.email, uid: fbUser.uid });
+      const idToken = await fbUser.getIdToken();
+      const res = await api.post('/auth/login', { email: fbUser.email, idToken });
 
       const loggedUser = res.data?.data?.user || {
         uid: fbUser.uid,
