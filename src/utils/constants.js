@@ -1,4 +1,4 @@
-// Emergency Numbers Specification (Bangladesh Default + Universal)
+// Emergency Numbers Specification (National Hotlines)
 export const EMERGENCY_NUMBERS = [
   {
     id: '999',
@@ -27,26 +27,6 @@ export const EMERGENCY_NUMBERS = [
     icon: 'FiHeart',
     color: 'bg-pink-600',
     description: 'Direct support against violence, harassment, and domestic abuse.'
-  },
-  {
-    id: 'fire',
-    name: 'Fire Service & Rescue',
-    number: '16163',
-    altNumber: '999',
-    category: 'Rescue',
-    icon: 'FiFlame',
-    color: 'bg-amber-600',
-    description: 'Emergency fire response and disaster search & rescue.'
-  },
-  {
-    id: 'ambulance',
-    name: 'Ambulance Emergency Dispatch',
-    number: '199',
-    altNumber: '999',
-    category: 'Medical',
-    icon: 'FiActivity',
-    color: 'bg-emerald-600',
-    description: '24/7 Paramedic and urgent ambulance transport.'
   }
 ];
 

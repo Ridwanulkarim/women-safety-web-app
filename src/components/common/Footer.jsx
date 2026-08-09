@@ -58,10 +58,6 @@ const Footer = () => {
                 <span>{t('hotlines.womenHelpline')}</span>
                 <a href="tel:109" className="font-bold text-rose-400 hover:underline">109 / 10921</a>
               </li>
-              <li className="flex justify-between items-center text-zinc-300">
-                <span>{t('hotlines.ambulanceDispatch')}</span>
-                <a href="tel:199" className="font-bold text-amber-400 hover:underline">199</a>
-              </li>
             </ul>
           </div>
 
