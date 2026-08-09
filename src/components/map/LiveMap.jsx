@@ -1,6 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, Circle } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, Circle, useMap } from 'react-leaflet';
 import L from 'leaflet';
+
+/**
+ * Imperatively recenters Leaflet map view whenever position (latitude/longitude) state updates
+ */
+function RecenterOnUpdate({ latitude, longitude, zoom }) {
+  const map = useMap();
+  useEffect(() => {
+    if (latitude != null && longitude != null) {
+      map.setView([latitude, longitude], zoom || map.getZoom());
+    }
+  }, [latitude, longitude, zoom, map]);
+  return null;
+}
 
 // Custom SVG map marker icon for Leaflet
 const createCustomIcon = (color = '#E91E63') => {
@@ -14,7 +27,7 @@ const createCustomIcon = (color = '#E91E63') => {
   });
 };
 
-const LiveMap = ({ latitude = 23.8103, longitude = 90.4125, zoom = 14, title = "Live Location", markers = [] }) => {
+const LiveMap = ({ latitude = 23.8103, longitude = 90.4125, accuracy = null, zoom = 14, title = "Live Location", markers = [] }) => {
   const googleApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
   const [googleMapsLoaded, setGoogleMapsLoaded] = useState(false);
 
@@ -53,6 +66,8 @@ const LiveMap = ({ latitude = 23.8103, longitude = 90.4125, zoom = 14, title = "
         scrollWheelZoom={false}
         className="w-full h-full"
       >
+        <RecenterOnUpdate latitude={latitude} longitude={longitude} zoom={zoom} />
+        
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -71,7 +86,7 @@ const LiveMap = ({ latitude = 23.8103, longitude = 90.4125, zoom = 14, title = "
         {/* Accuracy Range Circle */}
         <Circle
           center={[latitude, longitude]}
-          radius={400}
+          radius={accuracy || 400}
           pathOptions={{ fillColor: '#E91E63', fillOpacity: 0.15, color: '#E91E63', weight: 1 }}
         />
 

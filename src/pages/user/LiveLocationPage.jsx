@@ -36,7 +36,7 @@ const LiveLocationPage = () => {
 
       {/* Map Card */}
       <div className="glass-card p-6 rounded-3xl space-y-4">
-        <LiveMap latitude={location.latitude} longitude={location.longitude} title="Your Live Coordinates" />
+        <LiveMap latitude={location.latitude} longitude={location.longitude} accuracy={location.accuracy} title="Your Live Coordinates" />
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 text-xs">
           <div className="p-4 rounded-2xl bg-slate-100 dark:bg-slate-900">
