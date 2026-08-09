@@ -75,8 +75,10 @@
     "nationalDesc": "Toll-free national emergency response center for police, fire & ambulance.",
     "policeHelpline": "Police Emergency Helpline",
     "policeDesc": "Direct emergency dispatch for police assistance and crime reporting.",
-    "womenHelpline": "National Women & Child Helpline",
-    "womenDesc": "24/7 dedicated helpline for women and child security & legal support.",
+    "womenHelpline": "National Women Helpline",
+    "womenDesc": "24/7 dedicated helpline for women security & legal support against violence.",
+    "childHelpline": "Child Helpline Bangladesh",
+    "childDesc": "24/7 toll-free emergency helpline for child rights, protection, and rescue.",
     "shasthyoBatayon": "Shasthyo Batayon Health Helpline",
     "shasthyoDesc": "24/7 government health helpline for medical advice from registered doctors, hospital info, and ambulance listings."
   },

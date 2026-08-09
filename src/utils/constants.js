@@ -20,13 +20,21 @@ export const EMERGENCY_NUMBERS = [
   },
   {
     id: 'women-helpline',
-    name: 'National Women & Child Helpline',
+    name: 'National Women Helpline',
     number: '109',
-    altNumber: '10921',
     category: 'Specialized Hotline',
     icon: 'FiHeart',
     color: 'bg-pink-600',
-    description: 'Direct support against violence, harassment, and domestic abuse.'
+    description: 'Direct support against violence, harassment, and domestic abuse for women.'
+  },
+  {
+    id: 'child-helpline',
+    name: 'Child Helpline Bangladesh',
+    number: '1098',
+    category: 'Child Protection',
+    icon: 'FiUserCheck',
+    color: 'bg-purple-600',
+    description: '24/7 toll-free emergency helpline for child rights, protection, and rescue.'
   },
   {
     id: 'shasthyo-batayon',
