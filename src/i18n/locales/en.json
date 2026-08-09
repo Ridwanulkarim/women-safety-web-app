@@ -77,10 +77,8 @@
     "policeDesc": "Direct emergency dispatch for police assistance and crime reporting.",
     "womenHelpline": "National Women & Child Helpline",
     "womenDesc": "24/7 dedicated helpline for women and child security & legal support.",
-    "fireRescue": "Fire Service & Rescue",
-    "fireDesc": "Immediate emergency dispatch for fire hazards and rescue operations.",
-    "ambulanceDispatch": "Ambulance Emergency Dispatch",
-    "ambulanceDesc": "Medical emergency dispatch and paramedic ambulance transport."
+    "shasthyoBatayon": "Shasthyo Batayon Health Helpline",
+    "shasthyoDesc": "24/7 government health helpline for medical advice from registered doctors, hospital info, and ambulance listings."
   },
   "safetyTools": {
     "instantTools": "Instant Safety Tools",

@@ -27,6 +27,15 @@ export const EMERGENCY_NUMBERS = [
     icon: 'FiHeart',
     color: 'bg-pink-600',
     description: 'Direct support against violence, harassment, and domestic abuse.'
+  },
+  {
+    id: 'shasthyo-batayon',
+    name: 'Shasthyo Batayon',
+    number: '16263',
+    category: 'Medical Advice',
+    icon: 'FiActivity',
+    color: 'bg-emerald-600',
+    description: '24/7 government health helpline for medical advice from registered doctors, hospital info, and ambulance listings.'
   }
 ];
 
