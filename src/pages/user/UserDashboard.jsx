@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { FiAlertCircle, FiPhoneCall, FiMapPin, FiCheckCircle, FiShield, FiUser, FiActivity, FiVolume2 } from 'react-icons/fi';
+import { FiAlertCircle, FiPhoneCall, FiMapPin, FiCheckCircle, FiShield, FiUser, FiActivity, FiVolume2, FiPlusCircle } from 'react-icons/fi';
 import { useAuth } from '../../context/AuthContext';
 import { useSOS } from '../../context/SOSContext';
 import SOSButton from '../../components/sos/SOSButton';
@@ -12,14 +12,9 @@ import MedicalIDModal from '../../components/safety/MedicalIDModal';
 
 const UserDashboard = () => {
   const { user } = useAuth();
-  const { sosHistory, openSOSModal } = useSOS();
+  const { sosHistory, openSOSModal, savedContacts = [] } = useSOS();
   const [fakeCallOpen, setFakeCallOpen] = useState(false);
   const [medicalIdOpen, setMedicalIdOpen] = useState(false);
-
-  const mockContacts = user?.emergencyContacts && user.emergencyContacts.length > 0 ? user.emergencyContacts : [
-    { id: '1', name: 'Primary Guardian', phone: '+8801700000000', relationship: 'Mother', isPrimary: true },
-    { id: '2', name: 'Secondary Contact', phone: '+8801800000000', relationship: 'Sister', isPrimary: false }
-  ];
 
   return (
     <div className="space-y-6">
@@ -36,7 +31,7 @@ const UserDashboard = () => {
             Welcome, {user?.fullName || 'User'} 👋
           </h1>
           <p className="text-xs text-zinc-500 dark:text-zinc-400">
-            Emergency telemetry active. {mockContacts.length} priority emergency contact(s) linked to your SOS beacon.
+            Emergency telemetry active. {savedContacts.length} priority emergency contact(s) linked to your SOS beacon.
           </p>
         </div>
 
@@ -84,15 +79,29 @@ const UserDashboard = () => {
               </h3>
             </div>
             <Link to="/dashboard/contacts" className="text-xs font-mono font-semibold text-rose-600 dark:text-rose-400 hover:underline">
-              Manage ({mockContacts.length}/5)
+              Manage ({savedContacts.length}/5)
             </Link>
           </div>
 
-          <div className="space-y-3">
-            {mockContacts.slice(0, 2).map((c) => (
-              <ContactCard key={c.id} contact={c} />
-            ))}
-          </div>
+          {savedContacts.length === 0 ? (
+            <div className="p-6 text-center space-y-3 rounded-2xl bg-zinc-50 dark:bg-zinc-900/60 border border-dashed border-zinc-300 dark:border-zinc-800">
+              <p className="text-xs text-zinc-500 dark:text-zinc-400 font-medium">
+                No priority emergency contacts saved yet.
+              </p>
+              <Link
+                to="/dashboard/contacts"
+                className="px-4 py-2 rounded-xl bg-rose-600 text-white text-xs font-bold font-mono inline-flex items-center gap-1.5 shadow-sm"
+              >
+                <FiPlusCircle /> Add Emergency Contacts
+              </Link>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {savedContacts.slice(0, 2).map((c) => (
+                <ContactCard key={c.id || c._id} contact={c} />
+              ))}
+            </div>
+          )}
         </div>
 
       </div>
