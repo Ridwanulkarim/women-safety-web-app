@@ -74,6 +74,14 @@ export const triggerSOS = async (req, res, next) => {
       deliveryFailures: failedDeliveries
     });
 
+    // Generate In-App Emergency Notification Document for User Dashboard
+    await firestoreAdminService.createNotification({
+      userId: req.user.uid,
+      title: '🚨 Emergency SOS Distress Alert Triggered',
+      message: `Distress signal dispatched to ${contacts.length} saved emergency contact(s) at location: ${alertData.address}.`,
+      type: 'EMERGENCY'
+    });
+
     const statusCode = alertStatus === 'ALERT_FAILED' ? 502 : 201;
     const msg = alertStatus === 'FULLY_ALERTED'
       ? '🚨 Emergency SOS Triggered! All emergency contacts alerted.'

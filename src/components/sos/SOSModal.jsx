@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiAlertTriangle, FiX, FiCheckCircle, FiMapPin, FiPhone, FiCamera, FiUserCheck, FiPlus, FiSend } from 'react-icons/fi';
+import { FiAlertTriangle, FiX, FiCheckCircle, FiMapPin, FiPhone, FiCamera, FiUserCheck, FiPlus, FiSend, FiInfo, FiBell } from 'react-icons/fi';
 import { useSOS } from '../../context/SOSContext';
+import { useNotifications } from '../../context/NotificationContext';
 import { useGeolocation } from '../../hooks/useGeolocation';
 import { useNavigate } from 'react-router-dom';
 
@@ -17,6 +18,7 @@ const SOSModal = () => {
     loadingContacts
   } = useSOS();
 
+  const { refreshNotifications } = useNotifications();
   const location = useGeolocation(true);
   const [countdown, setCountdown] = useState(3);
   const [isBroadcasting, setIsBroadcasting] = useState(false);
@@ -27,11 +29,13 @@ const SOSModal = () => {
     if (sosModalOpen && countdown > 0 && !isSOSActive && isBroadcasting) {
       timer = setInterval(() => setCountdown(prev => prev - 1), 1000);
     } else if (countdown === 0 && isBroadcasting && !isSOSActive) {
-      sendSOSAlert(location);
+      sendSOSAlert(location).then(() => {
+        if (refreshNotifications) refreshNotifications();
+      });
       setIsBroadcasting(false);
     }
     return () => clearInterval(timer);
-  }, [sosModalOpen, countdown, isBroadcasting, isSOSActive]);
+  }, [sosModalOpen, countdown, isBroadcasting, isSOSActive, location, sendSOSAlert, refreshNotifications]);
 
   const handleStartBroadcast = () => {
     setCountdown(3);
@@ -101,7 +105,7 @@ const SOSModal = () => {
                             <FiUserCheck className="text-emerald-500" /> {contact.name}
                             {contact.relationship && <span className="text-[10px] text-zinc-400 font-mono">({contact.relationship})</span>}
                           </p>
-                          <p className="text-[11px] text-zinc-500 font-mono">{contact.phone || contact.email}</p>
+                          <p className="text-[11px] text-zinc-500 font-mono">{contact.phone || contact.email || 'No Phone/Email'}</p>
                         </div>
                         <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
                           ALERT DISPATCHED
@@ -110,6 +114,13 @@ const SOSModal = () => {
                     ))}
                   </div>
                 )}
+              </div>
+
+              {/* Notification Provider Info Banner */}
+              <div className="p-3 rounded-lg bg-blue-500/10 border border-blue-500/20 text-left text-[11px] text-blue-600 dark:text-blue-400 space-y-1">
+                <p className="font-bold flex items-center gap-1.5"><FiBell /> Notification Channels Active:</p>
+                <p>• <strong>In-App Alert</strong>: Created in your notifications bell feed.</p>
+                <p>• <strong>Outbound SMS & Email</strong>: Requires Twilio & Resend API keys in Vercel environment variables to deliver physical SMS to carrier numbers.</p>
               </div>
 
               {/* Emergency Evidence Action */}
@@ -219,7 +230,7 @@ const SOSModal = () => {
                             {contact.relationship && <span className="text-[10px] text-zinc-400 font-mono">({contact.relationship})</span>}
                             {contact.isPrimary && <span className="px-1.5 py-0.2 rounded text-[9px] bg-pink-500/10 text-pink-500 font-bold">PRIMARY</span>}
                           </p>
-                          <p className="text-[11px] text-zinc-500 font-mono">{contact.phone || contact.email}</p>
+                          <p className="text-[11px] text-zinc-500 font-mono">{contact.phone || contact.email || 'No Phone/Email'}</p>
                         </div>
                         <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-rose-500/10 text-rose-500 border border-rose-500/20">
                           DIRECT TARGET
