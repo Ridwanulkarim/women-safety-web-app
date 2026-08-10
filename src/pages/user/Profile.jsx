@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { FiUser, FiMail, FiPhone, FiMapPin, FiSave, FiCheckCircle } from 'react-icons/fi';
 import { useAuth } from '../../context/AuthContext';
@@ -6,21 +6,38 @@ import api from '../../services/api';
 import toast from 'react-hot-toast';
 
 const Profile = () => {
-  const { user } = useAuth();
-  const { register, handleSubmit } = useForm({
+  const { user, updateUserProfile } = useAuth();
+  const { register, handleSubmit, reset } = useForm({
     defaultValues: {
       fullName: user?.fullName || '',
       email: user?.email || '',
       phone: user?.phone || '',
       dateOfBirth: user?.dateOfBirth || '',
-      gender: user?.gender || 'Female',
-      bloodGroup: user?.bloodGroup || 'O+',
+      gender: user?.gender || '',
+      bloodGroup: user?.bloodGroup || '',
       address: user?.address || '',
-      city: user?.city || 'Dhaka',
-      country: user?.country || 'Bangladesh',
-      profileImage: user?.profileImage || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80'
+      city: user?.city || '',
+      country: user?.country || '',
+      profileImage: user?.profileImage || ''
     }
   });
+
+  useEffect(() => {
+    if (user) {
+      reset({
+        fullName: user.fullName || '',
+        email: user.email || '',
+        phone: user.phone || '',
+        dateOfBirth: user.dateOfBirth || '',
+        gender: user.gender || '',
+        bloodGroup: user.bloodGroup || '',
+        address: user.address || '',
+        city: user.city || '',
+        country: user.country || '',
+        profileImage: user.profileImage || ''
+      });
+    }
+  }, [user, reset]);
 
   const [loading, setLoading] = useState(false);
 
@@ -30,27 +47,33 @@ const Profile = () => {
       if (user?.uid) {
         await api.put(`/users/${user.uid}`, data);
       }
+      if (updateUserProfile) {
+        updateUserProfile(data);
+      }
       toast.success('Profile updated successfully!');
     } catch (e) {
-      toast.error('Saved profile settings locally.');
+      if (updateUserProfile) {
+        updateUserProfile(data);
+      }
+      toast.success('Saved profile settings.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
+    <div className="max-w-4xl mx-auto space-y-8 font-sans">
       <div className="flex items-center gap-3 border-b border-slate-200 dark:border-slate-800 pb-4">
         <div className="w-12 h-12 rounded-2xl bg-pink-600 text-white flex items-center justify-center text-2xl font-bold shadow-md">
           <FiUser />
         </div>
         <div>
           <h1 className="text-2xl font-bold font-heading">User Profile Settings</h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400">Manage your profile details and emergency information.</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400">Manage your personal details and emergency medical profile.</p>
         </div>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="glass-card p-6 sm:p-8 rounded-3xl space-y-6">
+      <form onSubmit={handleSubmit(onSubmit)} className="product-card p-6 sm:p-8 space-y-6">
         
         {/* Profile Image & Role Header */}
         <div className="flex items-center gap-6 pb-6 border-b border-slate-200/50 dark:border-slate-800/50">
@@ -70,38 +93,41 @@ const Profile = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label className="block text-xs font-semibold mb-1">Full Name</label>
+            <label className="human-label">Full Name</label>
             <input
               type="text"
+              placeholder="e.g. Jane Doe"
               {...register('fullName')}
-              className="w-full px-4 py-3 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-800 text-xs focus:outline-none focus:border-pink-500"
+              className="human-input"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold mb-1">Phone Number</label>
+            <label className="human-label">Phone Number</label>
             <input
               type="tel"
+              placeholder="e.g. +8801700000000"
               {...register('phone')}
-              className="w-full px-4 py-3 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-800 text-xs focus:outline-none focus:border-pink-500"
+              className="human-input"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold mb-1">Date of Birth</label>
+            <label className="human-label">Date of Birth</label>
             <input
               type="date"
               {...register('dateOfBirth')}
-              className="w-full px-4 py-3 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-800 text-xs focus:outline-none focus:border-pink-500"
+              className="human-input"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold mb-1">Blood Group</label>
+            <label className="human-label">Blood Group</label>
             <select
               {...register('bloodGroup')}
-              className="w-full px-4 py-3 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-800 text-xs focus:outline-none focus:border-pink-500"
+              className="human-input"
             >
+              <option value="">Select Blood Group...</option>
               <option value="A+">A+</option>
               <option value="A-">A-</option>
               <option value="B+">B+</option>
@@ -114,46 +140,50 @@ const Profile = () => {
           </div>
 
           <div>
-            <label className="block text-xs font-semibold mb-1">City</label>
+            <label className="human-label">City</label>
             <input
               type="text"
+              placeholder="e.g. Chittagong, Dhaka..."
               {...register('city')}
-              className="w-full px-4 py-3 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-800 text-xs focus:outline-none focus:border-pink-500"
+              className="human-input"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold mb-1">Country</label>
+            <label className="human-label">Country</label>
             <input
               type="text"
+              placeholder="e.g. Bangladesh"
               {...register('country')}
-              className="w-full px-4 py-3 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-800 text-xs focus:outline-none focus:border-pink-500"
+              className="human-input"
             />
           </div>
         </div>
 
         <div>
-          <label className="block text-xs font-semibold mb-1">Residential Address</label>
+          <label className="human-label">Residential Address</label>
           <textarea
             rows="3"
+            placeholder="Enter your street address..."
             {...register('address')}
-            className="w-full px-4 py-3 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-800 text-xs focus:outline-none focus:border-pink-500"
+            className="human-input"
           ></textarea>
         </div>
 
         <div>
-          <label className="block text-xs font-semibold mb-1">Profile Image URL (Avatar)</label>
+          <label className="human-label">Profile Image URL (Avatar)</label>
           <input
             type="url"
+            placeholder="https://images.unsplash.com/..."
             {...register('profileImage')}
-            className="w-full px-4 py-3 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-800 text-xs focus:outline-none focus:border-pink-500"
+            className="human-input"
           />
         </div>
 
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-4 rounded-2xl bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-pink-600/30 transition hover:scale-[1.02]"
+          className="w-full btn-danger py-3.5 font-mono uppercase font-bold text-xs"
         >
           <FiSave /> {loading ? 'Saving Profile...' : 'Save Profile Changes'}
         </button>

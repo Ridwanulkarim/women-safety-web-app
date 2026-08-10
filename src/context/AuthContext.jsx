@@ -18,7 +18,6 @@ export const AuthProvider = ({ children }) => {
       if (fbUser) {
         try {
           const idToken = await fbUser.getIdToken();
-          // Sync with backend API using Firebase ID token
           const res = await api.post('/auth/login', {
             email: fbUser.email,
             idToken
@@ -35,7 +34,7 @@ export const AuthProvider = ({ children }) => {
             uid: fbUser.uid,
             email: fbUser.email,
             fullName: fbUser.displayName || fbUser.email.split('@')[0],
-            role: 'user', // Always default to 'user'
+            role: 'user',
             profileImage: fbUser.photoURL || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80',
             status: 'active'
           });
@@ -172,6 +171,10 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const updateUserProfile = (updatedData) => {
+    setUser(prev => (prev ? { ...prev, ...updatedData } : updatedData));
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -183,6 +186,7 @@ export const AuthProvider = ({ children }) => {
         loginWithGoogle,
         logoutUser,
         resetPassword,
+        updateUserProfile,
         isAdmin: user?.role === 'admin'
       }}
     >
