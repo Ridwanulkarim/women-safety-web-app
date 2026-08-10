@@ -17,7 +17,16 @@ export const addContact = async (req, res, next) => {
       return errorResponse(res, 400, 'Maximum limit of 5 emergency contacts reached');
     }
 
-    // Security Hardening: Enforce server-side userId binding; ignore any client-supplied userId
+    const cleanPhone = (req.body.phone || '').replace(/[\s\-\(\)]/g, '');
+    if (!cleanPhone) {
+      return errorResponse(res, 400, 'Phone number is required');
+    }
+
+    const isDuplicate = contacts.some(c => (c.phone || '').replace(/[\s\-\(\)]/g, '') === cleanPhone);
+    if (isDuplicate) {
+      return errorResponse(res, 400, 'Duplicate Phone Number: An emergency contact with this phone number already exists in your list.');
+    }
+
     const contactPayload = {
       name: req.body.name,
       phone: req.body.phone,
@@ -28,7 +37,7 @@ export const addContact = async (req, res, next) => {
     };
 
     const newContact = await firestoreAdminService.addContact(req.user.uid, contactPayload);
-    return successResponse(res, 201, 'Emergency contact added', newContact);
+    return successResponse(res, 201, 'Emergency contact added successfully', newContact);
   } catch (error) {
     next(error);
   }
