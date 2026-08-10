@@ -92,6 +92,7 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 500;
   color: #18181b;
   transition: all 150ms ease;
+  color-scheme: light;
 }
 
 .dark .human-input {
@@ -115,19 +116,23 @@ h1, h2, h3, h4, h5, h6 {
   border-color: #e11d48;
 }
 
-/* Native Date Input Fixes for Dark Theme */
+/* Native Date Input Fixes for Light & Dark Theme */
 input[type="date"] {
+  color-scheme: light;
+}
+
+.dark input[type="date"] {
   color-scheme: dark;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  display: block !important;
+  opacity: 1 !important;
+  cursor: pointer;
 }
 
 .dark input[type="date"]::-webkit-calendar-picker-indicator {
   filter: invert(1);
-  cursor: pointer;
-  opacity: 0.8;
-}
-
-.dark input[type="date"]::-webkit-calendar-picker-indicator:hover {
-  opacity: 1;
 }
 
 /* Telemetry pulse animation */

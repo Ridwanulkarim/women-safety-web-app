@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { FiUser, FiMail, FiPhone, FiMapPin, FiSave, FiCheckCircle, FiCalendar } from 'react-icons/fi';
 import { useAuth } from '../../context/AuthContext';
@@ -7,6 +7,8 @@ import toast from 'react-hot-toast';
 
 const Profile = () => {
   const { user, updateUserProfile } = useAuth();
+  const dateInputRef = useRef(null);
+
   const { register, handleSubmit, reset } = useForm({
     defaultValues: {
       fullName: user?.fullName || '',
@@ -21,6 +23,8 @@ const Profile = () => {
       profileImage: user?.profileImage || ''
     }
   });
+
+  const { ref: dobRef, ...dobRegisterProps } = register('dateOfBirth');
 
   useEffect(() => {
     if (user) {
@@ -58,6 +62,20 @@ const Profile = () => {
       toast.success('Saved profile settings.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleOpenDatePicker = () => {
+    if (dateInputRef.current) {
+      if (typeof dateInputRef.current.showPicker === 'function') {
+        try {
+          dateInputRef.current.showPicker();
+        } catch (e) {
+          dateInputRef.current.focus();
+        }
+      } else {
+        dateInputRef.current.focus();
+      }
     }
   };
 
@@ -114,12 +132,25 @@ const Profile = () => {
 
           <div>
             <label className="human-label">Date of Birth</label>
-            <input
-              type="date"
-              {...register('dateOfBirth')}
-              className="human-input"
-              style={{ colorScheme: 'dark' }}
-            />
+            <div className="relative flex items-center">
+              <input
+                type="date"
+                {...dobRegisterProps}
+                ref={(e) => {
+                  dobRef(e);
+                  dateInputRef.current = e;
+                }}
+                className="human-input pr-10"
+              />
+              <button
+                type="button"
+                onClick={handleOpenDatePicker}
+                className="absolute right-3 text-pink-600 dark:text-pink-400 hover:text-pink-700 text-base cursor-pointer p-1"
+                title="Select Date of Birth"
+              >
+                <FiCalendar />
+              </button>
+            </div>
           </div>
 
           <div>
