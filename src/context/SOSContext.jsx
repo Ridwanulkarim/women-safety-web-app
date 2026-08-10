@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import api from '../services/api';
 import toast from 'react-hot-toast';
 import { useAuth } from './AuthContext';
@@ -11,13 +11,41 @@ export const SOSProvider = ({ children }) => {
   const [sosModalOpen, setSosModalOpen] = useState(false);
   const [sosHistory, setSosHistory] = useState([]);
   const [activeSOSData, setActiveSOSData] = useState(null);
+  const [savedContacts, setSavedContacts] = useState([]);
+  const [loadingContacts, setLoadingContacts] = useState(false);
 
-  const openSOSModal = () => setSosModalOpen(true);
+  const fetchSavedContacts = useCallback(async () => {
+    if (!user) {
+      setSavedContacts([]);
+      return;
+    }
+    setLoadingContacts(true);
+    try {
+      const res = await api.get('/contacts');
+      if (Array.isArray(res.data?.data)) {
+        setSavedContacts(res.data.data);
+      }
+    } catch (e) {
+      console.warn('Contacts fetch fallback in SOS Context');
+    } finally {
+      setLoadingContacts(false);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    fetchSavedContacts();
+  }, [fetchSavedContacts]);
+
+  const openSOSModal = () => {
+    fetchSavedContacts();
+    setSosModalOpen(true);
+  };
+
   const closeSOSModal = () => setSosModalOpen(false);
 
   const sendSOSAlert = async (locationData) => {
     try {
-      const lat = locationData?.latitude || 23.8103; // Default Dhaka coordinates if GPS denied
+      const lat = locationData?.latitude || 23.8103;
       const lng = locationData?.longitude || 90.4125;
       const addr = locationData?.address || `Lat: ${lat.toFixed(4)}, Lng: ${lng.toFixed(4)}`;
 
@@ -36,13 +64,21 @@ export const SOSProvider = ({ children }) => {
         longitude: lng,
         address: addr,
         status: 'ACTIVE',
+        contactsAlerted: savedContacts,
         timestamp: new Date().toISOString()
       };
 
       setIsSOSActive(true);
       setActiveSOSData(sosRecord);
-      setSosHistory(prev => [sosRecord, ...prev]);
-      toast.error('🚨 SOS EMERGENCY BROADCAST SENT! Emergency contacts notified.', { duration: 6000 });
+      setSosHistory(prev => [sosRecord, ...(Array.isArray(prev) ? prev : [])]);
+
+      const count = Array.isArray(sosRecord.contactsAlerted) ? sosRecord.contactsAlerted.length : savedContacts.length;
+      if (count > 0) {
+        toast.error(`🚨 SOS EMERGENCY BROADCAST SENT! ${count} saved emergency contact(s) notified.`, { duration: 6000 });
+      } else {
+        toast.error('🚨 SOS EMERGENCY BROADCAST SENT! (No emergency contacts saved yet).', { duration: 6000 });
+      }
+
       return sosRecord;
     } catch (error) {
       toast.error('SOS Broadcast Warning: Local distress signal captured.');
@@ -52,11 +88,12 @@ export const SOSProvider = ({ children }) => {
         longitude: locationData?.longitude || 90.4125,
         address: locationData?.address || 'Dhaka, Bangladesh',
         status: 'ACTIVE',
+        contactsAlerted: savedContacts,
         timestamp: new Date().toISOString()
       };
       setIsSOSActive(true);
       setActiveSOSData(fallbackRecord);
-      setSosHistory(prev => [fallbackRecord, ...prev]);
+      setSosHistory(prev => [fallbackRecord, ...(Array.isArray(prev) ? prev : [])]);
       return fallbackRecord;
     }
   };
@@ -79,8 +116,11 @@ export const SOSProvider = ({ children }) => {
         closeSOSModal,
         sendSOSAlert,
         resolveSOS,
-        sosHistory,
-        activeSOSData
+        sosHistory: Array.isArray(sosHistory) ? sosHistory : [],
+        activeSOSData,
+        savedContacts: Array.isArray(savedContacts) ? savedContacts : [],
+        loadingContacts,
+        refreshContacts: fetchSavedContacts
       }}
     >
       {children}
