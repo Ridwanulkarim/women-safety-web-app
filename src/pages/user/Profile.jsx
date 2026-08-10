@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { FiUser, FiMail, FiPhone, FiMapPin, FiSave, FiCheckCircle } from 'react-icons/fi';
+import { FiUser, FiMail, FiPhone, FiMapPin, FiSave, FiCheckCircle, FiCalendar } from 'react-icons/fi';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../services/api';
 import toast from 'react-hot-toast';
@@ -118,6 +118,7 @@ const Profile = () => {
               type="date"
               {...register('dateOfBirth')}
               className="human-input"
+              style={{ colorScheme: 'dark' }}
             />
           </div>
 
