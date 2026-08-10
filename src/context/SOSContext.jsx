@@ -11,9 +11,20 @@ export const SOSProvider = ({ children }) => {
   const [sosModalOpen, setSosModalOpen] = useState(false);
   const [sosHistory, setSosHistory] = useState([]);
   const [activeSOSData, setActiveSOSData] = useState(null);
-  const [savedContacts, setSavedContacts] = useState([]);
+  
+  const storageKey = `safehaven_contacts_${user?.uid || user?.email || 'guest'}`;
+
+  const [savedContacts, setSavedContacts] = useState(() => {
+    try {
+      const stored = localStorage.getItem(storageKey);
+      return stored ? JSON.parse(stored) : [];
+    } catch (e) {
+      return [];
+    }
+  });
   const [loadingContacts, setLoadingContacts] = useState(false);
 
+  // Sync saved contacts across LocalStorage and Backend API
   const fetchSavedContacts = useCallback(async () => {
     if (!user) {
       setSavedContacts([]);
@@ -22,19 +33,82 @@ export const SOSProvider = ({ children }) => {
     setLoadingContacts(true);
     try {
       const res = await api.get('/contacts');
-      if (Array.isArray(res.data?.data)) {
+      if (Array.isArray(res.data?.data) && res.data.data.length > 0) {
         setSavedContacts(res.data.data);
+        localStorage.setItem(storageKey, JSON.stringify(res.data.data));
+      } else {
+        // Fallback to local storage if API returns empty (e.g. serverless cold restart)
+        const stored = localStorage.getItem(storageKey);
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setSavedContacts(parsed);
+          }
+        }
       }
     } catch (e) {
-      console.warn('Contacts fetch fallback in SOS Context');
+      // LocalStorage fallback on API error
+      const stored = localStorage.getItem(storageKey);
+      if (stored) {
+        try { setSavedContacts(JSON.parse(stored)); } catch (err) {}
+      }
     } finally {
       setLoadingContacts(false);
     }
-  }, [user]);
+  }, [user, storageKey]);
 
   useEffect(() => {
     fetchSavedContacts();
   }, [fetchSavedContacts]);
+
+  const addContact = async (contactData) => {
+    if (savedContacts.length >= 5) {
+      toast.error('Maximum limit of 5 emergency contacts reached.');
+      return false;
+    }
+
+    const cleanNewPhone = (contactData.phone || '').replace(/[\s\-\(\)]/g, '');
+    const isDuplicate = savedContacts.some(c => (c.phone || '').replace(/[\s\-\(\)]/g, '') === cleanNewPhone);
+
+    if (isDuplicate) {
+      toast.error(`Duplicate Error: A contact with phone number "${contactData.phone}" already exists.`);
+      return false;
+    }
+
+    const newContact = {
+      id: 'contact_' + Date.now(),
+      ...contactData,
+      createdAt: new Date().toISOString()
+    };
+
+    const updatedList = [...savedContacts, newContact];
+    setSavedContacts(updatedList);
+    localStorage.setItem(storageKey, JSON.stringify(updatedList));
+
+    try {
+      await api.post('/contacts', contactData);
+    } catch (err) {
+      console.warn('API sync fallback for contact save');
+    }
+
+    toast.success('Emergency contact saved successfully!');
+    return true;
+  };
+
+  const deleteContact = async (contactId) => {
+    const updatedList = savedContacts.filter(c => c.id !== contactId && c._id !== contactId);
+    setSavedContacts(updatedList);
+    localStorage.setItem(storageKey, JSON.stringify(updatedList));
+
+    try {
+      await api.delete(`/contacts/${contactId}`);
+    } catch (err) {
+      console.warn('API sync fallback for contact deletion');
+    }
+
+    toast.success('Emergency contact removed.');
+    return true;
+  };
 
   const openSOSModal = () => {
     fetchSavedContacts();
@@ -120,6 +194,8 @@ export const SOSProvider = ({ children }) => {
         activeSOSData,
         savedContacts: Array.isArray(savedContacts) ? savedContacts : [],
         loadingContacts,
+        addContact,
+        deleteContact,
         refreshContacts: fetchSavedContacts
       }}
     >
