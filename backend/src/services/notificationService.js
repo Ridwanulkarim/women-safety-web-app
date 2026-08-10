@@ -5,14 +5,16 @@ export const checkNotificationConfig = () => {
   const hasTwilio = Boolean(process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN && process.env.TWILIO_PHONE_NUMBER);
   const hasResend = Boolean(process.env.RESEND_API_KEY);
   const hasSendGrid = Boolean(process.env.SENDGRID_API_KEY);
+  const hasTelegram = Boolean(process.env.TELEGRAM_BOT_TOKEN && process.env.TELEGRAM_CHAT_ID);
 
   console.log('====================================================');
   console.log('🚨 SAFEHAVEN EMERGENCY NOTIFICATION ENGINE STATUS');
-  console.log(`• Twilio SMS Provider: ${hasTwilio ? '✅ ACTIVE' : '⚠️ NOT CONFIGURED'}`);
-  console.log(`• Resend Email Provider: ${hasResend ? '✅ ACTIVE' : '⚠️ NOT CONFIGURED'}`);
+  console.log(`• Twilio SMS Provider: ${hasTwilio ? '✅ ACTIVE' : '⚠️ NOT CONFIGURED (Optional)'}`);
+  console.log(`• Resend Email Provider (Free 3K/mo): ${hasResend ? '✅ ACTIVE' : '⚠️ NOT CONFIGURED'}`);
   console.log(`• SendGrid Email Provider: ${hasSendGrid ? '✅ ACTIVE' : '⚠️ NOT CONFIGURED'}`);
-  if (!hasTwilio && !hasResend && !hasSendGrid) {
-    console.log('⚠️ MODE: SIMULATION ACTIVE (No Twilio/Resend keys configured in environment variables)');
+  console.log(`• Telegram Bot Provider (100% Free): ${hasTelegram ? '✅ ACTIVE' : '⚠️ NOT CONFIGURED'}`);
+  if (!hasTwilio && !hasResend && !hasSendGrid && !hasTelegram) {
+    console.log('⚠️ MODE: SIMULATION ACTIVE (No third-party provider keys configured)');
   }
   console.log('====================================================');
 };
@@ -61,7 +63,7 @@ export const sendTransactionalEmail = async ({ to, subject, htmlContent }) => {
 };
 
 /**
- * Dispatches outbound SMS (via Twilio) and/or Email (via Resend or SendGrid) to emergency contacts.
+ * Dispatches outbound SMS, Email, and/or Telegram alerts to emergency contacts.
  */
 export const sendSOSOutboundAlert = async (contact, alertData) => {
   const { userName, userPhone, latitude, longitude, address, locationUrl } = alertData;
@@ -70,9 +72,10 @@ export const sendSOSOutboundAlert = async (contact, alertData) => {
 
   let smsSent = false;
   let emailSent = false;
+  let telegramSent = false;
   const errors = [];
 
-  // 1. Twilio Outbound SMS Integration
+  // 1. Twilio Outbound SMS Integration (Optional Paid SMS)
   const accountSid = process.env.TWILIO_ACCOUNT_SID;
   const authToken = process.env.TWILIO_AUTH_TOKEN;
   const fromNumber = process.env.TWILIO_PHONE_NUMBER;
@@ -106,7 +109,7 @@ export const sendSOSOutboundAlert = async (contact, alertData) => {
     }
   }
 
-  // 2. Resend / SendGrid Email Outbound Integration
+  // 2. Resend / SendGrid Email Outbound Integration (Free Tier Available)
   const resendApiKey = process.env.RESEND_API_KEY;
   const sendgridApiKey = process.env.SENDGRID_API_KEY;
 
@@ -133,11 +136,31 @@ export const sendSOSOutboundAlert = async (contact, alertData) => {
     }
   }
 
-  if (accountSid || resendApiKey || sendgridApiKey) {
-    return { smsSent, emailSent, errors };
+  // 3. Telegram Bot Integration (100% FREE Unlimited Alerts)
+  const telegramBotToken = process.env.TELEGRAM_BOT_TOKEN;
+  const telegramChatId = contact.telegramChatId || process.env.TELEGRAM_CHAT_ID;
+
+  if (telegramBotToken && telegramChatId) {
+    try {
+      const telegramText = `🚨 *EMERGENCY SOS DISTRESS ALERT*\n\n*User:* ${userName} (${userPhone || 'N/A'})\n*Location:* ${address}\n\n📍 [View Live Location on Google Maps](${locationUrl})`;
+      await axios.post(`https://api.telegram.org/bot${telegramBotToken}/sendMessage`, {
+        chat_id: telegramChatId,
+        text: telegramText,
+        parse_mode: 'Markdown',
+        disable_web_page_preview: false
+      });
+      telegramSent = true;
+      logger.info(`Telegram Emergency Alert successfully dispatched to chat ${telegramChatId}`);
+    } catch (err) {
+      errors.push(`Telegram Error: ${err.message}`);
+    }
   }
 
-  // Demo / Simulation Mode when provider keys are not configured in Vercel environment variables
-  logger.warn(`[SIMULATION MODE] No Twilio/Resend API keys configured. Outbound alert to ${contact.name} (${contact.phone || contact.email || 'N/A'}) logged in console.`);
-  return { smsSent: true, emailSent: true, simulated: true };
+  if (accountSid || resendApiKey || sendgridApiKey || telegramBotToken) {
+    return { smsSent, emailSent, telegramSent, errors };
+  }
+
+  // Demo / Simulation Mode when no paid/free API keys are set in environment variables
+  logger.warn(`[SIMULATION MODE] No notification provider keys configured. Outbound alert to ${contact.name} (${contact.phone || contact.email || 'N/A'}) captured.`);
+  return { smsSent: true, emailSent: true, telegramSent: true, simulated: true };
 };

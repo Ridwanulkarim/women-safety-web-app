@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiAlertTriangle, FiX, FiCheckCircle, FiMapPin, FiPhone, FiCamera, FiUserCheck, FiPlus, FiSend, FiInfo, FiBell } from 'react-icons/fi';
+import { FiAlertTriangle, FiX, FiCheckCircle, FiMapPin, FiPhone, FiCamera, FiUserCheck, FiPlus, FiSend, FiBell, FiMessageSquare } from 'react-icons/fi';
 import { useSOS } from '../../context/SOSContext';
 import { useNotifications } from '../../context/NotificationContext';
 import { useGeolocation } from '../../hooks/useGeolocation';
@@ -48,6 +48,12 @@ const SOSModal = () => {
   };
 
   if (!sosModalOpen) return null;
+
+  // Build native cellular SMS link for zero-cost mobile carrier messaging
+  const phoneNumbers = savedContacts.filter(c => c.phone).map(c => c.phone).join(',');
+  const mapsUrl = `https://maps.google.com/?q=${location.latitude},${location.longitude}`;
+  const nativeSmsText = `🚨 EMERGENCY SOS ALERT! I need urgent help! Location: ${location.address}. Google Maps: ${mapsUrl}`;
+  const nativeSmsUrl = phoneNumbers ? `sms:${phoneNumbers}?body=${encodeURIComponent(nativeSmsText)}` : `sms:?body=${encodeURIComponent(nativeSmsText)}`;
 
   return (
     <AnimatePresence>
@@ -116,12 +122,15 @@ const SOSModal = () => {
                 )}
               </div>
 
-              {/* Notification Provider Info Banner */}
-              <div className="p-3 rounded-lg bg-blue-500/10 border border-blue-500/20 text-left text-[11px] text-blue-600 dark:text-blue-400 space-y-1">
-                <p className="font-bold flex items-center gap-1.5"><FiBell /> Notification Channels Active:</p>
-                <p>• <strong>In-App Alert</strong>: Created in your notifications bell feed.</p>
-                <p>• <strong>Outbound SMS & Email</strong>: Requires Twilio & Resend API keys in Vercel environment variables to deliver physical SMS to carrier numbers.</p>
-              </div>
+              {/* Free Zero-Cost Native SMS Dispatch Button */}
+              {phoneNumbers && (
+                <a
+                  href={nativeSmsUrl}
+                  className="w-full py-3 px-4 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs font-mono inline-flex items-center justify-center gap-2 shadow-lg transition"
+                >
+                  <FiMessageSquare /> 📱 SEND FREE SMS VIA MOBILE CARRIER APP
+                </a>
+              )}
 
               {/* Emergency Evidence Action */}
               <button
