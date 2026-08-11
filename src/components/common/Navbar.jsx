@@ -33,7 +33,7 @@ const Navbar = () => {
 
   return (
     <header className="sticky top-0 z-50 bg-white/95 dark:bg-[#09090b]/95 backdrop-blur-sm border-b border-zinc-200/90 dark:border-zinc-800/80 transition-colors">
-      <div className="max-w-7xl mx-auto px-2.5 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-14 sm:h-16">
           
           {/* Logo & Desktop Nav Links */}
@@ -70,14 +70,17 @@ const Navbar = () => {
             </nav>
           </div>
 
-          {/* Right Header Action Controls - Optimized for Mobile Viewports */}
-          <div className="flex items-center gap-1 sm:gap-2">
+          {/* Right Header Action Controls */}
+          <div className="flex items-center gap-1.5 sm:gap-2">
             
-            <LanguageToggle />
-            <ThemeToggle />
+            {/* Desktop Language & Theme Toggles */}
+            <div className="hidden lg:flex items-center gap-2">
+              <LanguageToggle />
+              <ThemeToggle />
+            </div>
 
             {user ? (
-              /* LOGGED IN CONTROLS */
+              /* LOGGED IN CONTROLS: Notification Bell & User Avatar Badge */
               <>
                 <button
                   onClick={openSOSModal}
@@ -87,11 +90,13 @@ const Navbar = () => {
                   <span>{t('nav.sosDispatch')}</span>
                 </button>
 
+                {/* Notifications Bell Button */}
                 <Link
                   to="/dashboard/notifications"
-                  className="relative p-1.5 sm:p-2 rounded-lg bg-zinc-100 dark:bg-zinc-800/80 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition border border-zinc-200 dark:border-zinc-700 min-h-[36px] sm:min-h-[40px] flex items-center justify-center"
+                  className="relative p-2 rounded-lg bg-zinc-100 dark:bg-zinc-800/80 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition border border-zinc-200 dark:border-zinc-700 min-h-[38px] min-w-[38px] flex items-center justify-center"
+                  title="Notifications"
                 >
-                  <FiBell className="w-4 h-4" />
+                  <FiBell className="w-4 h-4 text-zinc-800 dark:text-zinc-200" />
                   {unreadCount > 0 && (
                     <span className="absolute -top-1 -right-1 w-4 h-4 bg-rose-600 text-white text-[9px] font-bold rounded-full flex items-center justify-center font-mono">
                       {unreadCount}
@@ -99,11 +104,11 @@ const Navbar = () => {
                   )}
                 </Link>
 
-                {/* User Dropdown */}
+                {/* User Dropdown Badge */}
                 <div className="relative">
                   <button
                     onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-                    className="flex items-center gap-1.5 p-1 sm:pr-2 rounded-lg bg-zinc-100 dark:bg-zinc-800/80 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition border border-zinc-200 dark:border-zinc-700 min-h-[36px] sm:min-h-[40px]"
+                    className="flex items-center gap-1.5 p-1 sm:pr-2 rounded-lg bg-zinc-100 dark:bg-zinc-800/80 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition border border-zinc-200 dark:border-zinc-700 min-h-[38px]"
                   >
                     {user.profilePictureUrl || user.profileImage ? (
                       <img
@@ -184,28 +189,29 @@ const Navbar = () => {
               </div>
             )}
 
-            {/* ALWAYS-VISIBLE MOBILE HAMBURGER MENU BUTTON FOR ALL USERS */}
+            {/* ALWAYS-VISIBLE MOBILE HAMBURGER MENU BUTTON FOR EVERY MOBILE DEVICE */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-1.5 rounded-lg lg:hidden bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 min-h-[36px] sm:min-h-[40px] flex items-center justify-center ml-0.5"
+              className="p-2 rounded-lg lg:hidden bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 min-h-[38px] min-w-[38px] flex items-center justify-center"
               aria-label="Toggle Navigation Menu"
             >
-              {mobileMenuOpen ? <FiX className="w-5 h-5" /> : <FiMenu className="w-5 h-5" />}
+              {mobileMenuOpen ? <FiX className="w-5 h-5 text-rose-600" /> : <FiMenu className="w-5 h-5" />}
             </button>
 
           </div>
         </div>
       </div>
 
-      {/* MOBILE NAVIGATION DRAWER - ACCESSIBLE TO ALL VISITORS & LOGGED IN USERS */}
+      {/* MOBILE NAVIGATION DRAWER */}
       {mobileMenuOpen && (
         <div className="lg:hidden bg-white dark:bg-[#09090b] border-t border-zinc-200 dark:border-zinc-800 px-4 pt-3 pb-6 space-y-4 shadow-2xl animate-fade-in">
           <div className="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-2">
-            <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400">
-              SafeHaven Safety Portal
-            </span>
+            <div className="flex items-center gap-2">
+              <LanguageToggle />
+              <ThemeToggle />
+            </div>
             <span className="mono-tag mono-tag-emerald py-0 text-[9px]">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 telemetry-dot"></span> Live 24/7
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 telemetry-dot"></span> SafeHaven
             </span>
           </div>
 
