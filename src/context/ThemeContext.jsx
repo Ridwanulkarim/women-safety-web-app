@@ -5,15 +5,19 @@ const ThemeContext = createContext();
 export const ThemeProvider = ({ children }) => {
   const [darkMode, setDarkMode] = useState(() => {
     const saved = localStorage.getItem('safehaven_dark_mode');
-    return saved ? JSON.parse(saved) : true; // Default to dark mode for modern glassmorphism feel
+    return saved !== null ? JSON.parse(saved) : true;
   });
 
   useEffect(() => {
     const root = document.documentElement;
     if (darkMode) {
       root.classList.add('dark');
+      root.classList.remove('light');
+      root.style.colorScheme = 'dark';
     } else {
       root.classList.remove('dark');
+      root.classList.add('light');
+      root.style.colorScheme = 'light';
     }
     localStorage.setItem('safehaven_dark_mode', JSON.stringify(darkMode));
   }, [darkMode]);
