@@ -154,11 +154,17 @@ const DashboardLayout = () => {
               )}
             </Link>
 
+            {/* Quick Logout Icon Button on Mobile */}
             <button
-              onClick={openSOSModal}
-              className="hidden md:inline-flex btn-danger !py-1.5 !px-3 font-mono text-[11px]"
+              onClick={() => {
+                logoutUser();
+                navigate('/login');
+              }}
+              className="p-1.5 sm:p-2 rounded-lg bg-rose-500/10 text-rose-600 border border-rose-500/20 hover:bg-rose-500/20 transition min-h-[36px] flex items-center justify-center font-mono text-xs font-bold gap-1"
+              title="Logout"
             >
-              <FiAlertCircle /> SOS DISPATCH
+              <FiLogOut className="w-4 h-4" />
+              <span className="hidden sm:inline">Logout</span>
             </button>
           </div>
         </header>
@@ -180,6 +186,17 @@ const DashboardLayout = () => {
                 <span>{item.name}</span>
               </Link>
             ))}
+
+            <button
+              onClick={() => {
+                setSidebarOpen(false);
+                logoutUser();
+                navigate('/login');
+              }}
+              className="w-full flex items-center justify-between px-4 py-2.5 rounded-lg text-xs font-bold text-rose-600 bg-rose-500/10 hover:bg-rose-500/20 transition mt-2"
+            >
+              <span className="flex items-center gap-2"><FiLogOut /> Logout of Account</span>
+            </button>
           </div>
         )}
 

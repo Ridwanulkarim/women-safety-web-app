@@ -1,13 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
-import { FiUser, FiMail, FiPhone, FiMapPin, FiSave, FiCheckCircle, FiCalendar } from 'react-icons/fi';
+import { useNavigate } from 'react-router-dom';
+import { FiUser, FiMail, FiPhone, FiMapPin, FiSave, FiCheckCircle, FiCalendar, FiLogOut } from 'react-icons/fi';
 import { useAuth } from '../../context/AuthContext';
 import ProfilePictureUpload from '../../components/profile/ProfilePictureUpload';
 import api from '../../services/api';
 import toast from 'react-hot-toast';
 
 const Profile = () => {
-  const { user, updateUserProfile } = useAuth();
+  const { user, updateUserProfile, logoutUser } = useAuth();
+  const navigate = useNavigate();
   const dateInputRef = useRef(null);
 
   const { register, handleSubmit, reset, setValue } = useForm({
@@ -48,123 +50,94 @@ const Profile = () => {
 
   const [loading, setLoading] = useState(false);
 
-  const handleImageUploadSuccess = async (downloadUrl) => {
-    setValue('profilePictureUrl', downloadUrl);
-    setValue('profileImage', downloadUrl);
-
-    // Save uploaded profile picture URL directly to backend & AuthContext
-    try {
-      if (user?.uid) {
-        await api.put(`/users/${user.uid}`, {
-          profilePictureUrl: downloadUrl,
-          profileImage: downloadUrl
-        });
-      }
-      if (updateUserProfile) {
-        updateUserProfile({
-          profilePictureUrl: downloadUrl,
-          profileImage: downloadUrl
-        });
-      }
-    } catch (err) {
-      if (updateUserProfile) {
-        updateUserProfile({
-          profilePictureUrl: downloadUrl,
-          profileImage: downloadUrl
-        });
-      }
-    }
+  const handleImageUploadSuccess = (uploadedUrl) => {
+    setValue('profilePictureUrl', uploadedUrl);
+    setValue('profileImage', uploadedUrl);
+    updateUserProfile({ profilePictureUrl: uploadedUrl, profileImage: uploadedUrl });
   };
 
   const onSubmit = async (data) => {
     setLoading(true);
     try {
-      if (user?.uid) {
-        await api.put(`/users/${user.uid}`, data);
-      }
-      if (updateUserProfile) {
-        updateUserProfile(data);
-      }
+      const res = await api.put('/users/profile', data);
+      const updated = res.data?.data || data;
+      updateUserProfile(updated);
       toast.success('Profile updated successfully!');
-    } catch (e) {
-      if (updateUserProfile) {
-        updateUserProfile(data);
-      }
-      toast.success('Saved profile settings.');
+    } catch (error) {
+      updateUserProfile(data);
+      toast.success('Profile updated locally!');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleOpenDatePicker = () => {
-    if (dateInputRef.current) {
-      if (typeof dateInputRef.current.showPicker === 'function') {
-        try {
-          dateInputRef.current.showPicker();
-        } catch (e) {
-          dateInputRef.current.focus();
-        }
-      } else {
-        dateInputRef.current.focus();
-      }
-    }
-  };
-
   return (
-    <div className="max-w-4xl mx-auto space-y-8 font-sans">
-      <div className="flex items-center gap-3 border-b border-slate-200 dark:border-slate-800 pb-4">
-        <div className="w-12 h-12 rounded-2xl bg-rose-600 text-white flex items-center justify-center text-2xl font-bold shadow-md">
-          <FiUser />
-        </div>
+    <div className="max-w-2xl mx-auto space-y-6">
+      <div className="product-card p-6 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold font-heading">User Profile Settings</h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400">Manage your personal details, avatar photo, and emergency medical profile.</p>
+          <h1 className="text-xl font-bold font-heading text-zinc-900 dark:text-white">Profile Settings</h1>
+          <p className="text-xs text-zinc-500">Manage your personal emergency identification & photo</p>
         </div>
+        <span className="mono-tag mono-tag-emerald">
+          <FiCheckCircle /> Verified
+        </span>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="product-card p-6 sm:p-8 space-y-6">
         
-        {/* Profile Image Upload & User Info Header */}
-        <div className="flex flex-col sm:flex-row items-center gap-6 pb-6 border-b border-slate-200/50 dark:border-slate-800/50 text-center sm:text-left">
+        {/* Profile Picture Upload Component */}
+        <div className="border-b border-zinc-200 dark:border-zinc-800 pb-6">
+          <label className="human-label text-center mb-3">Profile Picture (Firebase Storage)</label>
           <ProfilePictureUpload
             currentUrl={user?.profilePictureUrl || user?.profileImage}
-            userId={user?.uid || 'guest'}
             onUploadSuccess={handleImageUploadSuccess}
+            userId={user?.uid}
           />
-
-          <div className="space-y-1">
-            <h3 className="text-xl font-bold font-heading">{user?.fullName || 'User'}</h3>
-            <p className="text-xs text-slate-400 font-mono">{user?.email}</p>
-            <span className="inline-block text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-rose-500/10 text-rose-500 border border-rose-500/20">
-              Role: {user?.role || 'User'}
-            </span>
-          </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="human-label">Full Name</label>
-            <input
-              type="text"
-              placeholder="e.g. Jane Doe"
-              {...register('fullName')}
-              className="human-input"
-            />
+            <div className="relative">
+              <FiUser className="absolute left-3.5 top-3.5 text-zinc-400" />
+              <input
+                type="text"
+                placeholder="Jane Doe"
+                {...register('fullName', { required: 'Full name is required' })}
+                className="human-input human-input-has-icon"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="human-label">Email Address (Read-only)</label>
+            <div className="relative">
+              <FiMail className="absolute left-3.5 top-3.5 text-zinc-400" />
+              <input
+                type="email"
+                disabled
+                {...register('email')}
+                className="human-input human-input-has-icon opacity-60 bg-zinc-100 dark:bg-zinc-900 cursor-not-allowed"
+              />
+            </div>
           </div>
 
           <div>
             <label className="human-label">Phone Number</label>
-            <input
-              type="tel"
-              placeholder="e.g. +8801700000000"
-              {...register('phone')}
-              className="human-input"
-            />
+            <div className="relative">
+              <FiPhone className="absolute left-3.5 top-3.5 text-zinc-400" />
+              <input
+                type="tel"
+                placeholder="+880 1700000000"
+                {...register('phone')}
+                className="human-input human-input-has-icon"
+              />
+            </div>
           </div>
 
           <div>
             <label className="human-label">Date of Birth</label>
-            <div className="relative flex items-center">
+            <div className="relative">
               <input
                 type="date"
                 {...dobRegisterProps}
@@ -176,30 +149,44 @@ const Profile = () => {
               />
               <button
                 type="button"
-                onClick={handleOpenDatePicker}
-                className="absolute right-3 text-rose-600 dark:text-rose-400 hover:text-rose-700 text-base cursor-pointer p-1"
-                title="Select Date of Birth"
+                onClick={() => {
+                  if (dateInputRef.current && typeof dateInputRef.current.showPicker === 'function') {
+                    dateInputRef.current.showPicker();
+                  } else if (dateInputRef.current) {
+                    dateInputRef.current.focus();
+                  }
+                }}
+                className="absolute right-3 top-2.5 p-1 rounded-md text-zinc-500 dark:text-zinc-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition"
+                title="Open Calendar Picker"
               >
-                <FiCalendar />
+                <FiCalendar className="w-4 h-4 text-rose-600 dark:text-rose-400" />
               </button>
             </div>
           </div>
 
           <div>
+            <label className="human-label">Gender</label>
+            <select {...register('gender')} className="human-input">
+              <option value="">Select Gender</option>
+              <option value="Female">Female</option>
+              <option value="Male">Male</option>
+              <option value="Other">Other</option>
+              <option value="Prefer not to say">Prefer not to say</option>
+            </select>
+          </div>
+
+          <div>
             <label className="human-label">Blood Group</label>
-            <select
-              {...register('bloodGroup')}
-              className="human-input"
-            >
-              <option value="">Select Blood Group...</option>
+            <select {...register('bloodGroup')} className="human-input">
+              <option value="">Select Blood Group</option>
               <option value="A+">A+</option>
               <option value="A-">A-</option>
               <option value="B+">B+</option>
               <option value="B-">B-</option>
-              <option value="O+">O+</option>
-              <option value="O-">O-</option>
               <option value="AB+">AB+</option>
               <option value="AB-">AB-</option>
+              <option value="O+">O+</option>
+              <option value="O-">O-</option>
             </select>
           </div>
 
@@ -207,7 +194,7 @@ const Profile = () => {
             <label className="human-label">City</label>
             <input
               type="text"
-              placeholder="e.g. Chittagong, Dhaka..."
+              placeholder="e.g. Dhaka"
               {...register('city')}
               className="human-input"
             />
@@ -241,6 +228,20 @@ const Profile = () => {
         >
           <FiSave /> {loading ? 'Saving Profile...' : 'Save Profile Changes'}
         </button>
+
+        {/* Prominent Mobile & Desktop Logout Button */}
+        <div className="pt-4 border-t border-zinc-200 dark:border-zinc-800">
+          <button
+            type="button"
+            onClick={() => {
+              logoutUser();
+              navigate('/login');
+            }}
+            className="w-full py-3 rounded-xl border border-rose-500/30 text-rose-600 dark:text-rose-400 bg-rose-500/10 hover:bg-rose-500/20 font-mono text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition cursor-pointer active:scale-95"
+          >
+            <FiLogOut className="w-4 h-4 text-rose-600" /> LOGOUT OF SAFEHAVEN ACCOUNT
+          </button>
+        </div>
 
       </form>
     </div>
