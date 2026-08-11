@@ -4,6 +4,27 @@ import { useAuth } from './AuthContext';
 
 const NotificationContext = createContext();
 
+const getInitialNotifications = (uid, email) => {
+  return [
+    {
+      id: 'notif_sec_' + Date.now(),
+      title: '🛡️ Security Alert: New Sign-In',
+      message: `New sign-in detected for ${email || 'your account'} on ${new Date().toLocaleString()}. Shield protection is active.`,
+      type: 'SECURITY',
+      isRead: false,
+      createdAt: new Date().toISOString()
+    },
+    {
+      id: 'notif_welcome',
+      title: 'Welcome to SafeHaven',
+      message: 'Your personal safety shield is active. Add up to 5 emergency contacts in your dashboard.',
+      type: 'INFO',
+      isRead: false,
+      createdAt: new Date().toISOString()
+    }
+  ];
+};
+
 export const NotificationProvider = ({ children }) => {
   const { user } = useAuth();
   const storageKey = `safehaven_notifications_${user?.uid || user?.email || 'guest'}`;
@@ -11,18 +32,12 @@ export const NotificationProvider = ({ children }) => {
   const [notifications, setNotifications] = useState(() => {
     try {
       const stored = localStorage.getItem(storageKey);
-      if (stored) return JSON.parse(stored);
-    } catch (e) {}
-    return [
-      {
-        id: 'notif_welcome',
-        title: 'Welcome to SafeHaven',
-        message: 'Your personal safety shield is active. Add up to 5 emergency contacts in your dashboard.',
-        type: 'INFO',
-        isRead: false,
-        createdAt: new Date().toISOString()
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
       }
-    ];
+    } catch (e) {}
+    return getInitialNotifications(user?.uid, user?.email);
   });
 
   const fetchNotifications = useCallback(async () => {
@@ -30,25 +45,42 @@ export const NotificationProvider = ({ children }) => {
       setNotifications([]);
       return;
     }
+
+    let apiList = [];
     try {
       const res = await api.get('/notifications');
-      if (Array.isArray(res.data?.data) && res.data.data.length > 0) {
-        setNotifications(res.data.data);
-        localStorage.setItem(storageKey, JSON.stringify(res.data.data));
-      } else {
-        const stored = localStorage.getItem(storageKey);
-        if (stored) {
-          try {
-            setNotifications(JSON.parse(stored));
-          } catch (err) {}
-        }
+      if (Array.isArray(res.data?.data)) {
+        apiList = res.data.data;
       }
-    } catch (error) {
+    } catch (e) {}
+
+    let localList = [];
+    try {
       const stored = localStorage.getItem(storageKey);
       if (stored) {
-        try { setNotifications(JSON.parse(stored)); } catch (err) {}
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed)) localList = parsed;
       }
+    } catch (e) {}
+
+    // Merge API & Local notifications and deduplicate by ID
+    const combined = [...apiList, ...localList];
+    const uniqueMap = new Map();
+    combined.forEach(n => {
+      if (n && n.id) uniqueMap.set(n.id, n);
+    });
+
+    let finalNotifications = Array.from(uniqueMap.values());
+
+    // Fallback: If 0 notifications exist, populate initial Welcome & Security Alert
+    if (finalNotifications.length === 0) {
+      finalNotifications = getInitialNotifications(user.uid, user.email);
     }
+
+    setNotifications(finalNotifications);
+    try {
+      localStorage.setItem(storageKey, JSON.stringify(finalNotifications));
+    } catch (e) {}
   }, [user, storageKey]);
 
   useEffect(() => {
