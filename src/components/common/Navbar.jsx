@@ -113,11 +113,17 @@ const Navbar = () => {
                     onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
                     className="flex items-center gap-2 p-1 pr-2 rounded-lg bg-zinc-100 dark:bg-zinc-800/80 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition border border-zinc-200 dark:border-zinc-700"
                   >
-                    <img
-                      src={user.profileImage || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80'}
-                      alt={user.fullName}
-                      className="w-6 h-6 rounded-md object-cover"
-                    />
+                    {user.profilePictureUrl || user.profileImage ? (
+                      <img
+                        src={user.profilePictureUrl || user.profileImage}
+                        alt={user.fullName}
+                        className="w-6 h-6 rounded-md object-cover"
+                      />
+                    ) : (
+                      <div className="w-6 h-6 rounded-md bg-rose-600 text-white font-bold flex items-center justify-center text-[10px]">
+                        {(user.fullName || user.email || 'U')[0].toUpperCase()}
+                      </div>
+                    )}
                     <span className="hidden md:inline-block text-xs font-medium text-zinc-800 dark:text-zinc-200 max-w-[80px] truncate">
                       {user.fullName}
                     </span>
