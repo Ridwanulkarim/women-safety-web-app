@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { FiShield, FiBell, FiUser, FiMenu, FiX, FiLogOut, FiLayout, FiAlertCircle, FiPhone, FiClock, FiMapPin, FiSettings, FiCamera } from 'react-icons/fi';
+import { FiShield, FiBell, FiUser, FiMenu, FiX, FiLogOut, FiLayout, FiAlertCircle, FiPhone, FiClock, FiMapPin, FiSettings, FiCamera, FiBookOpen } from 'react-icons/fi';
 import { useAuth } from '../../context/AuthContext';
 import { useNotifications } from '../../context/NotificationContext';
 import ThemeToggle from './ThemeToggle';
@@ -19,12 +19,12 @@ const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const navLinks = [
+  const publicNavLinks = [
     { name: t('nav.home'), path: '/' },
-    { name: t('nav.about'), path: '/about' },
     { name: t('nav.features'), path: '/features' },
     { name: t('nav.safetyTips'), path: '/safety-tips' },
     { name: t('nav.emergencyHelp'), path: '/emergency-help' },
+    { name: t('nav.about'), path: '/about' },
     { name: t('nav.blog'), path: '/blog' },
     { name: t('nav.contact'), path: '/contact' }
   ];
@@ -33,12 +33,12 @@ const Navbar = () => {
 
   return (
     <header className="sticky top-0 z-50 bg-white/95 dark:bg-[#09090b]/95 backdrop-blur-sm border-b border-zinc-200/90 dark:border-zinc-800/80 transition-colors">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-14 sm:h-16">
           
-          {/* Logo & Desktop Links */}
-          <div className="flex items-center gap-6">
-            <Link to={user ? "/" : "/login"} className="flex items-center gap-2.5 group">
+          {/* Logo & Desktop Nav Links */}
+          <div className="flex items-center gap-4 lg:gap-6">
+            <Link to="/" className="flex items-center gap-2 group">
               <div className="w-8 h-8 rounded-lg bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 flex items-center justify-center font-bold transition">
                 <FiShield className="w-4 h-4" />
               </div>
@@ -46,45 +46,38 @@ const Navbar = () => {
                 <span className="text-sm font-bold tracking-tight text-zinc-900 dark:text-white font-heading">
                   {t('nav.brandName')}
                 </span>
-                {user && (
-                  <span className="hidden md:inline-flex mono-tag mono-tag-emerald py-0 text-[10px]">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 telemetry-dot"></span> {t('nav.onlineStatus')}
-                  </span>
-                )}
+                <span className="hidden sm:inline-flex mono-tag mono-tag-emerald py-0 text-[10px]">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 telemetry-dot"></span> {t('nav.onlineStatus')}
+                </span>
               </div>
             </Link>
 
-            {/* Nav Links AFTER LOGIN ONLY */}
-            {user && (
-              <nav className="hidden lg:flex items-center gap-1 pl-4 border-l border-zinc-200 dark:border-zinc-800">
-                {navLinks.map((link) => (
-                  <Link
-                    key={link.path}
-                    to={link.path}
-                    className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
-                      isActive(link.path)
-                        ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white font-semibold'
-                        : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
-                    }`}
-                  >
-                    {link.name}
-                  </Link>
-                ))}
-              </nav>
-            )}
+            {/* Desktop Navigation Links */}
+            <nav className="hidden lg:flex items-center gap-1 pl-4 border-l border-zinc-200 dark:border-zinc-800">
+              {publicNavLinks.map((link) => (
+                <Link
+                  key={link.path}
+                  to={link.path}
+                  className={`px-2.5 py-1.5 rounded-md text-xs font-medium transition-all ${
+                    isActive(link.path)
+                      ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white font-semibold'
+                      : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
+                  }`}
+                >
+                  {link.name}
+                </Link>
+              ))}
+            </nav>
           </div>
 
-          {/* Right Controls - ALWAYS VISIBLE ON ALL SCREENS */}
-          <div className="flex items-center gap-2">
+          {/* Right Header Action Controls */}
+          <div className="flex items-center gap-1.5 sm:gap-2">
             
-            {/* Always Visible Language Toggle Switch */}
             <LanguageToggle />
-
-            {/* Dark Mode Toggle */}
             <ThemeToggle />
 
             {user ? (
-              /* AFTER LOGIN CONTROLS */
+              /* LOGGED IN CONTROLS */
               <>
                 <button
                   onClick={openSOSModal}
@@ -94,12 +87,11 @@ const Navbar = () => {
                   <span>{t('nav.sosDispatch')}</span>
                 </button>
 
-                {/* Notifications Button */}
                 <Link
                   to="/dashboard/notifications"
-                  className="relative p-2 rounded-lg bg-zinc-100 dark:bg-zinc-800/80 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition border border-zinc-200 dark:border-zinc-700"
+                  className="relative p-2 rounded-lg bg-zinc-100 dark:bg-zinc-800/80 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition border border-zinc-200 dark:border-zinc-700 min-h-[40px] flex items-center justify-center"
                 >
-                  <FiBell className="w-3.5 h-3.5" />
+                  <FiBell className="w-4 h-4" />
                   {unreadCount > 0 && (
                     <span className="absolute -top-1 -right-1 w-4 h-4 bg-rose-600 text-white text-[9px] font-bold rounded-full flex items-center justify-center font-mono">
                       {unreadCount}
@@ -111,7 +103,7 @@ const Navbar = () => {
                 <div className="relative">
                   <button
                     onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-                    className="flex items-center gap-2 p-1 pr-2 rounded-lg bg-zinc-100 dark:bg-zinc-800/80 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition border border-zinc-200 dark:border-zinc-700"
+                    className="flex items-center gap-2 p-1 pr-2 rounded-lg bg-zinc-100 dark:bg-zinc-800/80 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition border border-zinc-200 dark:border-zinc-700 min-h-[40px]"
                   >
                     {user.profilePictureUrl || user.profileImage ? (
                       <img
@@ -160,56 +152,6 @@ const Navbar = () => {
                         <FiUser /> {t('nav.profile')}
                       </Link>
 
-                      <Link
-                        to="/dashboard/contacts"
-                        onClick={() => setProfileDropdownOpen(false)}
-                        className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 transition"
-                      >
-                        <FiPhone /> {t('nav.emergencyContacts')}
-                      </Link>
-
-                      <Link
-                        to="/dashboard/sos-history"
-                        onClick={() => setProfileDropdownOpen(false)}
-                        className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 transition"
-                      >
-                        <FiClock /> {t('nav.sosHistory')}
-                      </Link>
-
-                      <Link
-                        to="/dashboard/live-location"
-                        onClick={() => setProfileDropdownOpen(false)}
-                        className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 transition"
-                      >
-                        <FiMapPin /> {t('nav.liveLocation')}
-                      </Link>
-
-                      <Link
-                        to="/dashboard/notifications"
-                        onClick={() => setProfileDropdownOpen(false)}
-                        className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 transition"
-                      >
-                        <FiBell /> {t('nav.notifications')}
-                      </Link>
-
-                      <Link
-                        to="/dashboard/settings"
-                        onClick={() => setProfileDropdownOpen(false)}
-                        className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 transition"
-                      >
-                        <FiSettings /> {t('nav.settings')}
-                      </Link>
-
-                      {isAdmin && (
-                        <Link
-                          to="/admin"
-                          onClick={() => setProfileDropdownOpen(false)}
-                          className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 transition"
-                        >
-                          <FiShield /> {t('nav.adminPanel')}
-                        </Link>
-                      )}
-
                       <button
                         onClick={() => {
                           setProfileDropdownOpen(false);
@@ -223,66 +165,97 @@ const Navbar = () => {
                     </div>
                   )}
                 </div>
-
-                {/* Mobile Menu Hamburger */}
-                <button
-                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                  className="p-1.5 rounded-lg lg:hidden bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700"
-                >
-                  {mobileMenuOpen ? <FiX className="w-5 h-5" /> : <FiMenu className="w-5 h-5" />}
-                </button>
               </>
             ) : (
-              /* BEFORE LOGIN CONTROLS */
-              <div className="flex items-center gap-2">
+              /* PUBLIC VISITOR SIGN-IN / REGISTER BUTTONS */
+              <div className="flex items-center gap-1.5">
                 <Link
                   to="/login"
-                  className="px-3 py-1.5 text-xs font-semibold text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition"
+                  className="px-2.5 py-1.5 text-xs font-semibold text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition"
                 >
                   {t('nav.signIn')}
                 </Link>
                 <Link
                   to="/register"
-                  className="btn-solid text-xs py-1.5 px-3"
+                  className="btn-danger text-xs !py-1.5 !px-3 font-mono"
                 >
                   {t('nav.getStarted')}
                 </Link>
               </div>
             )}
+
+            {/* ALWAYS-VISIBLE MOBILE HAMBURGER MENU BUTTON FOR EVERYONE */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="p-2 rounded-lg lg:hidden bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 min-h-[40px] flex items-center justify-center"
+              aria-label="Toggle Navigation Menu"
+            >
+              {mobileMenuOpen ? <FiX className="w-5 h-5" /> : <FiMenu className="w-5 h-5" />}
+            </button>
+
           </div>
         </div>
       </div>
 
-      {/* Mobile Menu AFTER LOGIN ONLY */}
-      {user && mobileMenuOpen && (
-        <div className="lg:hidden bg-white dark:bg-[#09090b] border-t border-zinc-200 dark:border-zinc-800 px-4 pt-2 pb-5 space-y-3">
+      {/* MOBILE NAVIGATION DRAWER - ACCESSIBLE TO ALL VISITORS */}
+      {mobileMenuOpen && (
+        <div className="lg:hidden bg-white dark:bg-[#09090b] border-t border-zinc-200 dark:border-zinc-800 px-4 pt-3 pb-6 space-y-4 shadow-2xl animate-fade-in">
+          <div className="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-2">
+            <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400">
+              SafeHaven Safety Portal
+            </span>
+            <span className="mono-tag mono-tag-emerald py-0 text-[9px]">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 telemetry-dot"></span> Live 24/7
+            </span>
+          </div>
+
           <nav className="flex flex-col space-y-1">
-            {navLinks.map((link) => (
+            {publicNavLinks.map((link) => (
               <Link
                 key={link.path}
                 to={link.path}
                 onClick={() => setMobileMenuOpen(false)}
-                className={`px-3 py-2 rounded-lg text-xs font-medium ${
+                className={`px-3 py-2.5 rounded-lg text-xs font-semibold flex items-center justify-between transition ${
                   isActive(link.path)
-                    ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white font-semibold'
-                    : 'text-zinc-600 dark:text-zinc-400'
+                    ? 'bg-rose-600 text-white font-bold'
+                    : 'text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800'
                 }`}
               >
-                {link.name}
+                <span>{link.name}</span>
               </Link>
             ))}
           </nav>
 
+          {/* Quick SOS & Action Buttons inside Mobile Drawer */}
           <div className="pt-2 border-t border-zinc-200 dark:border-zinc-800 space-y-2">
             <button
               onClick={() => {
                 setMobileMenuOpen(false);
                 openSOSModal();
               }}
-              className="w-full btn-danger font-mono text-xs"
+              className="w-full btn-danger font-mono text-xs py-3 flex items-center justify-center gap-2"
             >
-              <FiAlertCircle /> {t('nav.sosDispatch')}
+              <FiAlertCircle className="w-4 h-4" /> DISPATCH EMERGENCY SOS
             </button>
+
+            {!user && (
+              <div className="grid grid-cols-2 gap-2 pt-1">
+                <Link
+                  to="/login"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="btn-outline text-center py-2 text-xs"
+                >
+                  Sign In
+                </Link>
+                <Link
+                  to="/register"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="btn-solid text-center py-2 text-xs"
+                >
+                  Register Free
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       )}

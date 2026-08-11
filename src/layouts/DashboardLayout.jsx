@@ -10,6 +10,7 @@ import { useSOS } from '../context/SOSContext';
 import ThemeToggle from '../components/common/ThemeToggle';
 import SOSModal from '../components/sos/SOSModal';
 import ScrollToTop from '../components/common/ScrollToTop';
+import MobileBottomBar from '../components/common/MobileBottomBar';
 
 const DashboardLayout = () => {
   const { user, logoutUser } = useAuth();
@@ -34,7 +35,7 @@ const DashboardLayout = () => {
   const isActive = (path) => location.pathname === path;
 
   return (
-    <div className="min-h-screen flex bg-[#fafafa] dark:bg-[#09090b] text-zinc-900 dark:text-zinc-100 transition-colors duration-200">
+    <div className="min-h-screen flex bg-[#fafafa] dark:bg-[#09090b] text-zinc-900 dark:text-zinc-100 transition-colors duration-200 pb-16 lg:pb-0">
       <ScrollToTop />
 
       {/* Sidebar Desktop */}
@@ -125,7 +126,7 @@ const DashboardLayout = () => {
           <div className="flex items-center gap-3">
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="p-2 rounded-lg lg:hidden bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700"
+              className="p-2 rounded-lg lg:hidden bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700 min-h-[40px] flex items-center justify-center"
             >
               {sidebarOpen ? <FiX className="w-4 h-4" /> : <FiMenu className="w-4 h-4" />}
             </button>
@@ -170,6 +171,7 @@ const DashboardLayout = () => {
       </div>
 
       <SOSModal />
+      <MobileBottomBar />
     </div>
   );
 };
