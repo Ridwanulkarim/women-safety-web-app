@@ -22,7 +22,7 @@ const Login = () => {
       await loginUser(data.email, data.password);
       navigate(from, { replace: true });
     } catch (e) {
-      // toast shown in context
+      // toast shown in AuthContext
     } finally {
       setLoading(false);
     }
@@ -34,21 +34,21 @@ const Login = () => {
       await loginWithGoogle();
       navigate(from, { replace: true });
     } catch (e) {
-      // toast shown in context
+      // toast shown in AuthContext
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-[75vh] flex items-center justify-center p-4">
-      <div className="max-w-md w-full product-card p-8 space-y-6 shadow-lg">
+    <div className="min-h-[75vh] flex items-center justify-center p-3 sm:p-4">
+      <div className="max-w-md w-full product-card p-5 sm:p-8 space-y-6 shadow-xl border-zinc-200 dark:border-zinc-800">
         
         <div className="text-center space-y-2">
           <div className="w-10 h-10 mx-auto rounded-xl bg-rose-600 flex items-center justify-center text-white text-xl shadow-md">
             <FiShield />
           </div>
-          <h2 className="text-2xl font-extrabold font-heading text-zinc-900 dark:text-white">{t('auth.loginTitle')}</h2>
+          <h2 className="text-xl sm:text-2xl font-extrabold font-heading text-zinc-900 dark:text-white">{t('auth.loginTitle')}</h2>
           <p className="text-xs text-zinc-500 dark:text-zinc-400">{t('auth.loginSub')}</p>
         </div>
 
@@ -57,9 +57,9 @@ const Login = () => {
           type="button"
           onClick={handleGoogleSignIn}
           disabled={loading}
-          className="w-full py-2.5 px-4 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200 font-semibold text-xs flex items-center justify-center gap-3 transition shadow-xs"
+          className="w-full py-2.5 px-4 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200 font-semibold text-xs flex items-center justify-center gap-3 transition shadow-xs min-h-[44px]"
         >
-          <FcGoogle className="text-base" /> {t('auth.googleContinue')}
+          <FcGoogle className="text-base flex-shrink-0" /> {t('auth.googleContinue')}
         </button>
 
         <div className="relative flex items-center justify-center">
@@ -73,7 +73,7 @@ const Login = () => {
           <div>
             <label className="human-label">{t('auth.emailLabel')}</label>
             <div className="relative">
-              <FiMail className="absolute left-3.5 top-3 text-zinc-400" />
+              <FiMail className="absolute left-3.5 top-3.5 text-zinc-400" />
               <input
                 type="email"
                 placeholder={t('auth.emailPlaceholder')}
@@ -92,7 +92,7 @@ const Login = () => {
               </Link>
             </div>
             <div className="relative">
-              <FiLock className="absolute left-3.5 top-3 text-zinc-400" />
+              <FiLock className="absolute left-3.5 top-3.5 text-zinc-400" />
               <input
                 type="password"
                 placeholder={t('auth.passwordPlaceholder')}
@@ -106,7 +106,7 @@ const Login = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full btn-danger py-3 font-mono font-bold uppercase"
+            className="w-full btn-danger py-3 text-xs font-mono font-bold uppercase tracking-wider"
           >
             {loading ? t('auth.authenticating') : t('auth.signInBtn')}
           </button>

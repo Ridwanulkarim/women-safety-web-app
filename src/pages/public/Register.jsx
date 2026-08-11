@@ -16,9 +16,9 @@ const Register = () => {
     setLoading(true);
     try {
       await registerUser(data.email, data.password, data.fullName);
-      navigate('/dashboard');
+      navigate('/dashboard', { replace: true });
     } catch (e) {
-      // toast in context
+      // toast shown in AuthContext
     } finally {
       setLoading(false);
     }
@@ -28,38 +28,38 @@ const Register = () => {
     setLoading(true);
     try {
       await loginWithGoogle();
-      navigate('/dashboard');
+      navigate('/dashboard', { replace: true });
     } catch (e) {
-      // toast in context
+      // toast shown in AuthContext
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center p-4">
-      <div className="max-w-md w-full human-card p-8 space-y-6 shadow-lg">
+    <div className="min-h-[80vh] flex items-center justify-center p-3 sm:p-4">
+      <div className="max-w-md w-full product-card p-5 sm:p-8 space-y-6 shadow-xl border-zinc-200 dark:border-zinc-800">
         
         <div className="text-center space-y-2">
           <div className="w-10 h-10 mx-auto rounded-xl bg-rose-600 flex items-center justify-center text-white text-xl shadow-md">
             <FiShield />
           </div>
-          <h2 className="text-2xl font-extrabold font-heading text-slate-900 dark:text-white">Create Protection Account</h2>
-          <p className="text-xs text-slate-500 dark:text-slate-400">Join SafeHaven 24/7 Safety Network.</p>
+          <h2 className="text-xl sm:text-2xl font-extrabold font-heading text-zinc-900 dark:text-white">Create Protection Account</h2>
+          <p className="text-xs text-zinc-500 dark:text-zinc-400">Join SafeHaven 24/7 Safety Network.</p>
         </div>
 
         <button
           type="button"
           onClick={handleGoogleSignIn}
           disabled={loading}
-          className="w-full py-2.5 px-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 font-semibold text-xs flex items-center justify-center gap-3 transition shadow-sm"
+          className="w-full py-2.5 px-4 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200 font-semibold text-xs flex items-center justify-center gap-3 transition shadow-xs min-h-[44px]"
         >
-          <FcGoogle className="text-base" /> Sign up with Google
+          <FcGoogle className="text-base flex-shrink-0" /> Sign up with Google
         </button>
 
         <div className="relative flex items-center justify-center">
-          <div className="border-t border-slate-200 dark:border-slate-800 w-full"></div>
-          <span className="absolute bg-white dark:bg-[#111827] px-3 text-[10px] text-slate-400 uppercase tracking-widest font-bold">
+          <div className="border-t border-zinc-200 dark:border-zinc-800 w-full"></div>
+          <span className="absolute bg-white dark:bg-[#121215] px-3 text-[10px] text-zinc-400 uppercase tracking-widest font-bold">
             Or fill registration details
           </span>
         </div>
@@ -68,7 +68,7 @@ const Register = () => {
           <div>
             <label className="human-label">Full Name</label>
             <div className="relative">
-              <FiUser className="absolute left-3.5 top-3 text-slate-400" />
+              <FiUser className="absolute left-3.5 top-3.5 text-zinc-400" />
               <input
                 type="text"
                 placeholder="Jane Doe"
@@ -82,7 +82,7 @@ const Register = () => {
           <div>
             <label className="human-label">Email Address</label>
             <div className="relative">
-              <FiMail className="absolute left-3.5 top-3 text-slate-400" />
+              <FiMail className="absolute left-3.5 top-3.5 text-zinc-400" />
               <input
                 type="email"
                 placeholder="jane@example.com"
@@ -96,7 +96,7 @@ const Register = () => {
           <div>
             <label className="human-label">Password</label>
             <div className="relative">
-              <FiLock className="absolute left-3.5 top-3 text-slate-400" />
+              <FiLock className="absolute left-3.5 top-3.5 text-zinc-400" />
               <input
                 type="password"
                 placeholder="Minimum 6 characters"
@@ -110,13 +110,13 @@ const Register = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full btn-primary py-3"
+            className="w-full btn-danger py-3 text-xs font-mono font-bold uppercase tracking-wider"
           >
-            {loading ? 'Creating Account...' : 'Register Account'}
+            {loading ? 'Creating Account...' : 'Register Protection Account'}
           </button>
         </form>
 
-        <p className="text-center text-xs text-slate-500 dark:text-slate-400">
+        <p className="text-center text-xs text-zinc-500 dark:text-zinc-400">
           Already registered?{' '}
           <Link to="/login" className="font-bold text-rose-600 dark:text-rose-400 hover:underline">
             Sign In Here
