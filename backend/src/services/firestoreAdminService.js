@@ -106,7 +106,7 @@ export const firestoreAdminService = {
       fullName: userData.fullName || 'User',
       email: userData.email,
       phone: userData.phone || '',
-      profileImage: userData.profileImage || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80',
+      profileImage: userData.profileImage || '',
       dateOfBirth: userData.dateOfBirth || '',
       gender: userData.gender || 'Female',
       bloodGroup: userData.bloodGroup || '',

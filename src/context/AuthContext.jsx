@@ -35,7 +35,7 @@ export const AuthProvider = ({ children }) => {
             email: fbUser.email,
             fullName: fbUser.displayName || fbUser.email.split('@')[0],
             role: 'user',
-            profileImage: fbUser.photoURL || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80',
+            profileImage: fbUser.photoURL || '',
             status: 'active'
           });
         }

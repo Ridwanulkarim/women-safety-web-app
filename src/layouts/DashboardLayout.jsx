@@ -88,11 +88,17 @@ const DashboardLayout = () => {
         {/* User Footer */}
         <div className="pt-4 border-t border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <img
-              src={user?.profileImage || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80'}
-              alt={user?.fullName}
-              className="w-8 h-8 rounded-lg object-cover"
-            />
+            {user?.profilePictureUrl || user?.profileImage ? (
+              <img
+                src={user.profilePictureUrl || user.profileImage}
+                alt={user?.fullName}
+                className="w-8 h-8 rounded-lg object-cover"
+              />
+            ) : (
+              <div className="w-8 h-8 rounded-lg bg-rose-600 text-white font-bold flex items-center justify-center text-xs">
+                {(user?.fullName || user?.email || 'U')[0].toUpperCase()}
+              </div>
+            )}
             <div className="text-left max-w-[100px] truncate">
               <p className="text-xs font-bold text-zinc-900 dark:text-white truncate">{user?.fullName}</p>
               <p className="text-[10px] text-zinc-500 truncate font-mono">{user?.email}</p>
