@@ -12,11 +12,11 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [token, setToken] = useState(localStorage.getItem('safehaven_token') || null);
 
-  // Sync user from backend or local token
+  // Instant non-blocking session listener
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (fbUser) => {
+    const unsubscribe = onAuthStateChanged(auth, (fbUser) => {
       if (fbUser) {
-        // Fast local user state initialization
+        // Fast local user state initialization (instant UI render!)
         const fastUser = {
           uid: fbUser.uid,
           email: fbUser.email,
@@ -26,39 +26,31 @@ export const AuthProvider = ({ children }) => {
           status: 'active'
         };
         setUser(prev => prev || fastUser);
+        setLoading(false); // Unblock UI immediately!
 
-        try {
-          const idToken = await fbUser.getIdToken();
-          const res = await api.post('/auth/login', {
-            email: fbUser.email,
-            idToken
-          });
-
-          if (res.data?.data) {
-            setUser(res.data.data.user);
-            setToken(res.data.data.token);
-            localStorage.setItem('safehaven_token', res.data.data.token);
-          }
-        } catch (err) {
-          console.warn('Backend sync notice, using client session:', err.message);
-        }
-      } else {
-        const storedToken = localStorage.getItem('safehaven_token');
-        if (storedToken) {
+        // Background server sync
+        (async () => {
           try {
-            const res = await api.get('/auth/me');
+            const idToken = await fbUser.getIdToken();
+            const res = await api.post('/auth/login', {
+              email: fbUser.email,
+              idToken
+            }, { timeout: 3000 });
+
             if (res.data?.data) {
-              setUser(res.data.data);
+              setUser(res.data.data.user);
+              setToken(res.data.data.token);
+              localStorage.setItem('safehaven_token', res.data.data.token);
             }
-          } catch (e) {
-            setUser(null);
-            localStorage.removeItem('safehaven_token');
+          } catch (err) {
+            console.warn('Backend auth sync notice:', err.message);
           }
-        } else {
-          setUser(null);
-        }
+        })();
+      } else {
+        setUser(null);
+        localStorage.removeItem('safehaven_token');
+        setLoading(false); // Unblock UI immediately!
       }
-      setLoading(false);
     });
 
     return () => unsubscribe();
@@ -126,7 +118,7 @@ export const AuthProvider = ({ children }) => {
       setUser(loggedUser);
       setToken('firebase_active_token');
       localStorage.setItem('safehaven_token', 'firebase_active_token');
-      
+
       // Save Security Alert notification to user's feed
       try {
         const notifKey = `safehaven_notifications_${fbUser.uid}`;
