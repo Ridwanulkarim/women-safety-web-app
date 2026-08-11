@@ -8,6 +8,7 @@ import { useAuth } from '../context/AuthContext';
 import { useNotifications } from '../context/NotificationContext';
 import { useSOS } from '../context/SOSContext';
 import ThemeToggle from '../components/common/ThemeToggle';
+import LanguageToggle from '../components/common/LanguageToggle';
 import SOSModal from '../components/sos/SOSModal';
 import ScrollToTop from '../components/common/ScrollToTop';
 import MobileBottomBar from '../components/common/MobileBottomBar';
@@ -126,18 +127,36 @@ const DashboardLayout = () => {
           <div className="flex items-center gap-3">
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="p-2 rounded-lg lg:hidden bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700 min-h-[40px] flex items-center justify-center"
+              className="p-2 rounded-lg lg:hidden bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700 min-h-[38px] flex items-center justify-center"
             >
               {sidebarOpen ? <FiX className="w-4 h-4" /> : <FiMenu className="w-4 h-4" />}
             </button>
-            <h1 className="text-sm font-bold font-heading text-zinc-900 dark:text-white">User Control Panel</h1>
+            <h1 className="text-xs sm:text-sm font-bold font-heading text-zinc-900 dark:text-white truncate max-w-[130px] sm:max-w-none">
+              User Control Panel
+            </h1>
           </div>
 
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <LanguageToggle />
             <ThemeToggle />
+
+            {/* Notification Bell Button on Mobile & Desktop */}
+            <Link
+              to="/dashboard/notifications"
+              className="relative p-1.5 sm:p-2 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700 min-h-[36px] sm:min-h-[38px] min-w-[36px] flex items-center justify-center"
+              title="Notifications"
+            >
+              <FiBell className="w-4 h-4 text-zinc-800 dark:text-zinc-200" />
+              {unreadCount > 0 && (
+                <span className="absolute -top-1 -right-1 w-4 h-4 bg-rose-600 text-white text-[9px] font-bold rounded-full flex items-center justify-center font-mono">
+                  {unreadCount}
+                </span>
+              )}
+            </Link>
+
             <button
               onClick={openSOSModal}
-              className="btn-danger !py-1.5 !px-3 font-mono text-[11px]"
+              className="hidden md:inline-flex btn-danger !py-1.5 !px-3 font-mono text-[11px]"
             >
               <FiAlertCircle /> SOS DISPATCH
             </button>
