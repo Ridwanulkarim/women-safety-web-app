@@ -16,6 +16,17 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (fbUser) => {
       if (fbUser) {
+        // Fast local user state initialization
+        const fastUser = {
+          uid: fbUser.uid,
+          email: fbUser.email,
+          fullName: fbUser.displayName || fbUser.email.split('@')[0],
+          role: 'user',
+          profileImage: fbUser.photoURL || '',
+          status: 'active'
+        };
+        setUser(prev => prev || fastUser);
+
         try {
           const idToken = await fbUser.getIdToken();
           const res = await api.post('/auth/login', {
@@ -29,15 +40,7 @@ export const AuthProvider = ({ children }) => {
             localStorage.setItem('safehaven_token', res.data.data.token);
           }
         } catch (err) {
-          console.warn('Backend sync warning, fallback client session:', err.message);
-          setUser({
-            uid: fbUser.uid,
-            email: fbUser.email,
-            fullName: fbUser.displayName || fbUser.email.split('@')[0],
-            role: 'user',
-            profileImage: fbUser.photoURL || '',
-            status: 'active'
-          });
+          console.warn('Backend sync notice, using client session:', err.message);
         }
       } else {
         const storedToken = localStorage.getItem('safehaven_token');
@@ -65,25 +68,38 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
     try {
       const fbUser = await firebaseRegister(email, password, fullName);
-      const res = await api.post('/auth/register', {
-        uid: fbUser.uid,
-        email: fbUser.email,
-        password,
-        fullName: fullName || fbUser.displayName || email.split('@')[0]
-      });
-
-      const newUser = res.data?.data?.user || {
+      const newUser = {
         uid: fbUser.uid,
         email,
         fullName: fullName || email.split('@')[0],
-        role: 'user'
+        role: 'user',
+        profileImage: ''
       };
-      const newToken = res.data?.data?.token || 'mock_jwt_token';
 
       setUser(newUser);
-      setToken(newToken);
-      localStorage.setItem('safehaven_token', newToken);
-      toast.success('Registration successful! Verification email sent.');
+      setToken('firebase_active_token');
+      localStorage.setItem('safehaven_token', 'firebase_active_token');
+      toast.success('Registration successful!');
+
+      // Background Backend Sync
+      (async () => {
+        try {
+          const res = await api.post('/auth/register', {
+            uid: fbUser.uid,
+            email: fbUser.email,
+            password,
+            fullName: fullName || fbUser.displayName || email.split('@')[0]
+          });
+          if (res.data?.data?.user) setUser(res.data.data.user);
+          if (res.data?.data?.token) {
+            setToken(res.data.data.token);
+            localStorage.setItem('safehaven_token', res.data.data.token);
+          }
+        } catch (err) {
+          console.warn('Background register sync notice:', err.message);
+        }
+      })();
+
       return newUser;
     } catch (error) {
       toast.error(error.message || 'Registration failed');
@@ -97,21 +113,36 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
     try {
       const fbUser = await firebaseLogin(email, password);
-      const idToken = await fbUser.getIdToken();
-      const res = await api.post('/auth/login', { email, password, idToken });
 
-      const loggedUser = res.data?.data?.user || {
+      const loggedUser = {
         uid: fbUser.uid,
-        email,
+        email: fbUser.email,
         fullName: fbUser.displayName || email.split('@')[0],
-        role: 'user'
+        role: 'user',
+        profileImage: fbUser.photoURL || ''
       };
-      const newToken = res.data?.data?.token || 'mock_jwt_token';
 
+      // Instant session activation (0-lag navigation!)
       setUser(loggedUser);
-      setToken(newToken);
-      localStorage.setItem('safehaven_token', newToken);
+      setToken('firebase_active_token');
+      localStorage.setItem('safehaven_token', 'firebase_active_token');
       toast.success('Welcome back!');
+
+      // Background Backend Sync (does not block user)
+      (async () => {
+        try {
+          const idToken = await fbUser.getIdToken();
+          const res = await api.post('/auth/login', { email, password, idToken });
+          if (res.data?.data?.user) setUser(res.data.data.user);
+          if (res.data?.data?.token) {
+            setToken(res.data.data.token);
+            localStorage.setItem('safehaven_token', res.data.data.token);
+          }
+        } catch (err) {
+          console.warn('Background login sync notice:', err.message);
+        }
+      })();
+
       return loggedUser;
     } catch (error) {
       toast.error(error.message || 'Invalid email or password');
@@ -125,21 +156,35 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
     try {
       const fbUser = await firebaseGoogleLogin();
-      const idToken = await fbUser.getIdToken();
-      const res = await api.post('/auth/login', { email: fbUser.email, idToken });
-
-      const loggedUser = res.data?.data?.user || {
+      const loggedUser = {
         uid: fbUser.uid,
         email: fbUser.email,
         fullName: fbUser.displayName || fbUser.email.split('@')[0],
-        role: 'user'
+        role: 'user',
+        profileImage: fbUser.photoURL || ''
       };
-      const newToken = res.data?.data?.token || 'mock_jwt_token';
 
+      // Instant session activation (0-lag navigation!)
       setUser(loggedUser);
-      setToken(newToken);
-      localStorage.setItem('safehaven_token', newToken);
-      toast.success('Signed in with Google successfully!');
+      setToken('firebase_active_token');
+      localStorage.setItem('safehaven_token', 'firebase_active_token');
+      toast.success('Signed in with Google!');
+
+      // Background Backend Sync (does not block user)
+      (async () => {
+        try {
+          const idToken = await fbUser.getIdToken();
+          const res = await api.post('/auth/login', { email: fbUser.email, idToken });
+          if (res.data?.data?.user) setUser(res.data.data.user);
+          if (res.data?.data?.token) {
+            setToken(res.data.data.token);
+            localStorage.setItem('safehaven_token', res.data.data.token);
+          }
+        } catch (err) {
+          console.warn('Background Google auth sync notice:', err.message);
+        }
+      })();
+
       return loggedUser;
     } catch (error) {
       toast.error(error.message || 'Google login failed');
