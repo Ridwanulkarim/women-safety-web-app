@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { FiCamera, FiUser, FiLoader, FiCheck, FiAlertCircle, FiUploadCloud } from 'react-icons/fi';
+import { FiCamera, FiUser, FiLoader, FiAlertCircle, FiUploadCloud } from 'react-icons/fi';
 import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from 'firebase/storage';
 import { storage } from '../../firebase/config';
 import toast from 'react-hot-toast';
@@ -7,7 +7,6 @@ import toast from 'react-hot-toast';
 const ProfilePictureUpload = ({ currentUrl, onUploadSuccess, userId = 'guest' }) => {
   const [previewUrl, setPreviewUrl] = useState(currentUrl || '');
   const [uploading, setUploading] = useState(false);
-  const [progress, setProgress] = useState(0);
   const [errorMessage, setErrorMessage] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef(null);
@@ -29,7 +28,7 @@ const ProfilePictureUpload = ({ currentUrl, onUploadSuccess, userId = 'guest' })
     return null;
   };
 
-  const processAndUploadFile = async (file) => {
+  const processAndUploadFile = (file) => {
     const error = validateFile(file);
     if (error) {
       setErrorMessage(error);
@@ -38,70 +37,62 @@ const ProfilePictureUpload = ({ currentUrl, onUploadSuccess, userId = 'guest' })
 
     setErrorMessage(null);
     setUploading(true);
-    setProgress(0);
 
-    // Create live local preview immediately
-    const localPreview = URL.createObjectURL(file);
-    setPreviewUrl(localPreview);
+    // 1. Convert file to Data URL instantly for 0-lag preview & profile update
+    const reader = new FileReader();
+    reader.onloadend = async () => {
+      const dataUrl = reader.result;
+      setPreviewUrl(dataUrl);
 
-    const cleanFileName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
-    const storagePath = `profilePictures/${userId}/${Date.now()}_${cleanFileName}`;
-
-    try {
-      // 1. Delete previous profile picture from Storage if it exists and belongs to Firebase Storage
-      if (currentUrl && currentUrl.includes('firebasestorage.googleapis.com') && currentUrl.includes(userId)) {
-        try {
-          const oldStorageRef = ref(storage, currentUrl);
-          await deleteObject(oldStorageRef);
-        } catch (delErr) {
-          console.warn('Notice: Previous profile image deletion skipped:', delErr.message);
-        }
+      // Save image immediately to form & AuthContext
+      if (onUploadSuccess) {
+        onUploadSuccess(dataUrl);
       }
+      setUploading(false);
+      toast.success('Profile picture updated successfully!');
 
-      // 2. Upload new image file to Firebase Storage
-      const storageRef = ref(storage, storagePath);
-      const uploadTask = uploadBytesResumable(storageRef, file);
+      // 2. Attempt background upload to Firebase Storage (if bucket is active)
+      try {
+        const cleanFileName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+        const storagePath = `profilePictures/${userId}/${Date.now()}_${cleanFileName}`;
+        const storageRef = ref(storage, storagePath);
 
-      uploadTask.on(
-        'state_changed',
-        (snapshot) => {
-          const pct = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
-          setProgress(pct);
-        },
-        async (uploadError) => {
-          console.warn('Firebase Storage upload notice, falling back to data URL:', uploadError.message);
-          // Fallback: Data URL conversion if Storage bucket is not configured
-          const reader = new FileReader();
-          reader.onloadend = () => {
-            const dataUrl = reader.result;
-            setPreviewUrl(dataUrl);
-            setUploading(false);
-            if (onUploadSuccess) onUploadSuccess(dataUrl);
-            toast.success('Profile picture updated successfully!');
-          };
-          reader.readAsDataURL(file);
-        },
-        async () => {
-          const downloadUrl = await getDownloadURL(uploadTask.snapshot.ref);
-          setPreviewUrl(downloadUrl);
-          setUploading(false);
-          if (onUploadSuccess) onUploadSuccess(downloadUrl);
-          toast.success('Profile picture uploaded to SafeHaven!');
+        // Delete old image if it exists in Firebase Storage
+        if (currentUrl && currentUrl.includes('firebasestorage.googleapis.com')) {
+          try {
+            await deleteObject(ref(storage, currentUrl));
+          } catch (e) {}
         }
-      );
-    } catch (err) {
-      console.warn('Upload error notice, fallback to local URL:', err.message);
-      // Fallback: Read as Data URL
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const dataUrl = reader.result;
-        setPreviewUrl(dataUrl);
-        setUploading(false);
-        if (onUploadSuccess) onUploadSuccess(dataUrl);
-        toast.success('Profile picture updated!');
-      };
-      reader.readAsDataURL(file);
-    }
+
+        const uploadTask = uploadBytesResumable(storageRef, file);
+
+        // 3-second safety timeout for Firebase Storage background sync
+        const timeoutId = setTimeout(() => {
+          uploadTask.cancel();
+        }, 3000);
+
+        uploadTask.on(
+          'state_changed',
+          null,
+          (err) => {
+            clearTimeout(timeoutId);
+            console.warn('Firebase Storage notice:', err.message);
+          },
+          async () => {
+            clearTimeout(timeoutId);
+            try {
+              const downloadUrl = await getDownloadURL(uploadTask.snapshot.ref);
+              setPreviewUrl(downloadUrl);
+              if (onUploadSuccess) onUploadSuccess(downloadUrl);
+            } catch (e) {}
+          }
+        );
+      } catch (err) {
+        console.warn('Background storage sync notice:', err.message);
+      }
+    };
+
+    reader.readAsDataURL(file);
   };
 
   const handleFileSelect = (e) => {
@@ -191,11 +182,11 @@ const ProfilePictureUpload = ({ currentUrl, onUploadSuccess, userId = 'guest' })
           )}
         </div>
 
-        {/* Upload Loading Spinner & Progress Ring */}
+        {/* Upload Loading Spinner */}
         {uploading && (
           <div className="absolute inset-0 bg-zinc-950/70 flex flex-col items-center justify-center text-white z-10 space-y-1">
             <FiLoader className="w-8 h-8 text-rose-500 animate-spin" />
-            <span className="text-[10px] font-mono font-bold text-rose-400">{progress}%</span>
+            <span className="text-[10px] font-mono font-bold text-rose-400">Processing...</span>
           </div>
         )}
       </div>
