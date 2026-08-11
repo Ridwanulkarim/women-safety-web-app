@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { FiShield, FiBell, FiUser, FiMenu, FiX, FiLogOut, FiLayout, FiAlertCircle, FiPhone, FiClock, FiMapPin, FiSettings, FiCamera } from 'react-icons/fi';
+import { FiShield, FiBell, FiUser, FiLogOut, FiLayout, FiAlertCircle, FiPhone, FiClock, FiMapPin, FiSettings, FiCamera } from 'react-icons/fi';
 import { useAuth } from '../../context/AuthContext';
 import { useNotifications } from '../../context/NotificationContext';
 import ThemeToggle from './ThemeToggle';
@@ -13,7 +13,6 @@ const Navbar = () => {
   const { unreadCount } = useNotifications();
   const { openSOSModal } = useSOS();
   const { t } = useLanguage();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
 
   const navigate = useNavigate();
@@ -73,14 +72,12 @@ const Navbar = () => {
           {/* Right Header Action Controls */}
           <div className="flex items-center gap-1.5 sm:gap-2">
             
-            {/* Desktop Language & Theme Toggles */}
-            <div className="hidden lg:flex items-center gap-2">
-              <LanguageToggle />
-              <ThemeToggle />
-            </div>
+            {/* Always Visible Language & Theme Buttons (Mobile & Desktop) */}
+            <LanguageToggle />
+            <ThemeToggle />
 
             {user ? (
-              /* LOGGED IN CONTROLS: Notification Bell & User Avatar Badge */
+              /* LOGGED IN CONTROLS: Notification Bell Always Visible */
               <>
                 <button
                   onClick={openSOSModal}
@@ -90,10 +87,10 @@ const Navbar = () => {
                   <span>{t('nav.sosDispatch')}</span>
                 </button>
 
-                {/* Notifications Bell Button */}
+                {/* Notifications Bell Button - Always Visible */}
                 <Link
                   to="/dashboard/notifications"
-                  className="relative p-2 rounded-lg bg-zinc-100 dark:bg-zinc-800/80 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition border border-zinc-200 dark:border-zinc-700 min-h-[38px] min-w-[38px] flex items-center justify-center"
+                  className="relative p-1.5 sm:p-2 rounded-lg bg-zinc-100 dark:bg-zinc-800/80 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition border border-zinc-200 dark:border-zinc-700 min-h-[36px] sm:min-h-[40px] flex items-center justify-center"
                   title="Notifications"
                 >
                   <FiBell className="w-4 h-4 text-zinc-800 dark:text-zinc-200" />
@@ -104,11 +101,11 @@ const Navbar = () => {
                   )}
                 </Link>
 
-                {/* User Dropdown Badge */}
-                <div className="relative">
+                {/* User Dropdown Badge - Desktop Only (Hidden on Mobile Home) */}
+                <div className="hidden sm:block relative">
                   <button
                     onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-                    className="flex items-center gap-1.5 p-1 sm:pr-2 rounded-lg bg-zinc-100 dark:bg-zinc-800/80 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition border border-zinc-200 dark:border-zinc-700 min-h-[38px]"
+                    className="flex items-center gap-1.5 p-1 pr-2 rounded-lg bg-zinc-100 dark:bg-zinc-800/80 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition border border-zinc-200 dark:border-zinc-700 min-h-[40px]"
                   >
                     {user.profilePictureUrl || user.profileImage ? (
                       <img
@@ -121,7 +118,7 @@ const Navbar = () => {
                         {(user.fullName || user.email || 'U')[0].toUpperCase()}
                       </div>
                     )}
-                    <span className="hidden sm:inline-block text-xs font-medium text-zinc-800 dark:text-zinc-200 max-w-[80px] truncate">
+                    <span className="text-xs font-medium text-zinc-800 dark:text-zinc-200 max-w-[80px] truncate">
                       {user.fullName}
                     </span>
                   </button>
@@ -189,99 +186,9 @@ const Navbar = () => {
               </div>
             )}
 
-            {/* ALWAYS-VISIBLE MOBILE HAMBURGER MENU BUTTON FOR EVERY MOBILE DEVICE */}
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 rounded-lg lg:hidden bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 min-h-[38px] min-w-[38px] flex items-center justify-center"
-              aria-label="Toggle Navigation Menu"
-            >
-              {mobileMenuOpen ? <FiX className="w-5 h-5 text-rose-600" /> : <FiMenu className="w-5 h-5" />}
-            </button>
-
           </div>
         </div>
       </div>
-
-      {/* MOBILE NAVIGATION DRAWER */}
-      {mobileMenuOpen && (
-        <div className="lg:hidden bg-white dark:bg-[#09090b] border-t border-zinc-200 dark:border-zinc-800 px-4 pt-3 pb-6 space-y-4 shadow-2xl animate-fade-in">
-          <div className="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-2">
-            <div className="flex items-center gap-2">
-              <LanguageToggle />
-              <ThemeToggle />
-            </div>
-            <span className="mono-tag mono-tag-emerald py-0 text-[9px]">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 telemetry-dot"></span> SafeHaven
-            </span>
-          </div>
-
-          <nav className="flex flex-col space-y-1">
-            {publicNavLinks.map((link) => (
-              <Link
-                key={link.path}
-                to={link.path}
-                onClick={() => setMobileMenuOpen(false)}
-                className={`px-3 py-2.5 rounded-lg text-xs font-semibold flex items-center justify-between transition ${
-                  isActive(link.path)
-                    ? 'bg-rose-600 text-white font-bold'
-                    : 'text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800'
-                }`}
-              >
-                <span>{link.name}</span>
-              </Link>
-            ))}
-
-            {user && (
-              <>
-                <div className="pt-2 border-t border-zinc-200 dark:border-zinc-800 font-mono text-[10px] uppercase font-bold text-zinc-400">
-                  User Workspace
-                </div>
-                <Link
-                  to="/dashboard"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="px-3 py-2 rounded-lg text-xs font-semibold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800"
-                >
-                  Dashboard Overview
-                </Link>
-                <Link
-                  to="/dashboard/evidence"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="px-3 py-2 rounded-lg text-xs font-semibold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800"
-                >
-                  Evidence Locker (Voice/Photo)
-                </Link>
-                <Link
-                  to="/dashboard/contacts"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="px-3 py-2 rounded-lg text-xs font-semibold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800"
-                >
-                  Emergency Contacts
-                </Link>
-                <Link
-                  to="/dashboard/profile"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="px-3 py-2 rounded-lg text-xs font-semibold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800"
-                >
-                  Profile & Medical ID
-                </Link>
-              </>
-            )}
-          </nav>
-
-          {/* Quick SOS & Action Buttons inside Mobile Drawer */}
-          <div className="pt-2 border-t border-zinc-200 dark:border-zinc-800 space-y-2">
-            <button
-              onClick={() => {
-                setMobileMenuOpen(false);
-                openSOSModal();
-              }}
-              className="w-full btn-danger font-mono text-xs py-3 flex items-center justify-center gap-2"
-            >
-              <FiAlertCircle className="w-4 h-4" /> DISPATCH EMERGENCY SOS
-            </button>
-          </div>
-        </div>
-      )}
     </header>
   );
 };
