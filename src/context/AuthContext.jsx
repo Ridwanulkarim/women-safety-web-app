@@ -126,6 +126,22 @@ export const AuthProvider = ({ children }) => {
       setUser(loggedUser);
       setToken('firebase_active_token');
       localStorage.setItem('safehaven_token', 'firebase_active_token');
+      
+      // Save Security Alert notification to user's feed
+      try {
+        const notifKey = `safehaven_notifications_${fbUser.uid}`;
+        const storedNotifs = JSON.parse(localStorage.getItem(notifKey) || '[]');
+        const newSecNotif = {
+          id: 'notif_sec_' + Date.now(),
+          title: '🛡️ Security Alert: New Sign-In',
+          message: `New sign-in detected for ${fbUser.email} on ${new Date().toLocaleString()}. If this was not you, reset your password immediately.`,
+          type: 'SECURITY',
+          isRead: false,
+          createdAt: new Date().toISOString()
+        };
+        localStorage.setItem(notifKey, JSON.stringify([newSecNotif, ...storedNotifs]));
+      } catch (e) {}
+
       toast.success('Welcome back!');
 
       // Background Backend Sync (does not block user)

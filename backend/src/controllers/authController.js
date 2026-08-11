@@ -219,6 +219,17 @@ export const login = async (req, res, next) => {
     await firestoreAdminService.clearAccountLockout(user.email);
     await firestoreAdminService.updateUser(user.uid, { lastLogin: new Date().toISOString() });
 
+    // Create In-App Security Alert Notification for New Login
+    try {
+      await firestoreAdminService.createNotification(user.uid, {
+        title: '🛡️ Security Alert: New Sign-In',
+        message: `New sign-in detected for ${user.email} on ${new Date().toLocaleString()}. If this was not you, reset your password immediately.`,
+        type: 'SECURITY'
+      });
+    } catch (notifErr) {
+      console.warn('Login notification creation notice:', notifErr.message);
+    }
+
     const { passwordHash: _, resetPasswordToken: __, verificationToken: ___, twoFactorSecret: ____, twoFactorBackupCodes: _____, ...sanitizedUser } = user;
 
     const token = generateToken({
