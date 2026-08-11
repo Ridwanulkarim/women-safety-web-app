@@ -72,21 +72,13 @@ const Navbar = () => {
           {/* Right Header Action Controls */}
           <div className="flex items-center gap-1.5 sm:gap-2">
             
-            {/* Always Visible Language & Theme Buttons (Mobile & Desktop) */}
+            {/* Always Visible Language & Theme Buttons */}
             <LanguageToggle />
             <ThemeToggle />
 
             {user ? (
-              /* LOGGED IN CONTROLS: Notification Bell Always Visible */
+              /* LOGGED IN CONTROLS */
               <>
-                <button
-                  onClick={openSOSModal}
-                  className="hidden md:inline-flex btn-danger !py-1.5 !px-3 font-mono text-[11px]"
-                >
-                  <FiAlertCircle className="w-3.5 h-3.5" />
-                  <span>{t('nav.sosDispatch')}</span>
-                </button>
-
                 {/* Notifications Bell Button - Always Visible */}
                 <Link
                   to="/dashboard/notifications"
@@ -101,8 +93,8 @@ const Navbar = () => {
                   )}
                 </Link>
 
-                {/* User Dropdown Badge - Desktop Only (Hidden on Mobile Home) */}
-                <div className="hidden sm:block relative">
+                {/* User Dropdown Badge - Desktop Only */}
+                <div className="hidden lg:block relative">
                   <button
                     onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
                     className="flex items-center gap-1.5 p-1 pr-2 rounded-lg bg-zinc-100 dark:bg-zinc-800/80 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition border border-zinc-200 dark:border-zinc-700 min-h-[40px]"
