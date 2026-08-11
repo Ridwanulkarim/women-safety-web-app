@@ -43,23 +43,51 @@ const initMockData = () => {
     const defaultTips = [
       {
         id: 'tip-1',
-        title: 'Commuting at Night',
-        category: 'Travel Safety',
-        content: 'Stay in well-lit areas, share your live trip details with a trusted contact, and avoid wearing noise-canceling headphones.',
+        title: 'Physical Self-Defense Stance & Vulnerable Targets',
+        category: 'Self Defense',
+        content: 'Maintain a balanced wide stance with hands up at chest level. Target vulnerable areas like eyes, nose, throat, groin, and shins using palm strikes or elbows.',
         createdAt: new Date().toISOString()
       },
       {
         id: 'tip-2',
-        title: 'Ride-Sharing Security Checklist',
-        category: 'Travel Safety',
-        content: 'Verify driver identity, match license plate numbers before entering, and sit in the rear seat.',
+        title: 'App Location Privacy & Geolocation Audit',
+        category: 'Digital Safety',
+        content: 'Audit app permissions regularly. Disable background location tracking for social media and non-essential applications to prevent stalker tracking.',
         createdAt: new Date().toISOString()
       },
       {
         id: 'tip-3',
-        title: 'Home Entrance Vigilance',
+        title: 'Night Travel & Rideshare Security Checklist',
+        category: 'Travel Safety',
+        content: 'Always match driver photo, name, and vehicle license plate before entering a rideshare. Sit in the rear passenger seat and share live trip tracking with family.',
+        createdAt: new Date().toISOString()
+      },
+      {
+        id: 'tip-4',
+        title: 'Late-Night Overtime Safety Protocol',
+        category: 'Workplace Safety',
+        content: 'Inform building security when working late. Request security guards to escort you to your vehicle or taxi pickup location.',
+        createdAt: new Date().toISOString()
+      },
+      {
+        id: 'tip-5',
+        title: 'Home Entrance & Doorway Vigilance',
         category: 'Home Safety',
-        content: 'Have your keys ready before reaching your front door. Look around before stepping inside.',
+        content: 'Have house keys ready in hand before reaching your front door. Scan your surroundings before unlocking and stepping inside.',
+        createdAt: new Date().toISOString()
+      },
+      {
+        id: 'tip-6',
+        title: 'Legal Protection Under Nari O Shishu Nirjatan Daman Ain',
+        category: 'Legal Rights',
+        content: 'Under Bangladesh law, sexual harassment, stalking, and domestic abuse are strictly punishable offences. Victims have the right to immediate police action.',
+        createdAt: new Date().toISOString()
+      },
+      {
+        id: 'tip-7',
+        title: 'Access to Government Free Legal Aid (16430)',
+        category: 'Legal Rights',
+        content: 'Call the National Legal Aid Services Organization toll-free helpline at 16430 for 24/7 free legal representation and advice across Bangladesh.',
         createdAt: new Date().toISOString()
       }
     ];
