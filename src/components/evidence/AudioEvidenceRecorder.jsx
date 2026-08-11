@@ -1,10 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { FiMic, FiSquare, FiPlay, FiPause, FiDownload, FiTrash2, FiRadio } from 'react-icons/fi';
+import { FiMic, FiSquare, FiPlay, FiPause, FiDownload, FiTrash2, FiRadio, FiFileText } from 'react-icons/fi';
+import LegalEvidenceExporterModal from './LegalEvidenceExporterModal';
 import toast from 'react-hot-toast';
 
 const AudioEvidenceRecorder = ({ autoStart = false }) => {
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
+  const [selectedExportItem, setSelectedExportItem] = useState(null);
+  const [exporterOpen, setExporterOpen] = useState(false);
   const [recordings, setRecordings] = useState(() => {
     try {
       const saved = localStorage.getItem('safehaven_audio_evidence');
@@ -54,7 +57,6 @@ const AudioEvidenceRecorder = ({ autoStart = false }) => {
           toast.success('🎙️ Emergency Voice Recording Saved to Evidence Vault!');
         };
 
-        // Stop stream tracks
         stream.getTracks().forEach((t) => t.stop());
       };
 
@@ -86,6 +88,11 @@ const AudioEvidenceRecorder = ({ autoStart = false }) => {
     setRecordings(updated);
     localStorage.setItem('safehaven_audio_evidence', JSON.stringify(updated));
     toast.success('Audio evidence removed');
+  };
+
+  const handleOpenExporter = (rec) => {
+    setSelectedExportItem(rec);
+    setExporterOpen(true);
   };
 
   const formatTime = (secs) => {
@@ -154,6 +161,13 @@ const AudioEvidenceRecorder = ({ autoStart = false }) => {
                   <audio controls src={rec.dataUrl} className="h-8 max-w-[220px] mt-1" />
                 </div>
                 <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => handleOpenExporter(rec)}
+                    className="p-2 rounded-lg bg-rose-500/10 text-rose-600 dark:text-rose-400 hover:bg-rose-500/20 transition flex items-center gap-1 font-mono text-[10px] font-bold"
+                    title="Export Chain-of-Custody PDF Docket"
+                  >
+                    <FiFileText /> Legal PDF
+                  </button>
                   <a
                     href={rec.dataUrl}
                     download={`Evidence_Audio_${rec.id}.webm`}
@@ -175,6 +189,12 @@ const AudioEvidenceRecorder = ({ autoStart = false }) => {
           </div>
         )}
       </div>
+
+      <LegalEvidenceExporterModal
+        isOpen={exporterOpen}
+        onClose={() => setExporterOpen(false)}
+        item={selectedExportItem}
+      />
     </div>
   );
 };

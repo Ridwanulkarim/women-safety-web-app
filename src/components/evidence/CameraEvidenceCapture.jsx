@@ -1,11 +1,14 @@
 import React, { useState, useRef } from 'react';
-import { FiCamera, FiVideo, FiSquare, FiDownload, FiTrash2, FiEye, FiX, FiCheck } from 'react-icons/fi';
+import { FiCamera, FiVideo, FiSquare, FiDownload, FiTrash2, FiEye, FiX, FiCheck, FiFileText } from 'react-icons/fi';
+import LegalEvidenceExporterModal from './LegalEvidenceExporterModal';
 import toast from 'react-hot-toast';
 
 const CameraEvidenceCapture = () => {
   const [cameraActive, setCameraActive] = useState(false);
   const [isVideoRecording, setIsVideoRecording] = useState(false);
   const [previewImage, setPreviewImage] = useState(null);
+  const [selectedExportItem, setSelectedExportItem] = useState(null);
+  const [exporterOpen, setExporterOpen] = useState(false);
 
   const [evidenceList, setEvidenceList] = useState(() => {
     try {
@@ -53,7 +56,6 @@ const CameraEvidenceCapture = () => {
     const ctx = canvas.getContext('2d');
     ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
 
-    // Draw Watermark Stamp (Timestamp & GPS)
     ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
     ctx.fillRect(10, canvas.height - 40, 360, 30);
     ctx.fillStyle = '#ffffff';
@@ -125,6 +127,11 @@ const CameraEvidenceCapture = () => {
     setEvidenceList(updated);
     localStorage.setItem('safehaven_camera_evidence', JSON.stringify(updated));
     toast.success('Evidence removed');
+  };
+
+  const handleOpenExporter = (item) => {
+    setSelectedExportItem(item);
+    setExporterOpen(true);
   };
 
   return (
@@ -220,6 +227,13 @@ const CameraEvidenceCapture = () => {
                   <span className="text-[9px] font-mono truncate">{item.date}</span>
                   <div className="flex items-center justify-between">
                     <button
+                      onClick={() => handleOpenExporter(item)}
+                      className="p-1 rounded bg-rose-600 hover:bg-rose-700 text-xs text-white"
+                      title="Export Chain-of-Custody PDF Docket"
+                    >
+                      <FiFileText />
+                    </button>
+                    <button
                       onClick={() => setPreviewImage(item.dataUrl)}
                       className="p-1 rounded bg-zinc-800 hover:bg-zinc-700 text-xs"
                       title="View Full"
@@ -236,7 +250,7 @@ const CameraEvidenceCapture = () => {
                     </a>
                     <button
                       onClick={() => deleteEvidence(item.id)}
-                      className="p-1 rounded bg-rose-600 hover:bg-rose-700 text-xs text-white"
+                      className="p-1 rounded bg-rose-600/50 hover:bg-rose-700 text-xs text-white"
                       title="Delete"
                     >
                       <FiTrash2 />
@@ -263,6 +277,12 @@ const CameraEvidenceCapture = () => {
           </div>
         </div>
       )}
+
+      <LegalEvidenceExporterModal
+        isOpen={exporterOpen}
+        onClose={() => setExporterOpen(false)}
+        item={selectedExportItem}
+      />
     </div>
   );
 };
