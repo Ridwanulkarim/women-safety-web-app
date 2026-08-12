@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
+import { registerSW } from 'virtual:pwa-register';
 
 import AppRoutes from './routes/AppRoutes';
 import { ThemeProvider } from './context/ThemeContext';
@@ -13,6 +14,17 @@ import ErrorBoundary from './components/common/ErrorBoundary';
 
 import 'leaflet/dist/leaflet.css';
 import './styles/index.css';
+
+// Explicit PWA Service Worker Registration with auto-update
+registerSW({
+  immediate: true,
+  onNeedRefresh() {
+    console.log('SafeHaven PWA: New content available, updating...');
+  },
+  onOfflineReady() {
+    console.log('SafeHaven PWA: Ready for full offline emergency operation.');
+  }
+});
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
