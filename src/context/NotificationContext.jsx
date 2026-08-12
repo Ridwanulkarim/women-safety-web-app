@@ -64,11 +64,17 @@ export const NotificationProvider = ({ children }) => {
       }
     } catch (e) {}
 
-    // Merge API & Local notifications and deduplicate strictly by ID
+    // Merge API & Local notifications and deduplicate strictly by ID and (title + message)
     const combined = [...apiList, ...localList];
     const uniqueMap = new Map();
     combined.forEach(n => {
-      if (n && n.id) uniqueMap.set(n.id, n);
+      if (n) {
+        // Primary key: id, Secondary key: title + message to prevent duplicates with different IDs
+        const contentKey = `${n.title}_${n.message}`;
+        if (n.id && !uniqueMap.has(n.id) && !Array.from(uniqueMap.values()).some(existing => `${existing.title}_${existing.message}` === contentKey)) {
+          uniqueMap.set(n.id, n);
+        }
+      }
     });
 
     let finalNotifications = Array.from(uniqueMap.values());
@@ -97,11 +103,13 @@ export const NotificationProvider = ({ children }) => {
     };
     setNotifications(prev => {
       const currentList = Array.isArray(prev) ? prev : [];
-      // Deduplicate by title & createdAt minute to prevent duplicate re-logging
+      // Deduplicate by title & message to prevent duplicate re-logging
       const exists = currentList.some(n => n.title === newNotif.title && n.message === newNotif.message);
       if (exists) return currentList;
       const updated = [newNotif, ...currentList];
-      localStorage.setItem(storageKey, JSON.stringify(updated));
+      try {
+        localStorage.setItem(storageKey, JSON.stringify(updated));
+      } catch (e) {}
       return updated;
     });
   };

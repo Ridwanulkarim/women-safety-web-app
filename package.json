@@ -41,6 +41,7 @@
     "regjsparser": "^0.13.2"
   },
   "devDependencies": {
+    "@bubblewrap/cli": "^1.25.0",
     "@tailwindcss/postcss": "^4.0.0",
     "@tailwindcss/vite": "^4.0.0",
     "@types/react": "^19.0.7",
