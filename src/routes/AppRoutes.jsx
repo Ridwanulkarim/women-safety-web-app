@@ -44,6 +44,8 @@ import AdminAnnouncements from '../pages/admin/AdminAnnouncements';
 import AdminSOSReports from '../pages/admin/AdminSOSReports';
 import AdminSettings from '../pages/admin/AdminSettings';
 
+import PrivacyPolicy from '../pages/public/PrivacyPolicy';
+
 const AppRoutes = () => {
   return (
     <Routes>
@@ -54,6 +56,7 @@ const AppRoutes = () => {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/verify-email" element={<VerifyEmail />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
 
         {/* AUTHENTICATED PROTECTED APPLICATION ROUTES: Requires Login */}
         <Route

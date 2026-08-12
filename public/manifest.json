@@ -1,0 +1,25 @@
+{
+  "name": "SafeHaven - Women Emergency & Distress Network",
+  "short_name": "SafeHaven",
+  "description": "24/7 Mission-Critical Women Safety, Real-Time SOS Distress Broadcasting, GPS Telemetry & Evidence Vault.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#09090b",
+  "theme_color": "#09090b",
+  "orientation": "portrait",
+  "categories": ["safety", "utilities", "lifestyle"],
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

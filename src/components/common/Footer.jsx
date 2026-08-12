@@ -84,6 +84,7 @@ const Footer = () => {
         <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-zinc-500">
           <p>© {new Date().getFullYear()} {t('footer.allRightsReserved')}</p>
           <div className="flex gap-4">
+            <Link to="/privacy-policy" className="hover:text-zinc-300 transition text-rose-400 font-semibold">Privacy Policy</Link>
             <Link to="/contact" className="hover:text-zinc-300 transition">{t('footer.support')}</Link>
             <Link to="/safety-tips" className="hover:text-zinc-300 transition">{t('footer.securityProtocol')}</Link>
           </div>
