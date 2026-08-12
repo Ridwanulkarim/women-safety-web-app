@@ -17,6 +17,10 @@ build/
 frontend/.env
 backend/.env
 
+# Android Keystores (Security)
+*.keystore
+*.jks
+
 # Logs
 npm-debug.log*
 yarn-debug.log*
