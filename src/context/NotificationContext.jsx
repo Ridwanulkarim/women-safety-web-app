@@ -5,17 +5,18 @@ import { useAuth } from './AuthContext';
 const NotificationContext = createContext();
 
 const getInitialNotifications = (uid, email) => {
+  const userSeed = (uid || email || 'guest').replace(/[^a-zA-Z0-9]/g, '_');
   return [
     {
-      id: 'notif_sec_' + Date.now(),
+      id: `notif_sec_init_${userSeed}`,
       title: '🛡️ Security Alert: New Sign-In',
-      message: `New sign-in detected for ${email || 'your account'} on ${new Date().toLocaleString()}. Shield protection is active.`,
+      message: `New sign-in detected for ${email || 'your account'}. Shield protection is active.`,
       type: 'SECURITY',
       isRead: false,
       createdAt: new Date().toISOString()
     },
     {
-      id: 'notif_welcome',
+      id: `notif_welcome_${userSeed}`,
       title: 'Welcome to SafeHaven',
       message: 'Your personal safety shield is active. Add up to 5 emergency contacts in your dashboard.',
       type: 'INFO',
@@ -63,7 +64,7 @@ export const NotificationProvider = ({ children }) => {
       }
     } catch (e) {}
 
-    // Merge API & Local notifications and deduplicate by ID
+    // Merge API & Local notifications and deduplicate strictly by ID
     const combined = [...apiList, ...localList];
     const uniqueMap = new Map();
     combined.forEach(n => {
@@ -72,7 +73,7 @@ export const NotificationProvider = ({ children }) => {
 
     let finalNotifications = Array.from(uniqueMap.values());
 
-    // Fallback: If 0 notifications exist, populate initial Welcome & Security Alert
+    // Fallback: If 0 notifications exist, populate static initial Welcome & Security Alert
     if (finalNotifications.length === 0) {
       finalNotifications = getInitialNotifications(user.uid, user.email);
     }
@@ -96,6 +97,9 @@ export const NotificationProvider = ({ children }) => {
     };
     setNotifications(prev => {
       const currentList = Array.isArray(prev) ? prev : [];
+      // Deduplicate by title & createdAt minute to prevent duplicate re-logging
+      const exists = currentList.some(n => n.title === newNotif.title && n.message === newNotif.message);
+      if (exists) return currentList;
       const updated = [newNotif, ...currentList];
       localStorage.setItem(storageKey, JSON.stringify(updated));
       return updated;
