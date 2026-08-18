@@ -3,10 +3,12 @@ import { Link, useLocation } from 'react-router-dom';
 import { FiHome, FiAlertCircle, FiPhoneCall, FiCamera, FiUser } from 'react-icons/fi';
 import { useAuth } from '../../context/AuthContext';
 import { useSOS } from '../../context/SOSContext';
+import { useLanguage } from '../../context/LanguageContext';
 
 const MobileBottomBar = () => {
   const { user } = useAuth();
   const { openSOSModal } = useSOS();
+  const { t } = useLanguage();
   const location = useLocation();
 
   const isActive = (path) => location.pathname === path;
@@ -23,7 +25,7 @@ const MobileBottomBar = () => {
           }`}
         >
           <FiHome className="w-5 h-5 mb-0.5" />
-          <span>Home</span>
+          <span>{t('nav.home')}</span>
         </Link>
 
         {/* Helplines */}
@@ -54,7 +56,7 @@ const MobileBottomBar = () => {
           }`}
         >
           <FiCamera className="w-5 h-5 mb-0.5" />
-          <span>{user ? 'Vault' : 'Guides'}</span>
+          <span>{user ? t('nav.evidenceVault') : t('nav.safetyTips')}</span>
         </Link>
 
         {/* Profile / Account */}
@@ -65,7 +67,7 @@ const MobileBottomBar = () => {
           }`}
         >
           <FiUser className="w-5 h-5 mb-0.5" />
-          <span>{user ? 'Account' : 'Login'}</span>
+          <span>{user ? t('nav.profile') : t('nav.signIn')}</span>
         </Link>
 
       </div>
