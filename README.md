@@ -11,7 +11,7 @@
 [![Android TWA](https://img.shields.io/badge/Android_TWA-Target_SDK_36-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://developer.android.com/)
 [![Vercel Deployed](https://img.shields.io/badge/Vercel-Live_Production-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://women-safety-web-app-three.vercel.app)
 
-[🌐 Live Production Web App](https://women-safety-web-app-three.vercel.app) • [📱 Android App Bundle (.aab)](/Users/apple/.gemini/antigravity/scratch/safehaven-android/app/build/outputs/bundle/release/app-release.aab) • [📖 Documentation](#-table-of-contents)
+[🌐 Live Production Web App](https://women-safety-web-app-three.vercel.app) • [📖 Documentation](#-table-of-contents) • [🤖 Android TWA Guide](#-android-twa-build-instructions)
 
 </div>
 
