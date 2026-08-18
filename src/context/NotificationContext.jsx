@@ -54,14 +54,19 @@ export const NotificationProvider = ({ children }) => {
   const [notifications, setNotifications] = useState(() => {
     try {
       const stored = localStorage.getItem(storageKey);
-      if (stored) {
+      if (stored !== null) {
         const parsed = JSON.parse(stored);
-        if (Array.isArray(parsed) && parsed.length > 0) {
+        if (Array.isArray(parsed)) {
           return deduplicateNotifications(parsed);
         }
       }
     } catch (e) {}
-    return getInitialNotifications(user?.uid, user?.email);
+
+    const initial = getInitialNotifications(user?.uid, user?.email);
+    try {
+      localStorage.setItem(storageKey, JSON.stringify(initial));
+    } catch (e) {}
+    return initial;
   });
 
   const fetchNotifications = useCallback(async () => {
@@ -79,9 +84,11 @@ export const NotificationProvider = ({ children }) => {
     } catch (e) {}
 
     let localList = [];
+    let hasStoredKey = false;
     try {
       const stored = localStorage.getItem(storageKey);
-      if (stored) {
+      if (stored !== null) {
+        hasStoredKey = true;
         const parsed = JSON.parse(stored);
         if (Array.isArray(parsed)) localList = parsed;
       }
@@ -91,8 +98,8 @@ export const NotificationProvider = ({ children }) => {
     const combined = [...apiList, ...localList];
     let finalNotifications = deduplicateNotifications(combined);
 
-    // Fallback: If 0 notifications exist, populate static initial Welcome & Security Alert
-    if (finalNotifications.length === 0) {
+    // Fallback: Populate initial notifications ONLY if key has NEVER been set before
+    if (!hasStoredKey && finalNotifications.length === 0) {
       finalNotifications = getInitialNotifications(user.uid, user.email);
     }
 
