@@ -26,6 +26,27 @@ const getInitialNotifications = (uid, email) => {
   ];
 };
 
+const deduplicateNotifications = (list) => {
+  if (!Array.isArray(list)) return [];
+  const map = new Map();
+  // Sort newest first
+  const sorted = [...list].sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+  for (const item of sorted) {
+    if (!item || !item.id) continue;
+    const titleKey = (item.title || '').trim().toLowerCase();
+    const idKey = item.id;
+
+    const existsByTitle = Array.from(map.values()).some(
+      existing => (existing.title || '').trim().toLowerCase() === titleKey
+    );
+
+    if (!map.has(idKey) && !existsByTitle) {
+      map.set(idKey, item);
+    }
+  }
+  return Array.from(map.values());
+};
+
 export const NotificationProvider = ({ children }) => {
   const { user } = useAuth();
   const storageKey = `safehaven_notifications_${user?.uid || user?.email || 'guest'}`;
@@ -35,7 +56,9 @@ export const NotificationProvider = ({ children }) => {
       const stored = localStorage.getItem(storageKey);
       if (stored) {
         const parsed = JSON.parse(stored);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return deduplicateNotifications(parsed);
+        }
       }
     } catch (e) {}
     return getInitialNotifications(user?.uid, user?.email);
@@ -64,20 +87,9 @@ export const NotificationProvider = ({ children }) => {
       }
     } catch (e) {}
 
-    // Merge API & Local notifications and deduplicate strictly by ID and (title + message)
+    // Merge API & Local notifications and deduplicate strictly newest-first by ID & Title
     const combined = [...apiList, ...localList];
-    const uniqueMap = new Map();
-    combined.forEach(n => {
-      if (n) {
-        // Primary key: id, Secondary key: title + message to prevent duplicates with different IDs
-        const contentKey = `${n.title}_${n.message}`;
-        if (n.id && !uniqueMap.has(n.id) && !Array.from(uniqueMap.values()).some(existing => `${existing.title}_${existing.message}` === contentKey)) {
-          uniqueMap.set(n.id, n);
-        }
-      }
-    });
-
-    let finalNotifications = Array.from(uniqueMap.values());
+    let finalNotifications = deduplicateNotifications(combined);
 
     // Fallback: If 0 notifications exist, populate static initial Welcome & Security Alert
     if (finalNotifications.length === 0) {
@@ -103,10 +115,7 @@ export const NotificationProvider = ({ children }) => {
     };
     setNotifications(prev => {
       const currentList = Array.isArray(prev) ? prev : [];
-      // Deduplicate by title & message to prevent duplicate re-logging
-      const exists = currentList.some(n => n.title === newNotif.title && n.message === newNotif.message);
-      if (exists) return currentList;
-      const updated = [newNotif, ...currentList];
+      const updated = deduplicateNotifications([newNotif, ...currentList]);
       try {
         localStorage.setItem(storageKey, JSON.stringify(updated));
       } catch (e) {}
