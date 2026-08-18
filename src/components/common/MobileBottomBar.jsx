@@ -11,6 +11,11 @@ const MobileBottomBar = () => {
   const { t } = useLanguage();
   const location = useLocation();
 
+  const hiddenPaths = ['/login', '/register', '/signin', '/signup'];
+  if (hiddenPaths.includes(location.pathname)) {
+    return null;
+  }
+
   const isActive = (path) => location.pathname === path;
 
   return (
