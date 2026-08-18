@@ -161,20 +161,24 @@ const Navbar = () => {
                 </div>
               </>
             ) : (
-              /* PUBLIC VISITOR SIGN-IN / REGISTER BUTTONS */
-              <div className="flex items-center gap-1">
-                <Link
-                  to="/login"
-                  className="px-2 py-1 text-xs font-semibold text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition"
-                >
-                  {t('nav.signIn')}
-                </Link>
-                <Link
-                  to="/register"
-                  className="btn-danger text-xs !py-1 !px-2.5 font-mono"
-                >
-                  {t('nav.getStarted')}
-                </Link>
+              /* PUBLIC VISITOR SIGN-IN / REGISTER BUTTONS - Hidden on Mobile to avoid header clutter */
+              <div className="hidden sm:flex items-center gap-1.5">
+                {location.pathname !== '/login' && (
+                  <Link
+                    to="/login"
+                    className="px-2.5 py-1 text-xs font-semibold text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition"
+                  >
+                    {t('nav.signIn')}
+                  </Link>
+                )}
+                {location.pathname !== '/register' && (
+                  <Link
+                    to="/register"
+                    className="btn-danger text-xs !py-1 !px-2.5 font-mono"
+                  >
+                    {t('nav.getStarted')}
+                  </Link>
+                )}
               </div>
             )}
 
