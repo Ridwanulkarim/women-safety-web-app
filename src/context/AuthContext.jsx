@@ -207,29 +207,6 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const loginDemoUser = async () => {
-    setLoading(true);
-    try {
-      const demoUser = {
-        uid: 'demo_user_safehaven_2026',
-        email: 'demo@safehaven.app',
-        fullName: 'Demo Tester',
-        role: 'user',
-        profileImage: '',
-        status: 'active'
-      };
-      setUser(demoUser);
-      setToken('demo_active_token');
-      localStorage.setItem('safehaven_token', 'demo_active_token');
-      toast.success('Logged in as Demo User!');
-      return demoUser;
-    } catch (error) {
-      toast.error('Failed to start demo session');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const updateUserProfile = (updatedData) => {
     setUser(prev => (prev ? { ...prev, ...updatedData } : updatedData));
   };
@@ -243,7 +220,6 @@ export const AuthProvider = ({ children }) => {
         registerUser,
         loginUser,
         loginWithGoogle,
-        loginDemoUser,
         logoutUser,
         resetPassword,
         updateUserProfile,
