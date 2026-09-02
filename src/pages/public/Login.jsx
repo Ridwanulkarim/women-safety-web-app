@@ -7,7 +7,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
 
 const Login = () => {
-  const { loginUser, loginWithGoogle } = useAuth();
+  const { loginUser, loginWithGoogle, loginDemoUser } = useAuth();
   const { register, handleSubmit, formState: { errors } } = useForm();
   const [loading, setLoading] = useState(false);
   const { t } = useLanguage();
