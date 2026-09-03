@@ -38,7 +38,7 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-[82vh] flex items-center justify-center p-3 sm:p-6 my-2 lg:my-6">
+    <div className="w-full flex items-center justify-center p-2 sm:p-4">
       <div className="max-w-4xl w-full grid grid-cols-1 lg:grid-cols-12 rounded-3xl overflow-hidden shadow-2xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-[#121215]">
         
         {/* Left Side: Modern Visual Security Banner (Desktop) */}
