@@ -36,26 +36,31 @@ const DashboardLayout = () => {
   const isActive = (path) => location.pathname === path;
 
   return (
-    <div className="min-h-screen flex bg-[#fafafa] dark:bg-[#09090b] text-zinc-900 dark:text-zinc-100 transition-colors duration-200 pb-16 lg:pb-0">
+    <div className="min-h-screen flex bg-[#f8fafc] dark:bg-[#09090d] text-zinc-900 dark:text-zinc-100 transition-colors duration-200 pb-16 lg:pb-0">
       <ScrollToTop />
 
       {/* Sidebar Desktop */}
-      <aside className="hidden lg:flex flex-col w-64 bg-white dark:bg-[#121215] border-r border-zinc-200 dark:border-zinc-800 p-5 sticky top-0 h-screen z-30">
-        <Link to="/" className="flex items-center gap-3 mb-6">
-          <div className="w-8 h-8 rounded-lg bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 flex items-center justify-center font-bold">
-            <FiShield className="w-4 h-4" />
+      <aside className="hidden lg:flex flex-col w-64 bg-white/90 dark:bg-[#0e0e13]/90 backdrop-blur-xl border-r border-zinc-200/80 dark:border-zinc-800/80 p-5 sticky top-0 h-screen z-30 shadow-xs">
+        <Link to="/" className="flex items-center gap-2.5 mb-6 group">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-rose-600 to-rose-700 text-white flex items-center justify-center font-bold shadow-md shadow-rose-600/30 group-hover:scale-105 transition-transform duration-200">
+            <FiShield className="w-4.5 h-4.5" />
           </div>
-          <span className="text-base font-bold font-heading text-zinc-900 dark:text-white">
-            SafeHaven
-          </span>
+          <div>
+            <span className="text-base font-extrabold font-heading text-zinc-900 dark:text-white tracking-tight block">
+              SafeHaven
+            </span>
+            <span className="text-[10px] font-mono font-bold text-emerald-500 uppercase flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 telemetry-dot"></span> Shield Active
+            </span>
+          </div>
         </Link>
 
         {/* SOS Quick Button */}
         <button
           onClick={openSOSModal}
-          className="w-full btn-danger mb-6 font-mono text-xs"
+          className="w-full btn-danger mb-6 font-mono text-xs shadow-lg shadow-rose-600/30"
         >
-          <FiAlertCircle className="w-4 h-4" /> SOS DISPATCH
+          <FiAlertCircle className="w-4 h-4 animate-pulse" /> SOS DISPATCH
         </button>
 
         {/* Nav Links */}
@@ -67,18 +72,20 @@ const DashboardLayout = () => {
               <Link
                 key={item.path}
                 to={item.path}
-                className={`flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition ${
+                className={`flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold transition-all duration-200 ${
                   active
-                    ? 'bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 font-bold'
-                    : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-white'
+                    ? 'bg-gradient-to-r from-rose-600 to-rose-700 text-white shadow-md shadow-rose-600/25 font-bold'
+                    : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800/60 hover:text-zinc-900 dark:hover:text-white'
                 }`}
               >
                 <div className="flex items-center gap-2.5">
-                  <Icon className="w-4 h-4" />
+                  <Icon className={`w-4 h-4 ${active ? 'text-white' : 'text-zinc-500 dark:text-zinc-400'}`} />
                   <span>{item.name}</span>
                 </div>
                 {item.badge > 0 && (
-                  <span className="px-1.5 py-0.5 rounded bg-rose-600 text-white text-[10px] font-mono font-bold">
+                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-mono font-bold ${
+                    active ? 'bg-white text-rose-600' : 'bg-rose-600 text-white'
+                  }`}>
                     {item.badge}
                   </span>
                 )}
@@ -88,16 +95,16 @@ const DashboardLayout = () => {
         </nav>
 
         {/* User Footer */}
-        <div className="pt-4 border-t border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
-          <div className="flex items-center gap-2">
+        <div className="pt-4 border-t border-zinc-200/80 dark:border-zinc-800/80 flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
             {user?.profilePictureUrl || user?.profileImage ? (
               <img
                 src={user.profilePictureUrl || user.profileImage}
                 alt={user?.fullName}
-                className="w-8 h-8 rounded-lg object-cover"
+                className="w-9 h-9 rounded-xl object-cover ring-2 ring-rose-500/20"
               />
             ) : (
-              <div className="w-8 h-8 rounded-lg bg-rose-600 text-white font-bold flex items-center justify-center text-xs">
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-rose-600 to-rose-700 text-white font-bold flex items-center justify-center text-xs shadow-sm">
                 {(user?.fullName || user?.email || 'U')[0].toUpperCase()}
               </div>
             )}
@@ -111,7 +118,7 @@ const DashboardLayout = () => {
               logoutUser();
               navigate('/login');
             }}
-            className="p-1.5 rounded-lg text-zinc-400 hover:text-rose-600 hover:bg-rose-500/10 transition"
+            className="p-2 rounded-xl text-zinc-400 hover:text-rose-600 hover:bg-rose-500/10 transition"
             title="Logout"
           >
             <FiLogOut className="w-4 h-4" />

@@ -72,21 +72,26 @@ const Profile = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
-      <div className="product-card p-6 flex items-center justify-between">
+    <div className="max-w-3xl mx-auto space-y-6 font-sans relative overflow-hidden">
+      {/* Ambient background glow */}
+      <div className="absolute top-0 right-1/4 w-80 h-80 bg-rose-600/10 rounded-full blur-3xl pointer-events-none"></div>
+
+      <div className="glass-card-xl p-6 sm:p-8 flex items-center justify-between gap-4 relative z-10">
         <div>
-          <h1 className="text-xl font-bold font-heading text-zinc-900 dark:text-white">Profile Settings</h1>
-          <p className="text-xs text-zinc-500">Manage your personal emergency identification & photo</p>
+          <div className="flex items-center gap-2 mb-1">
+            <h1 className="text-xl sm:text-2xl font-extrabold font-heading text-zinc-900 dark:text-white">Profile Settings</h1>
+            <span className="mono-tag mono-tag-emerald text-[10px]">
+              <FiCheckCircle /> Verified ID
+            </span>
+          </div>
+          <p className="text-xs text-zinc-500 dark:text-zinc-400">Manage your emergency medical identification & cloud avatar</p>
         </div>
-        <span className="mono-tag mono-tag-emerald">
-          <FiCheckCircle /> Verified
-        </span>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="product-card p-6 sm:p-8 space-y-6">
+      <form onSubmit={handleSubmit(onSubmit)} className="glass-card-xl p-6 sm:p-8 space-y-6 relative z-10">
         
         {/* Profile Picture Upload Component */}
-        <div className="border-b border-zinc-200 dark:border-zinc-800 pb-6">
+        <div className="border-b border-zinc-200/80 dark:border-zinc-800/80 pb-6">
           <label className="human-label text-center mb-3">Profile Picture (Firebase Storage)</label>
           <ProfilePictureUpload
             currentUrl={user?.profilePictureUrl || user?.profileImage}

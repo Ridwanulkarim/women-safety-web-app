@@ -27,22 +27,22 @@ const AdminLayout = () => {
   const isActive = (path) => location.pathname === path;
 
   return (
-    <div className="min-h-screen flex bg-slate-950 text-slate-100">
+    <div className="min-h-screen flex bg-[#08080c] text-zinc-100 font-sans">
       <ScrollToTop />
 
       {/* Sidebar Desktop */}
-      <aside className="hidden lg:flex flex-col w-64 bg-slate-900 border-r border-slate-800 p-5 sticky top-0 h-screen z-30">
-        <div className="flex items-center justify-between mb-8">
-          <Link to="/admin" className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-purple-600 flex items-center justify-center text-white font-bold shadow-md shadow-purple-600/30">
+      <aside className="hidden lg:flex flex-col w-64 bg-[#0d0d12]/95 backdrop-blur-xl border-r border-zinc-800/80 p-5 sticky top-0 h-screen z-30 shadow-2xl">
+        <div className="flex items-center justify-between mb-6">
+          <Link to="/admin" className="flex items-center gap-3 group">
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-rose-600 to-rose-700 flex items-center justify-center text-white font-bold shadow-lg shadow-rose-600/30 group-hover:scale-105 transition-transform duration-200">
               <FiShield className="w-5 h-5" />
             </div>
             <div>
-              <span className="text-lg font-black font-heading bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">
+              <span className="text-base font-extrabold font-heading text-white tracking-tight block">
                 SafeHaven
               </span>
-              <span className="block text-[9px] uppercase tracking-widest text-purple-400 font-bold">
-                Admin Command
+              <span className="text-[10px] font-mono font-bold text-rose-500 uppercase tracking-wider flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-rose-500 telemetry-dot"></span> Admin Command
               </span>
             </div>
           </Link>
@@ -50,9 +50,9 @@ const AdminLayout = () => {
 
         <Link
           to="/dashboard"
-          className="mb-4 px-3 py-2 rounded-xl bg-slate-800/60 hover:bg-slate-800 text-xs font-semibold text-slate-300 flex items-center gap-2 transition"
+          className="mb-4 px-3.5 py-2.5 rounded-xl bg-zinc-900/80 hover:bg-zinc-800 border border-zinc-800/80 text-xs font-semibold text-zinc-300 flex items-center gap-2 transition"
         >
-          <FiArrowLeft /> Return to User Portal
+          <FiArrowLeft className="text-rose-500" /> Return to User Portal
         </Link>
 
         {/* Admin Nav */}
@@ -64,13 +64,13 @@ const AdminLayout = () => {
               <Link
                 key={item.path}
                 to={item.path}
-                className={`flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-semibold transition ${
+                className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all duration-200 ${
                   active
-                    ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/20'
-                    : 'text-slate-400 hover:bg-slate-800 hover:text-purple-400'
+                    ? 'bg-gradient-to-r from-rose-600 to-rose-700 text-white shadow-md shadow-rose-600/25 font-bold'
+                    : 'text-zinc-400 hover:bg-zinc-900 hover:text-zinc-200'
                 }`}
               >
-                <Icon className="w-4 h-4" />
+                <Icon className={`w-4 h-4 ${active ? 'text-white' : 'text-zinc-400'}`} />
                 <span>{item.name}</span>
               </Link>
             );
@@ -78,17 +78,18 @@ const AdminLayout = () => {
         </nav>
 
         {/* Footer */}
-        <div className="pt-4 border-t border-slate-800 flex items-center justify-between">
+        <div className="pt-4 border-t border-zinc-800/80 flex items-center justify-between">
           <div className="text-left">
-            <p className="text-xs font-bold text-slate-200">{user?.fullName || 'Admin User'}</p>
-            <p className="text-[10px] text-purple-400 uppercase font-bold">Administrator</p>
+            <p className="text-xs font-bold text-zinc-200 truncate max-w-[130px]">{user?.fullName || 'Admin User'}</p>
+            <p className="text-[10px] text-rose-500 uppercase font-mono font-bold">Administrator</p>
           </div>
           <button
             onClick={() => {
               logoutUser();
               navigate('/login');
             }}
-            className="p-2 rounded-xl text-slate-400 hover:text-red-500 transition"
+            className="p-2 rounded-xl text-zinc-400 hover:text-rose-500 hover:bg-rose-500/10 transition"
+            title="Logout"
           >
             <FiLogOut className="w-4 h-4" />
           </button>

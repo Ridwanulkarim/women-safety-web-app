@@ -166,30 +166,34 @@ const SafetyTips = () => {
   });
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-10 font-sans">
-      <div className="text-center max-w-2xl mx-auto space-y-4">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 text-xs font-mono font-bold uppercase tracking-wider">
-          <FiShield /> Safety Manual & Legal Guide
-        </div>
-        <h1 className="text-3xl sm:text-4xl font-extrabold font-heading text-zinc-900 dark:text-white">
-          Personal Safety Manual
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-10 relative overflow-hidden">
+      {/* Ambient background glow */}
+      <div className="absolute top-10 left-1/2 -translate-x-1/2 w-96 h-96 bg-rose-600/10 rounded-full blur-3xl pointer-events-none"></div>
+
+      {/* Header */}
+      <div className="text-center max-w-3xl mx-auto space-y-3 relative z-10">
+        <span className="mono-tag mono-tag-rose">
+          <span className="w-1.5 h-1.5 rounded-full bg-rose-500 telemetry-dot"></span> Knowledge Vault & Legal Rights
+        </span>
+        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold font-heading text-zinc-900 dark:text-white tracking-tight">
+          Safety Tips & <span className="gradient-text-rose">Survival Guidelines</span>
         </h1>
-        <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400">
-          Tactical strategies, digital defense guidelines, and legal rights for emergency preparedness.
+        <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed font-normal">
+          Field-tested deterrence tactics, digital hygiene protocols, and Bangladesh women's legal protection rights.
         </p>
       </div>
 
       {/* Filter & Search Bar */}
-      <div className="product-card p-4 sm:p-6 flex flex-col md:flex-row gap-4 items-center justify-between">
+      <div className="glass-card-xl p-4 sm:p-6 flex flex-col md:flex-row gap-4 items-center justify-between relative z-10">
         <div className="flex flex-wrap gap-2 w-full md:w-auto">
           {TIP_CATEGORIES.map(cat => (
             <button
               key={cat}
               onClick={() => setCategory(cat)}
-              className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition ${
+              className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition-all duration-200 ${
                 category === cat
-                  ? 'bg-rose-600 text-white shadow-md shadow-rose-600/20'
-                  : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-rose-500/10 hover:text-rose-500'
+                  ? 'bg-rose-600 text-white shadow-md shadow-rose-600/25'
+                  : 'bg-zinc-100 dark:bg-zinc-800/80 text-zinc-700 dark:text-zinc-300 hover:bg-rose-500/10 hover:text-rose-500'
               }`}
             >
               {cat}
@@ -197,34 +201,34 @@ const SafetyTips = () => {
           ))}
         </div>
 
-        <div className="relative w-full md:w-72">
+        <div className="relative w-full md:w-80">
           <FiSearch className="absolute left-3.5 top-3.5 text-zinc-400" />
           <input
             type="text"
-            placeholder="Search safety tips or rights..."
+            placeholder="Search safety tips or legal rights..."
             value={search}
             onChange={e => setSearch(e.target.value)}
-            className="human-input pl-10"
+            className="human-input pl-10 text-xs"
           />
         </div>
       </div>
 
       {/* Tips Grid */}
       {loading ? (
-        <div className="p-12 text-center text-xs text-zinc-400 font-mono">
+        <div className="p-16 text-center text-xs text-zinc-400 font-mono">
           Loading safety guidelines...
         </div>
       ) : filteredTips.length === 0 ? (
-        <div className="product-card p-12 text-center space-y-3">
+        <div className="glass-card-xl p-12 text-center space-y-3">
           <p className="text-sm font-bold text-zinc-700 dark:text-zinc-300">No safety tips found matching "{search}"</p>
           <button onClick={() => { setSearch(''); setCategory('All'); }} className="btn-outline text-xs">
             Reset Category Filter
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 relative z-10">
           {filteredTips.map(tip => (
-            <div key={tip.id} className="product-card p-6 space-y-3 product-card-hover flex flex-col justify-between">
+            <div key={tip.id} className="product-card product-card-hover p-6 sm:p-7 space-y-3 flex flex-col justify-between">
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="mono-tag mono-tag-rose">
@@ -232,10 +236,10 @@ const SafetyTips = () => {
                   </span>
                   <FiBookOpen className="text-zinc-400" />
                 </div>
-                <h3 className="text-base font-bold font-heading text-zinc-900 dark:text-white leading-snug">
+                <h3 className="text-base font-extrabold font-heading text-zinc-900 dark:text-white leading-snug">
                   {tip.title}
                 </h3>
-                <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
+                <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed font-normal">
                   {tip.content}
                 </p>
               </div>

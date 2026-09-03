@@ -41,56 +41,80 @@ const AdminDashboard = () => {
   }, []);
 
   return (
-    <div className="space-y-8">
-      <div className="space-y-2">
-        <h1 className="text-3xl font-extrabold font-heading text-purple-400">Admin Control Center</h1>
-        <p className="text-xs text-slate-400">Real-time emergency monitoring and user platform overview.</p>
+    <div className="space-y-8 relative overflow-hidden font-sans">
+      {/* Ambient background glow */}
+      <div className="absolute top-0 right-1/4 w-96 h-96 bg-rose-600/10 rounded-full blur-3xl pointer-events-none"></div>
+
+      <div className="space-y-1.5 relative z-10">
+        <div className="flex items-center gap-2">
+          <span className="mono-tag mono-tag-rose text-[10px]">
+            <span className="w-1.5 h-1.5 rounded-full bg-rose-500 telemetry-dot"></span> COMMAND TELEMETRY
+          </span>
+        </div>
+        <h1 className="text-3xl font-extrabold font-heading text-white tracking-tight">
+          Admin <span className="gradient-text-rose">Control Center</span>
+        </h1>
+        <p className="text-xs text-zinc-400">Real-time emergency telemetry monitoring, incident response, and platform analytics.</p>
       </div>
 
       {/* Stats Cards Row */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="glass-card p-6 rounded-3xl border-l-4 border-l-purple-500 space-y-2">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 relative z-10">
+        <div className="glass-card-xl p-6 sm:p-7 border-l-4 border-l-blue-500 space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-bold text-slate-400 uppercase">Total Registered Users</span>
-            <FiUsers className="text-purple-400 text-xl" />
+            <span className="text-[10px] font-bold text-zinc-400 uppercase font-mono">Total Registered Users</span>
+            <div className="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center text-lg">
+              <FiUsers />
+            </div>
           </div>
-          <p className="text-3xl font-black font-heading text-slate-100">{stats.totalUsers}</p>
+          <p className="text-3xl font-black font-heading text-white">{stats.totalUsers}</p>
         </div>
 
-        <div className="glass-card p-6 rounded-3xl border-l-4 border-l-red-500 space-y-2">
+        <div className="glass-card-xl p-6 sm:p-7 border-l-4 border-l-rose-500 space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-bold text-slate-400 uppercase">Active SOS Alerts</span>
-            <FiAlertTriangle className="text-red-500 text-xl animate-pulse" />
+            <span className="text-[10px] font-bold text-zinc-400 uppercase font-mono">Active Distress Alerts</span>
+            <div className="w-10 h-10 rounded-xl bg-rose-500/10 text-rose-500 flex items-center justify-center text-lg">
+              <FiAlertTriangle className="animate-pulse" />
+            </div>
           </div>
-          <p className="text-3xl font-black font-heading text-red-500">{stats.activeAlerts}</p>
+          <p className="text-3xl font-black font-heading text-rose-500">{stats.activeAlerts}</p>
         </div>
 
-        <div className="glass-card p-6 rounded-3xl border-l-4 border-l-emerald-500 space-y-2">
+        <div className="glass-card-xl p-6 sm:p-7 border-l-4 border-l-emerald-500 space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-bold text-slate-400 uppercase">Resolved Incidents</span>
-            <FiCheckCircle className="text-emerald-500 text-xl" />
+            <span className="text-[10px] font-bold text-zinc-400 uppercase font-mono">Resolved Incidents</span>
+            <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-lg">
+              <FiCheckCircle />
+            </div>
           </div>
-          <p className="text-3xl font-black font-heading text-emerald-500">{stats.resolvedAlerts}</p>
+          <p className="text-3xl font-black font-heading text-emerald-400">{stats.resolvedAlerts}</p>
         </div>
 
-        <div className="glass-card p-6 rounded-3xl border-l-4 border-l-pink-500 space-y-2">
+        <div className="glass-card-xl p-6 sm:p-7 border-l-4 border-l-purple-500 space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-bold text-slate-400 uppercase">Total SOS Lifetime</span>
-            <FiPieChart className="text-pink-500 text-xl" />
+            <span className="text-[10px] font-bold text-zinc-400 uppercase font-mono">Total SOS Lifetime</span>
+            <div className="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center text-lg">
+              <FiPieChart />
+            </div>
           </div>
-          <p className="text-3xl font-black font-heading text-pink-500">{stats.totalSOSAlerts}</p>
+          <p className="text-3xl font-black font-heading text-purple-400">{stats.totalSOSAlerts}</p>
         </div>
       </div>
 
       {/* Chart Visualizations */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="glass-card p-6 rounded-3xl space-y-4">
-          <h3 className="text-base font-bold font-heading text-slate-200">Monthly SOS Distress Incident Trends</h3>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 relative z-10">
+        <div className="glass-card-xl p-6 sm:p-8 space-y-4">
+          <div className="border-b border-zinc-800/80 pb-3">
+            <h3 className="text-base font-extrabold font-heading text-white">Monthly SOS Distress Incident Trends</h3>
+            <p className="text-xs text-zinc-500">Telemetry count grouped by billing and operational cycles</p>
+          </div>
           <SOSChart data={stats.monthlySOSStats} />
         </div>
 
-        <div className="glass-card p-6 rounded-3xl space-y-4">
-          <h3 className="text-base font-bold font-heading text-slate-200">User Base Growth</h3>
+        <div className="glass-card-xl p-6 sm:p-8 space-y-4">
+          <div className="border-b border-zinc-800/80 pb-3">
+            <h3 className="text-base font-extrabold font-heading text-white">User Base Growth & Adoption</h3>
+            <p className="text-xs text-zinc-500">Cumulative verified user onboarding curve</p>
+          </div>
           <UserGrowthChart />
         </div>
       </div>

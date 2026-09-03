@@ -20,22 +20,28 @@ const EmergencyContacts = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8 font-sans">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-4">
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-2xl bg-pink-600 text-white flex items-center justify-center text-2xl font-bold shadow-md">
+    <div className="max-w-4xl mx-auto space-y-8 font-sans relative overflow-hidden">
+      {/* Ambient background glow */}
+      <div className="absolute top-0 right-1/4 w-80 h-80 bg-rose-600/10 rounded-full blur-3xl pointer-events-none"></div>
+
+      <div className="glass-card-xl p-6 sm:p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 relative z-10">
+        <div className="flex items-center gap-3.5">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-rose-600 to-rose-700 text-white flex items-center justify-center text-2xl font-bold shadow-lg shadow-rose-600/30">
             <FiPhoneCall />
           </div>
-          <div>
-            <h1 className="text-2xl font-bold font-heading">Emergency Contacts</h1>
-            <p className="text-xs text-slate-500 dark:text-slate-400">Add up to 5 priority contacts who will receive your SOS distress broadcasts.</p>
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <h1 className="text-xl sm:text-2xl font-extrabold font-heading text-zinc-900 dark:text-white">Emergency Contacts</h1>
+              <span className="mono-tag mono-tag-rose text-[10px]">{savedContacts.length}/5 QUOTA</span>
+            </div>
+            <p className="text-xs text-zinc-500 dark:text-zinc-400">Add up to 5 priority contacts who will receive your SOS distress broadcasts & SMS.</p>
           </div>
         </div>
 
         <button
           onClick={() => setModalOpen(true)}
           disabled={savedContacts.length >= 5}
-          className="px-5 py-3 rounded-2xl bg-pink-600 hover:bg-pink-700 disabled:opacity-50 text-white font-bold text-xs uppercase tracking-wider flex items-center gap-2 shadow-lg shadow-pink-600/30 transition"
+          className="btn-danger py-3 px-5 text-xs font-mono font-bold uppercase tracking-wider shadow-lg shadow-rose-600/25"
         >
           <FiPlusCircle className="text-base" /> Add Contact ({savedContacts.length}/5)
         </button>
@@ -48,29 +54,29 @@ const EmergencyContacts = () => {
       )}
 
       {loadingContacts ? (
-        <div className="p-8 text-center text-xs text-slate-400 font-mono">
+        <div className="p-12 text-center text-xs text-zinc-400 font-mono">
           Loading saved emergency contacts...
         </div>
       ) : savedContacts.length === 0 ? (
-        <div className="p-8 sm:p-12 glass-card rounded-3xl text-center space-y-4 border-dashed border-2 border-slate-300 dark:border-slate-800">
-          <div className="w-16 h-16 mx-auto rounded-full bg-pink-500/10 text-pink-500 flex items-center justify-center text-3xl">
+        <div className="p-8 sm:p-12 glass-card-xl rounded-3xl text-center space-y-4 border-dashed border-2 border-zinc-300 dark:border-zinc-800">
+          <div className="w-16 h-16 mx-auto rounded-full bg-rose-500/10 text-rose-500 flex items-center justify-center text-3xl">
             <FiUsers />
           </div>
-          <div className="space-y-1 max-w-md mx-auto">
-            <h3 className="text-lg font-bold text-slate-900 dark:text-white font-heading">No Emergency Contacts Saved</h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
+          <div className="space-y-1.5 max-w-md mx-auto">
+            <h3 className="text-lg font-extrabold text-zinc-900 dark:text-white font-heading">No Emergency Contacts Linked</h3>
+            <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed font-normal">
               You haven't added any emergency contacts yet. Manually add up to 5 priority contacts (family or trusted friends) to receive your SOS broadcasts.
             </p>
           </div>
           <button
             onClick={() => setModalOpen(true)}
-            className="px-6 py-3 rounded-2xl bg-pink-600 hover:bg-pink-700 text-white font-bold text-xs uppercase tracking-wider inline-flex items-center gap-2 shadow-lg shadow-pink-600/30 transition"
+            className="btn-danger py-3 px-6 text-xs font-mono font-bold uppercase tracking-wider inline-flex items-center gap-2 shadow-lg shadow-rose-600/30"
           >
             <FiUserPlus /> Add Your First Emergency Contact
           </button>
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-3.5 relative z-10">
           {savedContacts.map((c) => (
             <ContactCard key={c.id || c._id} contact={c} onDelete={handleDeleteContact} />
           ))}
