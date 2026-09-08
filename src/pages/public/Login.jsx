@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { FiShield, FiLock, FiMail, FiEye, FiEyeOff, FiCheckCircle, FiActivity } from 'react-icons/fi';
+import { FiShield, FiLock, FiMail, FiEye, FiEyeOff, FiCheckCircle, FiActivity, FiAlertCircle } from 'react-icons/fi';
 import { FcGoogle } from 'react-icons/fc';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
@@ -11,6 +11,7 @@ const Login = () => {
   const { register, handleSubmit, formState: { errors } } = useForm();
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [authError, setAuthError] = useState('');
   const { t } = useLanguage();
 
   const navigate = useNavigate();
@@ -19,11 +20,12 @@ const Login = () => {
 
   const onSubmit = async (data) => {
     setLoading(true);
+    setAuthError('');
     try {
       await loginUser(data.email, data.password);
       navigate(from, { replace: true });
     } catch (e) {
-      // toast shown in AuthContext
+      setAuthError(e.message || 'Invalid email or password');
     } finally {
       setLoading(false);
     }
@@ -31,11 +33,12 @@ const Login = () => {
 
   const handleGoogleSignIn = async () => {
     setLoading(true);
+    setAuthError('');
     try {
       await loginWithGoogle();
       navigate(from, { replace: true });
     } catch (e) {
-      // toast shown in AuthContext
+      setAuthError(e.message || 'Google sign in failed');
     } finally {
       setLoading(false);
     }
@@ -110,6 +113,24 @@ const Login = () => {
               {t('auth.orEmail')}
             </span>
           </div>
+
+          {authError && (
+            <div className="p-3.5 rounded-xl bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/30 text-rose-700 dark:text-rose-400 text-xs flex items-start gap-2.5 font-medium">
+              <FiAlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+              <div className="space-y-1">
+                <p>{authError}</p>
+                {authError.includes('Google') && (
+                  <button
+                    type="button"
+                    onClick={handleGoogleSignIn}
+                    className="text-rose-700 dark:text-rose-300 font-bold underline cursor-pointer text-xs"
+                  >
+                    Click here to Sign In with Google
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div>

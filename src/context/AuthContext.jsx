@@ -16,6 +16,38 @@ export const isUserAdmin = (email) => {
   return clean === 'ridwanulk08@gmail.com';
 };
 
+export const formatAuthError = (error) => {
+  if (!error) return 'An unexpected error occurred.';
+  const code = error.code || '';
+  const msg = error.message || '';
+
+  if (
+    code === 'auth/invalid-credential' ||
+    msg.includes('auth/invalid-credential') ||
+    code === 'auth/wrong-password' ||
+    msg.includes('auth/wrong-password')
+  ) {
+    return 'Invalid email or password. If you originally registered with Google, please click "Continue with Google" or reset your password.';
+  }
+  if (code === 'auth/user-not-found' || msg.includes('auth/user-not-found')) {
+    return 'No account registered with this email address. Please sign up or continue with Google.';
+  }
+  if (code === 'auth/email-already-in-use' || msg.includes('auth/email-already-in-use')) {
+    return 'An account already exists with this email address.';
+  }
+  if (code === 'auth/popup-closed-by-user' || msg.includes('auth/popup-closed-by-user')) {
+    return 'Sign-in window was closed before completing.';
+  }
+  if (code === 'auth/too-many-requests' || msg.includes('auth/too-many-requests')) {
+    return 'Too many failed login attempts. Please wait a few moments or reset your password.';
+  }
+  if (code === 'auth/network-request-failed' || msg.includes('network-request-failed')) {
+    return 'Network connection error. Please check your internet connection.';
+  }
+  const cleaned = msg.replace(/^Firebase:\s*/i, '').replace(/\(auth\/[^)]+\)\.?/i, '').trim();
+  return cleaned || 'Authentication failed. Please try again.';
+};
+
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
@@ -119,8 +151,9 @@ export const AuthProvider = ({ children }) => {
 
       return newUser;
     } catch (error) {
-      toast.error(error.message || 'Registration failed');
-      throw error;
+      const msg = formatAuthError(error);
+      toast.error(msg);
+      throw new Error(msg);
     } finally {
       setLoading(false);
     }
@@ -166,8 +199,9 @@ export const AuthProvider = ({ children }) => {
 
       return loggedUser;
     } catch (error) {
-      toast.error(error.message || 'Invalid email or password');
-      throw error;
+      const msg = formatAuthError(error);
+      toast.error(msg);
+      throw new Error(msg);
     } finally {
       setLoading(false);
     }
@@ -216,8 +250,9 @@ export const AuthProvider = ({ children }) => {
 
       return loggedUser;
     } catch (error) {
-      toast.error(error.message || 'Google login failed');
-      throw error;
+      const msg = formatAuthError(error);
+      toast.error(msg);
+      throw new Error(msg);
     } finally {
       setLoading(false);
     }
@@ -238,10 +273,11 @@ export const AuthProvider = ({ children }) => {
   const resetPassword = async (email) => {
     try {
       await firebaseResetPassword(email);
-      toast.success('Password reset email sent!');
+      toast.success('Password reset email sent! Check your inbox.');
     } catch (error) {
-      toast.error(error.message || 'Failed to send reset email');
-      throw error;
+      const msg = formatAuthError(error);
+      toast.error(msg);
+      throw new Error(msg);
     }
   };
 

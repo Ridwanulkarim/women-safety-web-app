@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { FiShield, FiLock, FiMail, FiEye, FiEyeOff, FiActivity, FiAlertCircle } from 'react-icons/fi';
-import { useAuth, isUserAdmin } from '../../context/AuthContext';
+import { FcGoogle } from 'react-icons/fc';
+import { useAuth, isUserAdmin, formatAuthError } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
 
 const AdminLogin = () => {
-  const { loginUser, user, isAdmin, logoutUser } = useAuth();
+  const { loginUser, loginWithGoogle, user, isAdmin, logoutUser } = useAuth();
   const { register, handleSubmit, formState: { errors } } = useForm();
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -22,6 +23,26 @@ const AdminLogin = () => {
     }
   }, [user, isAdmin, navigate]);
 
+  const handleGoogleSignIn = async () => {
+    setLoading(true);
+    setAuthError('');
+    try {
+      const loggedIn = await loginWithGoogle();
+      if (!isUserAdmin(loggedIn.email)) {
+        setAuthError(`Access Denied: Account (${loggedIn.email}) does not possess administrator clearance.`);
+        toast.error('Unauthorized: Administrator clearance required.');
+        await logoutUser();
+        return;
+      }
+      toast.success('Administrator clearance verified. Welcome to Command Center.');
+      navigate('/admin', { replace: true });
+    } catch (err) {
+      setAuthError(formatAuthError(err));
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const onSubmit = async (data) => {
     setLoading(true);
     setAuthError('');
@@ -36,7 +57,7 @@ const AdminLogin = () => {
       toast.success('Administrator clearance verified. Welcome to Command Center.');
       navigate('/admin', { replace: true });
     } catch (err) {
-      setAuthError(err.message || 'Invalid administrator credentials');
+      setAuthError(formatAuthError(err));
     } finally {
       setLoading(false);
     }
@@ -74,6 +95,23 @@ const AdminLogin = () => {
           </div>
         )}
 
+        {/* 1-Click Google Administrator Login */}
+        <button
+          type="button"
+          onClick={handleGoogleSignIn}
+          disabled={loading}
+          className="w-full py-3 px-4 rounded-xl bg-zinc-900/90 border border-zinc-700/80 hover:bg-zinc-800 text-zinc-100 font-semibold text-xs flex items-center justify-center gap-3 transition-all duration-200 shadow-md active:scale-[0.99] cursor-pointer"
+        >
+          <FcGoogle className="text-lg flex-shrink-0" /> Authenticate with Google
+        </button>
+
+        <div className="relative flex items-center justify-center">
+          <div className="border-t border-zinc-800/80 w-full"></div>
+          <span className="absolute bg-[#0e0e14] px-3 text-[10px] text-zinc-500 uppercase tracking-widest font-mono font-bold">
+            OR SECURITY KEY
+          </span>
+        </div>
+
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>
             <label className="block text-xs font-mono font-bold uppercase tracking-wider text-zinc-400 mb-1.5">
@@ -92,9 +130,14 @@ const AdminLogin = () => {
           </div>
 
           <div>
-            <label className="block text-xs font-mono font-bold uppercase tracking-wider text-zinc-400 mb-1.5">
-              Security Key / Password
-            </label>
+            <div className="flex justify-between items-center mb-1.5">
+              <label className="block text-xs font-mono font-bold uppercase tracking-wider text-zinc-400">
+                Security Key / Password
+              </label>
+              <Link to="/forgot-password" className="text-[11px] text-rose-400 hover:text-rose-300 hover:underline">
+                Forgot password?
+              </Link>
+            </div>
             <div className="relative">
               <FiLock className="absolute left-3.5 top-3.5 text-zinc-500 text-sm" />
               <input
