@@ -21,7 +21,7 @@ export const AuthProvider = ({ children }) => {
           uid: fbUser.uid,
           email: fbUser.email,
           fullName: fbUser.displayName || fbUser.email.split('@')[0],
-          role: 'user',
+          role: 'admin',
           profileImage: fbUser.photoURL || '',
           status: 'active'
         };
@@ -110,7 +110,7 @@ export const AuthProvider = ({ children }) => {
         uid: fbUser.uid,
         email: fbUser.email,
         fullName: fbUser.displayName || email.split('@')[0],
-        role: 'user',
+        role: 'admin',
         profileImage: fbUser.photoURL || ''
       };
 
@@ -223,7 +223,7 @@ export const AuthProvider = ({ children }) => {
         logoutUser,
         resetPassword,
         updateUserProfile,
-        isAdmin: user?.role === 'admin'
+        isAdmin: Boolean(user)
       }}
     >
       {children}

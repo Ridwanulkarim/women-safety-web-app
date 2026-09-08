@@ -98,18 +98,31 @@ const AdminLayout = () => {
 
       {/* Main Body */}
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="bg-slate-900/80 backdrop-blur-md border-b border-slate-800 px-4 py-3 flex items-center justify-between sticky top-0 z-20">
+        <header className="bg-[#0e0e13]/90 backdrop-blur-xl border-b border-zinc-800/80 px-4 py-3 flex items-center justify-between sticky top-0 z-20">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="p-2 rounded-xl lg:hidden bg-slate-800 text-slate-200"
+              className="p-2 rounded-xl lg:hidden bg-zinc-800 text-zinc-200"
             >
               {sidebarOpen ? <FiX className="w-5 h-5" /> : <FiMenu className="w-5 h-5" />}
             </button>
-            <h1 className="text-base font-bold font-heading text-purple-400">Admin Control Center</h1>
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-purple-500 animate-ping"></span>
+              <h1 className="text-xs sm:text-sm font-bold font-heading text-purple-400">Admin Command Center</h1>
+            </div>
           </div>
 
-          <ThemeToggle />
+          <div className="flex items-center gap-2">
+            <Link
+              to="/dashboard"
+              className="px-3 py-1.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-semibold flex items-center gap-1.5 transition border border-zinc-700/60"
+              title="Return to User Dashboard"
+            >
+              <FiArrowLeft className="text-rose-500" />
+              <span className="hidden sm:inline">User Portal</span>
+            </Link>
+            <ThemeToggle />
+          </div>
         </header>
 
         {sidebarOpen && (

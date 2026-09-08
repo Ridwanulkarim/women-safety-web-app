@@ -55,6 +55,11 @@ const Footer = () => {
               <li><Link to="/features" className="hover:text-rose-400 transition-colors">{t('nav.features')}</Link></li>
               <li><Link to="/safety-tips" className="hover:text-rose-400 transition-colors">{t('nav.safetyTips')}</Link></li>
               <li><Link to="/blog" className="hover:text-rose-400 transition-colors">{t('nav.blog')}</Link></li>
+              <li>
+                <Link to="/admin" className="text-purple-400 hover:text-purple-300 font-bold transition-colors flex items-center gap-1.5">
+                  <FiShield className="text-xs" /> Admin Command Center
+                </Link>
+              </li>
             </ul>
           </div>
 

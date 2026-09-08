@@ -24,6 +24,7 @@ const DashboardLayout = () => {
 
   const menuItems = [
     { name: 'Dashboard', path: '/dashboard', icon: FiLayout },
+    { name: 'Admin Command', path: '/admin', icon: FiShield, isAdminPill: true },
     { name: 'Evidence Vault', path: '/dashboard/evidence', icon: FiCamera },
     { name: 'Profile', path: '/dashboard/profile', icon: FiUser },
     { name: 'Emergency Contacts', path: '/dashboard/contacts', icon: FiPhoneCall },
@@ -79,9 +80,14 @@ const DashboardLayout = () => {
                 }`}
               >
                 <div className="flex items-center gap-2.5">
-                  <Icon className={`w-4 h-4 ${active ? 'text-white' : 'text-zinc-500 dark:text-zinc-400'}`} />
-                  <span>{item.name}</span>
+                  <Icon className={`w-4 h-4 ${item.isAdminPill ? 'text-purple-400' : active ? 'text-white' : 'text-zinc-500 dark:text-zinc-400'}`} />
+                  <span className={item.isAdminPill ? 'text-purple-600 dark:text-purple-400 font-bold' : ''}>{item.name}</span>
                 </div>
+                {item.isAdminPill && (
+                  <span className="px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-600 dark:text-purple-400 text-[9px] font-mono font-bold uppercase tracking-wider">
+                    ADMIN
+                  </span>
+                )}
                 {item.badge > 0 && (
                   <span className={`px-2 py-0.5 rounded-full text-[10px] font-mono font-bold ${
                     active ? 'bg-white text-rose-600' : 'bg-rose-600 text-white'
@@ -144,6 +150,15 @@ const DashboardLayout = () => {
           </div>
 
           <div className="flex items-center gap-1.5 sm:gap-2">
+            <Link
+              to="/admin"
+              className="px-2.5 sm:px-3 py-1.5 rounded-lg bg-purple-600 hover:bg-purple-700 text-white font-mono text-xs font-bold flex items-center gap-1.5 shadow-sm transition active:scale-95"
+              title="Access Admin Command Center"
+            >
+              <FiShield className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Admin Panel</span>
+            </Link>
+
             <LanguageToggle />
             <ThemeToggle />
 
