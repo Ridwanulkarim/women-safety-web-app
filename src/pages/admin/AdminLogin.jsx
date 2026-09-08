@@ -83,7 +83,7 @@ const AdminLogin = () => {
               <FiMail className="absolute left-3.5 top-3.5 text-zinc-500 text-sm" />
               <input
                 type="email"
-                placeholder="admin@safehaven.app"
+                placeholder="ridwanulk08@gmail.com"
                 {...register('email', { required: 'Admin email is required' })}
                 className="w-full pl-10 pr-4 py-3 rounded-xl bg-zinc-900/90 border border-zinc-800 text-zinc-100 placeholder-zinc-500 text-xs focus:outline-none focus:border-rose-500 transition font-sans"
               />

@@ -7,15 +7,13 @@ import toast from 'react-hot-toast';
 import { upsertRegisteredUser } from '../utils/adminDataRegistry';
 
 export const ADMIN_EMAILS = [
-  'ridwanulk08@gmail.com',
-  'admin@safehaven.app',
-  'admin@safehaven.org'
+  'ridwanulk08@gmail.com'
 ];
 
 export const isUserAdmin = (email) => {
   if (!email) return false;
   const clean = email.toLowerCase().trim();
-  return ADMIN_EMAILS.includes(clean) || clean.startsWith('admin@');
+  return clean === 'ridwanulk08@gmail.com';
 };
 
 const AuthContext = createContext();

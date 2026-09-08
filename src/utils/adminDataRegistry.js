@@ -15,8 +15,15 @@ export const sanitizeUsers = (list) => {
     const name = (u.fullName || '').toLowerCase().trim();
     if (email.includes('example.com')) return false;
     if (name === 'sarah connor' || name === 'emily rose') return false;
-    if (email === 'admin@safehaven.org' && name === 'admin manager') return false;
+    if (email === 'admin@safehaven.app' || name === 'safehaven admin') return false;
+    if (email === 'admin@safehaven.org' || name === 'admin manager') return false;
     return true;
+  }).map((u) => {
+    const email = u.email ? u.email.toLowerCase().trim() : '';
+    if (email === 'ridwanulk08@gmail.com') {
+      return { ...u, role: 'admin' };
+    }
+    return u;
   });
 };
 
@@ -95,7 +102,7 @@ export const upsertRegisteredUser = async (userData) => {
       fullName: userData.fullName || email.split('@')[0],
       email: email,
       phone: userData.phone || 'Not Provided',
-      role: userData.role || (email.includes('admin') ? 'admin' : 'user'),
+      role: email === 'ridwanulk08@gmail.com' ? 'admin' : (userData.role || 'user'),
       status: userData.status || 'active',
       profileImage: userData.profileImage || '',
       createdAt:

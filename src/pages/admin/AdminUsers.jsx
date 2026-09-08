@@ -59,9 +59,13 @@ const AdminUsers = () => {
         snapshot.forEach((d) => {
           const data = d.data();
           if (data && data.email) {
+            const clean = data.email.toLowerCase().trim();
+            if (clean === 'admin@safehaven.app' || data.fullName?.toLowerCase().trim() === 'safehaven admin') return;
             cloudUsers.push({
               uid: d.id,
-              ...data
+              ...data,
+              email: clean,
+              role: clean === 'ridwanulk08@gmail.com' ? 'admin' : 'user'
             });
           }
         });
@@ -69,10 +73,20 @@ const AdminUsers = () => {
         // Merge cloud users with local users
         const localUsers = getRegisteredUsers();
         const map = new Map();
-        localUsers.forEach((u) => map.set(u.email.toLowerCase().trim(), u));
-        cloudUsers.forEach((u) =>
-          map.set(u.email.toLowerCase().trim(), { ...map.get(u.email.toLowerCase().trim()), ...u })
-        );
+        localUsers.forEach((u) => {
+          if (u.email) {
+            const clean = u.email.toLowerCase().trim();
+            if (clean !== 'admin@safehaven.app') {
+              map.set(clean, { ...u, role: clean === 'ridwanulk08@gmail.com' ? 'admin' : 'user' });
+            }
+          }
+        });
+        cloudUsers.forEach((u) => {
+          const clean = u.email.toLowerCase().trim();
+          if (clean !== 'admin@safehaven.app') {
+            map.set(clean, { ...map.get(clean), ...u, role: clean === 'ridwanulk08@gmail.com' ? 'admin' : 'user' });
+          }
+        });
 
         const merged = sanitizeUsers(Array.from(map.values()));
         setUsers(merged);
@@ -108,16 +122,33 @@ const AdminUsers = () => {
       snap.docs.forEach((d) => {
         const data = d.data();
         if (data && data.email) {
-          cloudUsers.push({ uid: d.id, ...data });
+          const clean = data.email.toLowerCase().trim();
+          if (clean === 'admin@safehaven.app' || data.fullName?.toLowerCase().trim() === 'safehaven admin') return;
+          cloudUsers.push({
+            uid: d.id,
+            ...data,
+            email: clean,
+            role: clean === 'ridwanulk08@gmail.com' ? 'admin' : 'user'
+          });
         }
       });
 
       const localUsers = getRegisteredUsers();
       const map = new Map();
-      localUsers.forEach((u) => map.set(u.email.toLowerCase().trim(), u));
-      cloudUsers.forEach((u) =>
-        map.set(u.email.toLowerCase().trim(), { ...map.get(u.email.toLowerCase().trim()), ...u })
-      );
+      localUsers.forEach((u) => {
+        if (u.email) {
+          const clean = u.email.toLowerCase().trim();
+          if (clean !== 'admin@safehaven.app') {
+            map.set(clean, { ...u, role: clean === 'ridwanulk08@gmail.com' ? 'admin' : 'user' });
+          }
+        }
+      });
+      cloudUsers.forEach((u) => {
+        const clean = u.email.toLowerCase().trim();
+        if (clean !== 'admin@safehaven.app') {
+          map.set(clean, { ...map.get(clean), ...u, role: clean === 'ridwanulk08@gmail.com' ? 'admin' : 'user' });
+        }
+      });
 
       const merged = sanitizeUsers(Array.from(map.values()));
       setUsers(merged);
@@ -335,13 +366,13 @@ const AdminUsers = () => {
                     <td className="p-4">
                       <span
                         className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase font-mono ${
-                          u.role === 'admin'
+                          (u.role === 'admin' || u.email?.toLowerCase().trim() === 'ridwanulk08@gmail.com')
                             ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30'
                             : 'bg-zinc-800 text-zinc-300 border border-zinc-700'
                         }`}
                       >
-                        {u.role === 'admin' && <FiShield className="w-3 h-3" />}
-                        {u.role}
+                        {(u.role === 'admin' || u.email?.toLowerCase().trim() === 'ridwanulk08@gmail.com') && <FiShield className="w-3 h-3" />}
+                        {(u.role === 'admin' || u.email?.toLowerCase().trim() === 'ridwanulk08@gmail.com') ? 'admin' : 'user'}
                       </span>
                     </td>
                     <td className="p-4">

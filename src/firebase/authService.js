@@ -15,11 +15,7 @@ export const syncUserDocument = async (user, fullName) => {
   try {
     const userDocRef = doc(db, 'users', user.uid);
     const email = user.email ? user.email.toLowerCase().trim() : '';
-    const isAdmin =
-      email === 'admin@safehaven.app' ||
-      email === 'ridwanulk08@gmail.com' ||
-      email === 'admin@safehaven.org' ||
-      email.startsWith('admin@');
+    const isAdmin = email === 'ridwanulk08@gmail.com';
 
     await setDoc(
       userDocRef,
