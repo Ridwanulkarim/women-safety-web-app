@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { FiUsers, FiAlertTriangle, FiCheckCircle, FiRadio, FiPieChart, FiActivity, FiArrowUpRight } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
+import { collection, onSnapshot } from 'firebase/firestore';
+import { db } from '../../firebase/config';
 import api from '../../services/api';
 import { SOSChart, UserGrowthChart } from '../../components/charts/DashboardCharts';
-import { getRegisteredUsers, getGlobalSOSAlerts } from '../../utils/adminDataRegistry';
+import { getRegisteredUsers, getGlobalSOSAlerts, sanitizeUsers, sanitizeAlerts } from '../../utils/adminDataRegistry';
 import { formatDate } from '../../utils/helpers';
 
 const AdminDashboard = () => {
@@ -18,21 +20,49 @@ const AdminDashboard = () => {
   useEffect(() => {
     refreshData();
 
-    // Background server fetch if available
-    (async () => {
-      try {
-        const res = await api.get('/analytics/dashboard');
-        if (res.data?.data) {
-          // If server provides valid aggregate stats
-        }
-      } catch (e) {}
-    })();
+    // Firestore real-time users subscription
+    const unsubUsers = onSnapshot(collection(db, 'users'), (snap) => {
+      const cloudUsers = [];
+      snap.forEach((d) => {
+        const data = d.data();
+        if (data && data.email) cloudUsers.push({ uid: d.id, ...data });
+      });
+      if (cloudUsers.length > 0) {
+        const local = getRegisteredUsers();
+        const map = new Map();
+        local.forEach((u) => map.set(u.email.toLowerCase().trim(), u));
+        cloudUsers.forEach((u) => map.set(u.email.toLowerCase().trim(), { ...map.get(u.email.toLowerCase().trim()), ...u }));
+        const merged = sanitizeUsers(Array.from(map.values()));
+        setUsers(merged);
+        localStorage.setItem('safehaven_registered_users', JSON.stringify(merged));
+      }
+    }, (err) => console.warn('Dashboard users stream notice:', err.message));
+
+    // Firestore real-time SOS alerts subscription
+    const unsubSOS = onSnapshot(collection(db, 'sos'), (snap) => {
+      const cloudAlerts = [];
+      snap.forEach((d) => {
+        const data = d.data();
+        if (data) cloudAlerts.push({ id: d.id, ...data });
+      });
+      if (cloudAlerts.length > 0) {
+        const local = getGlobalSOSAlerts();
+        const map = new Map();
+        local.forEach((a) => map.set(a.id, a));
+        cloudAlerts.forEach((a) => map.set(a.id, { ...map.get(a.id), ...a }));
+        const merged = sanitizeAlerts(Array.from(map.values()));
+        setAlerts(merged);
+        localStorage.setItem('safehaven_global_sos_alerts', JSON.stringify(merged));
+      }
+    }, (err) => console.warn('Dashboard SOS stream notice:', err.message));
 
     window.addEventListener('safehaven_users_updated', refreshData);
     window.addEventListener('safehaven_sos_updated', refreshData);
     window.addEventListener('storage', refreshData);
 
     return () => {
+      unsubUsers();
+      unsubSOS();
       window.removeEventListener('safehaven_users_updated', refreshData);
       window.removeEventListener('safehaven_sos_updated', refreshData);
       window.removeEventListener('storage', refreshData);

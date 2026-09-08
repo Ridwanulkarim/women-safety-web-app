@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { FiAlertTriangle, FiCheckCircle, FiMapPin, FiClock, FiShield, FiRadio, FiTrash2 } from 'react-icons/fi';
+import { FiAlertTriangle, FiCheckCircle, FiMapPin, FiClock, FiShield, FiRadio, FiTrash2, FiRefreshCw } from 'react-icons/fi';
+import { collection, onSnapshot, getDocs, doc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { db } from '../../firebase/config';
 import LiveMap from '../../components/map/LiveMap';
 import { formatDate } from '../../utils/helpers';
 import toast from 'react-hot-toast';
@@ -8,58 +10,90 @@ import {
   getGlobalSOSAlerts,
   updateSOSAlertStatus,
   deleteSOSAlert,
-  saveGlobalSOSAlert
+  saveGlobalSOSAlert,
+  fetchFirestoreSOSAlerts,
+  sanitizeAlerts
 } from '../../utils/adminDataRegistry';
 
 const AdminAlerts = () => {
   const [alerts, setAlerts] = useState(() => getGlobalSOSAlerts());
   const [filter, setFilter] = useState('ALL'); // ALL, ACTIVE, ACKNOWLEDGED, RESOLVED
-
-  const syncAlerts = useCallback(async () => {
-    // 1. Instant local read
-    const local = getGlobalSOSAlerts();
-    setAlerts(local);
-
-    // 2. Background API sync if available
-    try {
-      const res = await api.get('/sos');
-      if (Array.isArray(res.data?.data) && res.data.data.length > 0) {
-        res.data.data.forEach((a) => saveGlobalSOSAlert(a));
-        setAlerts(getGlobalSOSAlerts());
-      }
-    } catch (e) {
-      // Offline / serverless fallback
-    }
-  }, []);
+  const [syncing, setSyncing] = useState(false);
 
   useEffect(() => {
-    syncAlerts();
+    let isMounted = true;
+    setAlerts(getGlobalSOSAlerts());
 
-    const handleUpdate = () => {
+    // Cloud Firestore Real-time Alert Stream
+    const unsubscribe = onSnapshot(
+      collection(db, 'sos'),
+      (snapshot) => {
+        if (!isMounted) return;
+        const cloudAlerts = [];
+        snapshot.forEach((d) => {
+          const data = d.data();
+          if (data) {
+            cloudAlerts.push({ id: d.id, ...data });
+          }
+        });
+
+        const localAlerts = getGlobalSOSAlerts();
+        const map = new Map();
+        localAlerts.forEach((a) => map.set(a.id, a));
+        cloudAlerts.forEach((a) => map.set(a.id, { ...map.get(a.id), ...a }));
+
+        const merged = sanitizeAlerts(Array.from(map.values()));
+        setAlerts(merged);
+        localStorage.setItem('safehaven_global_sos_alerts', JSON.stringify(merged));
+      },
+      (err) => {
+        console.warn('Firestore SOS stream notice:', err.message);
+      }
+    );
+
+    const handleLocalUpdate = () => {
       setAlerts(getGlobalSOSAlerts());
     };
 
-    window.addEventListener('safehaven_sos_updated', handleUpdate);
-    window.addEventListener('storage', handleUpdate);
+    window.addEventListener('safehaven_sos_updated', handleLocalUpdate);
+    window.addEventListener('storage', handleLocalUpdate);
 
     return () => {
-      window.removeEventListener('safehaven_sos_updated', handleUpdate);
-      window.removeEventListener('storage', handleUpdate);
+      isMounted = false;
+      unsubscribe();
+      window.removeEventListener('safehaven_sos_updated', handleLocalUpdate);
+      window.removeEventListener('storage', handleLocalUpdate);
     };
-  }, [syncAlerts]);
+  }, []);
+
+  const handleManualSync = async () => {
+    setSyncing(true);
+    const updated = await fetchFirestoreSOSAlerts();
+    setAlerts(updated);
+    setSyncing(false);
+    toast.success('Live distress beacons refreshed from cloud.');
+  };
 
   const handleUpdateStatus = async (id, nextStatus) => {
     try {
+      await updateDoc(doc(db, 'sos', id), { status: nextStatus });
+    } catch (e) {}
+    try {
       await api.patch(`/sos/${id}/status`, { status: nextStatus });
     } catch (e) {}
-    const updated = updateSOSAlertStatus(id, nextStatus);
+
+    const updated = await updateSOSAlertStatus(id, nextStatus);
     setAlerts(updated);
     toast.success(`SOS distress signal marked as ${nextStatus}.`);
   };
 
-  const handleDeleteAlert = (id) => {
+  const handleDeleteAlert = async (id) => {
     if (!window.confirm('Delete this emergency alert log?')) return;
-    const updated = deleteSOSAlert(id);
+    try {
+      await deleteDoc(doc(db, 'sos', id));
+    } catch (e) {}
+
+    const updated = await deleteSOSAlert(id);
     setAlerts(updated);
     toast.success('SOS alert record removed.');
   };
@@ -84,25 +118,36 @@ const AdminAlerts = () => {
             Emergency <span className="gradient-text-rose">SOS Distress Monitor</span>
           </h1>
           <p className="text-xs text-zinc-400">
-            Real-time telemetry and dispatch coordination for emergency user distress signals.
+            Real-time telemetry and dispatch coordination for emergency citizen distress signals.
           </p>
         </div>
 
-        {/* Filter Badges */}
-        <div className="flex items-center gap-2 bg-zinc-900/80 p-1 rounded-2xl border border-zinc-800">
-          {['ALL', 'ACTIVE', 'ACKNOWLEDGED', 'RESOLVED'].map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setFilter(tab)}
-              className={`px-3 py-1.5 rounded-xl text-[10px] font-mono font-bold uppercase transition ${
-                filter === tab
-                  ? 'bg-rose-600 text-white shadow-md shadow-rose-600/30'
-                  : 'text-zinc-400 hover:text-zinc-200'
-              }`}
-            >
-              {tab} {tab === 'ACTIVE' && activeCount > 0 && `(${activeCount})`}
-            </button>
-          ))}
+        <div className="flex flex-wrap items-center gap-3">
+          {/* Filter Badges */}
+          <div className="flex items-center gap-1 bg-zinc-900/80 p-1 rounded-2xl border border-zinc-800">
+            {['ALL', 'ACTIVE', 'ACKNOWLEDGED', 'RESOLVED'].map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setFilter(tab)}
+                className={`px-3 py-1.5 rounded-xl text-[10px] font-mono font-bold uppercase transition ${
+                  filter === tab
+                    ? 'bg-rose-600 text-white shadow-md shadow-rose-600/30'
+                    : 'text-zinc-400 hover:text-zinc-200'
+                }`}
+              >
+                {tab} {tab === 'ACTIVE' && activeCount > 0 && `(${activeCount})`}
+              </button>
+            ))}
+          </div>
+
+          <button
+            onClick={handleManualSync}
+            disabled={syncing}
+            className="p-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 hover:text-white transition"
+            title="Refresh from Cloud"
+          >
+            <FiRefreshCw className={`w-4 h-4 ${syncing ? 'animate-spin text-rose-500' : ''}`} />
+          </button>
         </div>
       </div>
 
