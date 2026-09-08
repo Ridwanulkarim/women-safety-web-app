@@ -79,15 +79,17 @@ const Navbar = () => {
             {user ? (
               /* LOGGED IN CONTROLS */
               <>
-                {/* Admin Command Center Quick Link Button */}
-                <Link
-                  to="/admin"
-                  className="px-3 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-mono text-xs font-bold flex items-center gap-1.5 shadow-md shadow-purple-600/25 transition active:scale-95"
-                  title="Admin Command Center"
-                >
-                  <FiShield className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">Admin Panel</span>
-                </Link>
+                {/* Admin Command Center Quick Link Button - ONLY visible to verified Administrators */}
+                {isAdmin && (
+                  <Link
+                    to="/admin"
+                    className="px-3 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-mono text-xs font-bold flex items-center gap-1.5 shadow-md shadow-purple-600/25 transition active:scale-95"
+                    title="Admin Command Center"
+                  >
+                    <FiShield className="w-3.5 h-3.5" />
+                    <span className="hidden sm:inline">Admin Panel</span>
+                  </Link>
+                )}
 
                 {/* Notifications Bell Button */}
                 <Link
@@ -130,18 +132,22 @@ const Navbar = () => {
                       <div className="px-3 py-2.5 border-b border-zinc-200/80 dark:border-zinc-800/80">
                         <p className="text-xs font-bold text-zinc-900 dark:text-white truncate">{user.fullName}</p>
                         <p className="text-[11px] text-zinc-500 truncate font-mono">{user.email}</p>
-                        <span className="inline-block mt-1 px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-600 dark:text-purple-400 font-mono text-[9px] font-bold uppercase">
-                          Administrator
-                        </span>
+                        {isAdmin && (
+                          <span className="inline-block mt-1 px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-600 dark:text-purple-400 font-mono text-[9px] font-bold uppercase">
+                            Administrator
+                          </span>
+                        )}
                       </div>
 
-                      <Link
-                        to="/admin"
-                        onClick={() => setProfileDropdownOpen(false)}
-                        className="flex items-center gap-2 px-3 py-2 text-xs font-bold rounded-lg bg-purple-500/10 text-purple-600 dark:text-purple-400 hover:bg-purple-500/20 transition"
-                      >
-                        <FiShield /> Admin Command Center
-                      </Link>
+                      {isAdmin && (
+                        <Link
+                          to="/admin"
+                          onClick={() => setProfileDropdownOpen(false)}
+                          className="flex items-center gap-2 px-3 py-2 text-xs font-bold rounded-lg bg-purple-500/10 text-purple-600 dark:text-purple-400 hover:bg-purple-500/20 transition"
+                        >
+                          <FiShield /> Admin Command Center
+                        </Link>
+                      )}
 
                       <Link
                         to="/dashboard"
@@ -184,12 +190,6 @@ const Navbar = () => {
             ) : (
               /* PUBLIC VISITOR SIGN-IN / REGISTER BUTTONS */
               <div className="hidden sm:flex items-center gap-2">
-                <Link
-                  to="/admin"
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono font-bold text-purple-600 dark:text-purple-400 bg-purple-500/10 hover:bg-purple-500/20 rounded-xl transition border border-purple-500/30 shadow-xs"
-                >
-                  <FiShield className="w-3.5 h-3.5" /> Admin Portal
-                </Link>
                 {location.pathname !== '/login' && (
                   <Link
                     to="/login"

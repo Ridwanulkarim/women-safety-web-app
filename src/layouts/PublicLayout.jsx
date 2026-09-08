@@ -8,7 +8,7 @@ import MobileBottomBar from '../components/common/MobileBottomBar';
 
 const PublicLayout = () => {
   const location = useLocation();
-  const authPaths = ['/login', '/register', '/signin', '/signup', '/forgot-password'];
+  const authPaths = ['/login', '/register', '/signin', '/signup', '/forgot-password', '/admin/login'];
   const isAuthPage = authPaths.includes(location.pathname);
 
   if (isAuthPage) {

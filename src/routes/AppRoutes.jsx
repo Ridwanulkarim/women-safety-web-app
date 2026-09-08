@@ -43,6 +43,7 @@ import AdminAlerts from '../pages/admin/AdminAlerts';
 import AdminAnnouncements from '../pages/admin/AdminAnnouncements';
 import AdminSOSReports from '../pages/admin/AdminSOSReports';
 import AdminSettings from '../pages/admin/AdminSettings';
+import AdminLogin from '../pages/admin/AdminLogin';
 
 import PrivacyPolicy from '../pages/public/PrivacyPolicy';
 
@@ -57,6 +58,7 @@ const AppRoutes = () => {
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/verify-email" element={<VerifyEmail />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="/admin/login" element={<AdminLogin />} />
 
         {/* AUTHENTICATED PROTECTED APPLICATION ROUTES: Requires Login */}
         <Route

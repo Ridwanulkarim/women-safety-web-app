@@ -5,6 +5,18 @@ import { firebaseLogin, firebaseRegister, firebaseGoogleLogin, firebaseLogout, f
 import api from '../services/api';
 import toast from 'react-hot-toast';
 
+export const ADMIN_EMAILS = [
+  'ridwanulk08@gmail.com',
+  'admin@safehaven.app',
+  'admin@safehaven.org'
+];
+
+export const isUserAdmin = (email) => {
+  if (!email) return false;
+  const clean = email.toLowerCase().trim();
+  return ADMIN_EMAILS.includes(clean) || clean.startsWith('admin@');
+};
+
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
@@ -17,11 +29,12 @@ export const AuthProvider = ({ children }) => {
     const unsubscribe = onAuthStateChanged(auth, (fbUser) => {
       if (fbUser) {
         // Fast local user state initialization (instant UI render!)
+        const role = isUserAdmin(fbUser.email) ? 'admin' : 'user';
         const fastUser = {
           uid: fbUser.uid,
           email: fbUser.email,
           fullName: fbUser.displayName || fbUser.email.split('@')[0],
-          role: 'admin',
+          role,
           profileImage: fbUser.photoURL || '',
           status: 'active'
         };
@@ -64,7 +77,7 @@ export const AuthProvider = ({ children }) => {
         uid: fbUser.uid,
         email,
         fullName: fullName || email.split('@')[0],
-        role: 'user',
+        role: isUserAdmin(email) ? 'admin' : 'user',
         profileImage: ''
       };
 
@@ -110,7 +123,7 @@ export const AuthProvider = ({ children }) => {
         uid: fbUser.uid,
         email: fbUser.email,
         fullName: fbUser.displayName || email.split('@')[0],
-        role: 'admin',
+        role: isUserAdmin(email) ? 'admin' : 'user',
         profileImage: fbUser.photoURL || ''
       };
 
@@ -151,7 +164,7 @@ export const AuthProvider = ({ children }) => {
         uid: fbUser.uid,
         email: fbUser.email,
         fullName: fbUser.displayName || fbUser.email.split('@')[0],
-        role: 'user',
+        role: isUserAdmin(fbUser.email) ? 'admin' : 'user',
         profileImage: fbUser.photoURL || ''
       };
 
@@ -223,7 +236,7 @@ export const AuthProvider = ({ children }) => {
         logoutUser,
         resetPassword,
         updateUserProfile,
-        isAdmin: Boolean(user)
+        isAdmin: isUserAdmin(user?.email)
       }}
     >
       {children}

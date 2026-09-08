@@ -19,18 +19,23 @@ export const ProtectedRoute = ({ children }) => {
 };
 
 export const AdminRoute = ({ children }) => {
-  const { user, loading } = useAuth();
+  const { user, loading, isAdmin } = useAuth();
   const location = useLocation();
 
   if (loading) {
     return <LoadingSpinner message="Verifying administrator credentials..." />;
   }
 
-  // If visitor is not logged in, take them to login page so they can authenticate
+  // If not logged in, direct to dedicated admin login
   if (!user) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    return <Navigate to="/admin/login" state={{ from: location }} replace />;
   }
 
-  // Authenticated user has access to Admin Command Center
+  // If logged in as regular user, block access and return to user dashboard
+  if (!isAdmin) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  // Authenticated administrator has access
   return children;
 };

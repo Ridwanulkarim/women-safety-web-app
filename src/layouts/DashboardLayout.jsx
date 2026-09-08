@@ -14,7 +14,7 @@ import ScrollToTop from '../components/common/ScrollToTop';
 import MobileBottomBar from '../components/common/MobileBottomBar';
 
 const DashboardLayout = () => {
-  const { user, logoutUser } = useAuth();
+  const { user, logoutUser, isAdmin } = useAuth();
   const { unreadCount } = useNotifications();
   const { openSOSModal } = useSOS();
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -22,9 +22,8 @@ const DashboardLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const menuItems = [
+  const baseMenuItems = [
     { name: 'Dashboard', path: '/dashboard', icon: FiLayout },
-    { name: 'Admin Command', path: '/admin', icon: FiShield, isAdminPill: true },
     { name: 'Evidence Vault', path: '/dashboard/evidence', icon: FiCamera },
     { name: 'Profile', path: '/dashboard/profile', icon: FiUser },
     { name: 'Emergency Contacts', path: '/dashboard/contacts', icon: FiPhoneCall },
@@ -33,6 +32,14 @@ const DashboardLayout = () => {
     { name: 'Notifications', path: '/dashboard/notifications', icon: FiBell, badge: unreadCount },
     { name: 'Settings', path: '/dashboard/settings', icon: FiSettings }
   ];
+
+  const menuItems = isAdmin
+    ? [
+        { name: 'Dashboard', path: '/dashboard', icon: FiLayout },
+        { name: 'Admin Command', path: '/admin', icon: FiShield, isAdminPill: true },
+        ...baseMenuItems.slice(1)
+      ]
+    : baseMenuItems;
 
   const isActive = (path) => location.pathname === path;
 
@@ -150,14 +157,16 @@ const DashboardLayout = () => {
           </div>
 
           <div className="flex items-center gap-1.5 sm:gap-2">
-            <Link
-              to="/admin"
-              className="px-2.5 sm:px-3 py-1.5 rounded-lg bg-purple-600 hover:bg-purple-700 text-white font-mono text-xs font-bold flex items-center gap-1.5 shadow-sm transition active:scale-95"
-              title="Access Admin Command Center"
-            >
-              <FiShield className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Admin Panel</span>
-            </Link>
+            {isAdmin && (
+              <Link
+                to="/admin"
+                className="px-2.5 sm:px-3 py-1.5 rounded-lg bg-purple-600 hover:bg-purple-700 text-white font-mono text-xs font-bold flex items-center gap-1.5 shadow-sm transition active:scale-95"
+                title="Access Admin Command Center"
+              >
+                <FiShield className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Admin Panel</span>
+              </Link>
+            )}
 
             <LanguageToggle />
             <ThemeToggle />

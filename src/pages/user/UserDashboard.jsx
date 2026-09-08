@@ -43,13 +43,6 @@ const UserDashboard = () => {
 
         {/* Quick Safety Action Bar */}
         <div className="flex flex-wrap items-center gap-2.5 relative z-10">
-          <Link
-            to="/admin"
-            className="px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-mono text-xs font-bold flex items-center gap-2 transition active:scale-95 shadow-md shadow-purple-600/25"
-          >
-            <FiShield /> ADMIN COMMAND
-          </Link>
-
           <SirenAlarmButton />
 
           <button
