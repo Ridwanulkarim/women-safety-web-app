@@ -27,20 +27,23 @@ export const AuthProvider = ({ children }) => {
 
   // Instant non-blocking session listener
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (fbUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (fbUser) => {
       if (fbUser) {
         // Fast local user state initialization (instant UI render!)
         const role = isUserAdmin(fbUser.email) ? 'admin' : 'user';
+        const cleanEmail = fbUser.email ? fbUser.email.toLowerCase().trim() : '';
         const fastUser = {
           uid: fbUser.uid,
-          email: fbUser.email,
-          fullName: fbUser.displayName || fbUser.email.split('@')[0],
+          email: cleanEmail,
+          fullName: fbUser.displayName || cleanEmail.split('@')[0],
           role,
           profileImage: fbUser.photoURL || '',
-          status: 'active'
+          status: 'active',
+          createdAt: fbUser.metadata?.creationTime || new Date().toISOString(),
+          lastLogin: new Date().toISOString()
         };
         setUser(prev => prev || fastUser);
-        upsertRegisteredUser(fastUser);
+        await upsertRegisteredUser(fastUser);
         setLoading(false); // Unblock UI immediately!
 
         // Background server sync
@@ -48,15 +51,19 @@ export const AuthProvider = ({ children }) => {
           try {
             const idToken = await fbUser.getIdToken();
             const res = await api.post('/auth/login', {
-              email: fbUser.email,
+              email: cleanEmail,
+              uid: fbUser.uid,
               idToken
             }, { timeout: 3000 });
 
-            if (res.data?.data) {
-              setUser(res.data.data.user);
-              upsertRegisteredUser(res.data.data.user);
-              setToken(res.data.data.token);
-              localStorage.setItem('safehaven_token', res.data.data.token);
+            if (res.data?.data?.user) {
+              const serverUser = { ...res.data.data.user, uid: fbUser.uid };
+              setUser(serverUser);
+              await upsertRegisteredUser(serverUser);
+              if (res.data?.data?.token) {
+                setToken(res.data.data.token);
+                localStorage.setItem('safehaven_token', res.data.data.token);
+              }
             }
           } catch (err) {
             console.warn('Backend auth sync notice:', err.message);
@@ -136,7 +143,7 @@ export const AuthProvider = ({ children }) => {
 
       // Instant session activation (0-lag navigation!)
       setUser(loggedUser);
-      upsertRegisteredUser(loggedUser);
+      await upsertRegisteredUser(loggedUser);
       setToken('firebase_active_token');
       toast.success('Welcome back!');
 
@@ -144,10 +151,11 @@ export const AuthProvider = ({ children }) => {
       (async () => {
         try {
           const idToken = await fbUser.getIdToken();
-          const res = await api.post('/auth/login', { email, password, idToken });
+          const res = await api.post('/auth/login', { email: fbUser.email, uid: fbUser.uid, idToken });
           if (res.data?.data?.user) {
-            setUser(res.data.data.user);
-            upsertRegisteredUser(res.data.data.user);
+            const serverUser = { ...res.data.data.user, uid: fbUser.uid };
+            setUser(serverUser);
+            await upsertRegisteredUser(serverUser);
           }
           if (res.data?.data?.token) {
             setToken(res.data.data.token);
@@ -176,12 +184,15 @@ export const AuthProvider = ({ children }) => {
         email: fbUser.email,
         fullName: fbUser.displayName || fbUser.email.split('@')[0],
         role: isUserAdmin(fbUser.email) ? 'admin' : 'user',
-        profileImage: fbUser.photoURL || ''
+        profileImage: fbUser.photoURL || '',
+        status: 'active',
+        createdAt: fbUser.metadata?.creationTime || new Date().toISOString(),
+        lastLogin: new Date().toISOString()
       };
 
       // Instant session activation (0-lag navigation!)
       setUser(loggedUser);
-      upsertRegisteredUser(loggedUser);
+      await upsertRegisteredUser(loggedUser);
       setToken('firebase_active_token');
       localStorage.setItem('safehaven_token', 'firebase_active_token');
       toast.success('Signed in with Google!');
@@ -190,10 +201,11 @@ export const AuthProvider = ({ children }) => {
       (async () => {
         try {
           const idToken = await fbUser.getIdToken();
-          const res = await api.post('/auth/login', { email: fbUser.email, idToken });
+          const res = await api.post('/auth/login', { email: fbUser.email, uid: fbUser.uid, idToken });
           if (res.data?.data?.user) {
-            setUser(res.data.data.user);
-            upsertRegisteredUser(res.data.data.user);
+            const serverUser = { ...res.data.data.user, uid: fbUser.uid };
+            setUser(serverUser);
+            await upsertRegisteredUser(serverUser);
           }
           if (res.data?.data?.token) {
             setToken(res.data.data.token);

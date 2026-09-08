@@ -109,16 +109,18 @@ app.post(['/api/auth/register', '/auth/register'], (req, res) => {
 
 app.post(['/api/auth/login', '/auth/login'], (req, res) => {
   const { email, uid } = req.body;
+  const cleanEmail = email ? email.toLowerCase().trim() : '';
   let user = uid ? dbData.users.get(uid) : null;
   if (!user) {
-    user = Array.from(dbData.users.values()).find(u => u.email === email);
+    user = Array.from(dbData.users.values()).find(u => u.email === cleanEmail);
   }
+  const isAdmin = cleanEmail === 'ridwanulk08@gmail.com' || cleanEmail.startsWith('admin@') || cleanEmail.includes('admin');
   if (!user) {
     user = {
       uid: uid || 'user_' + Date.now(),
-      email,
-      fullName: email.split('@')[0],
-      role: email && email.includes('admin') ? 'admin' : 'user',
+      email: cleanEmail,
+      fullName: cleanEmail.split('@')[0],
+      role: isAdmin ? 'admin' : 'user',
       createdAt: new Date().toISOString()
     };
     dbData.users.set(user.uid, user);
@@ -128,6 +130,10 @@ app.post(['/api/auth/login', '/auth/login'], (req, res) => {
 });
 
 // USER ROUTES
+app.get(['/api/users', '/users'], (req, res) => {
+  return res.status(200).json({ success: true, data: Array.from(dbData.users.values()) });
+});
+
 app.get(['/api/users/me', '/users/me'], authenticateToken, (req, res) => {
   const user = dbData.users.get(req.user.uid) || { uid: req.user.uid, email: req.user.email, fullName: req.user.fullName, role: req.user.role };
   return res.status(200).json({ success: true, data: user });
