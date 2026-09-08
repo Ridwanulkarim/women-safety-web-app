@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 import api from '../services/api';
 import toast from 'react-hot-toast';
 import { useAuth } from './AuthContext';
+import { saveGlobalSOSAlert, updateSOSAlertStatus } from '../utils/adminDataRegistry';
 
 const SOSContext = createContext();
 
@@ -134,6 +135,9 @@ export const SOSProvider = ({ children }) => {
       const res = await api.post('/sos', payload);
       const sosRecord = res.data?.data || {
         id: 'sos_' + Date.now(),
+        userName: user?.fullName || (user?.email ? user.email.split('@')[0] : 'User'),
+        userPhone: user?.phone || 'Emergency Direct',
+        userEmail: user?.email || '',
         latitude: lat,
         longitude: lng,
         address: addr,
@@ -145,6 +149,7 @@ export const SOSProvider = ({ children }) => {
       setIsSOSActive(true);
       setActiveSOSData(sosRecord);
       setSosHistory(prev => [sosRecord, ...(Array.isArray(prev) ? prev : [])]);
+      saveGlobalSOSAlert(sosRecord);
 
       const count = Array.isArray(sosRecord.contactsAlerted) ? sosRecord.contactsAlerted.length : savedContacts.length;
       if (count > 0) {
@@ -158,6 +163,9 @@ export const SOSProvider = ({ children }) => {
       toast.error('SOS Broadcast Warning: Local distress signal captured.');
       const fallbackRecord = {
         id: 'sos_local_' + Date.now(),
+        userName: user?.fullName || (user?.email ? user.email.split('@')[0] : 'User'),
+        userPhone: user?.phone || 'Emergency Direct',
+        userEmail: user?.email || '',
         latitude: locationData?.latitude || 23.8103,
         longitude: locationData?.longitude || 90.4125,
         address: locationData?.address || 'Dhaka, Bangladesh',
@@ -168,14 +176,19 @@ export const SOSProvider = ({ children }) => {
       setIsSOSActive(true);
       setActiveSOSData(fallbackRecord);
       setSosHistory(prev => [fallbackRecord, ...(Array.isArray(prev) ? prev : [])]);
+      saveGlobalSOSAlert(fallbackRecord);
       return fallbackRecord;
     }
   };
 
   const resolveSOS = async (sosId) => {
+    const targetId = sosId || activeSOSData?.id;
     try {
-      if (sosId) await api.patch(`/sos/${sosId}/status`, { status: 'RESOLVED' });
+      if (targetId) await api.patch(`/sos/${targetId}/status`, { status: 'RESOLVED' });
     } catch (e) {}
+    if (targetId) {
+      updateSOSAlertStatus(targetId, 'RESOLVED');
+    }
     setIsSOSActive(false);
     setActiveSOSData(null);
     toast.success('SOS state resolved and marked safe.');

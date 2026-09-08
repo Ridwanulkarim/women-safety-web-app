@@ -110,7 +110,7 @@ const MedicalIDModal = ({ isOpen, onClose }) => {
                 required
                 value={formData.contactName}
                 onChange={(e) => setFormData({ ...formData, contactName: e.target.value })}
-                placeholder="e.g. Sarah Connor (Mother)"
+                placeholder="e.g. Ayesha Rahman (Mother)"
                 className="human-input"
               />
             </div>

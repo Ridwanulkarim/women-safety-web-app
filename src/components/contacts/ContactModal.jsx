@@ -33,7 +33,7 @@ const ContactModal = ({ isOpen, onClose, onSave }) => {
             <label className="human-label">Full Name</label>
             <input
               type="text"
-              placeholder="e.g. Sarah Connor"
+              placeholder="e.g. Ayesha Rahman"
               {...register('name', { required: 'Name is required' })}
               className={`human-input ${errors.name ? 'human-input-error' : ''}`}
             />
