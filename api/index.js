@@ -252,7 +252,7 @@ This is an automated mission-critical security alert sent to ${email}.`;
 };
 
 app.post(['/api/auth/login', '/auth/login'], async (req, res) => {
-  const { email, uid } = req.body;
+  const { email, uid, isSessionRestore } = req.body;
   const cleanEmail = email ? email.toLowerCase().trim() : '';
   let user = uid ? dbData.users.get(uid) : null;
   if (!user) {
@@ -270,11 +270,13 @@ app.post(['/api/auth/login', '/auth/login'], async (req, res) => {
     dbData.users.set(user.uid, user);
   }
 
-  // Dispatch automated security alert email to user (Awaited so Vercel Serverless Function doesn't kill it)
-  try {
-    await dispatchLoginAlertEmail(user.email, user.fullName);
-  } catch (err) {
-    console.warn('Email dispatch notice:', err.message);
+  // Dispatch automated security alert email only on REAL sign-in, NOT on page refresh / session restore!
+  if (!isSessionRestore) {
+    try {
+      await dispatchLoginAlertEmail(user.email, user.fullName);
+    } catch (err) {
+      console.warn('Email dispatch notice:', err.message);
+    }
   }
 
   const token = generateToken({ uid: user.uid, email: user.email, role: user.role, fullName: user.fullName });

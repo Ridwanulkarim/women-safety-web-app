@@ -83,7 +83,8 @@ export const AuthProvider = ({ children }) => {
             const res = await api.post('/auth/login', {
               email: cleanEmail,
               uid: fbUser.uid,
-              idToken
+              idToken,
+              isSessionRestore: true
             }, { timeout: 12000 });
 
             if (res.data?.data?.user) {
@@ -182,7 +183,7 @@ export const AuthProvider = ({ children }) => {
       (async () => {
         try {
           const idToken = await fbUser.getIdToken();
-          const res = await api.post('/auth/login', { email: fbUser.email, uid: fbUser.uid, idToken });
+          const res = await api.post('/auth/login', { email: fbUser.email, uid: fbUser.uid, idToken, isSessionRestore: false });
           if (res.data?.data?.user) {
             const serverUser = { ...res.data.data.user, uid: fbUser.uid };
             setUser(serverUser);
@@ -233,7 +234,7 @@ export const AuthProvider = ({ children }) => {
       (async () => {
         try {
           const idToken = await fbUser.getIdToken();
-          const res = await api.post('/auth/login', { email: fbUser.email, uid: fbUser.uid, idToken });
+          const res = await api.post('/auth/login', { email: fbUser.email, uid: fbUser.uid, idToken, isSessionRestore: false });
           if (res.data?.data?.user) {
             const serverUser = { ...res.data.data.user, uid: fbUser.uid };
             setUser(serverUser);

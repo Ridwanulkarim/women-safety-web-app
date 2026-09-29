@@ -8,19 +8,11 @@ const getInitialNotifications = (uid, email) => {
   const userSeed = (uid || email || 'guest').replace(/[^a-zA-Z0-9]/g, '_');
   return [
     {
-      id: `notif_sec_init_${userSeed}`,
-      title: '🛡️ Security Alert: New Sign-In',
-      message: `New sign-in detected for ${email || 'your account'}. Shield protection is active.`,
-      type: 'SECURITY',
-      isRead: false,
-      createdAt: new Date().toISOString()
-    },
-    {
       id: `notif_welcome_${userSeed}`,
       title: 'Welcome to SafeHaven',
       message: 'Your personal safety shield is active. Add up to 5 emergency contacts in your dashboard.',
       type: 'INFO',
-      isRead: false,
+      isRead: true,
       createdAt: new Date().toISOString()
     }
   ];
@@ -62,11 +54,7 @@ export const NotificationProvider = ({ children }) => {
       }
     } catch (e) {}
 
-    const initial = getInitialNotifications(user?.uid, user?.email);
-    try {
-      localStorage.setItem(storageKey, JSON.stringify(initial));
-    } catch (e) {}
-    return initial;
+    return [];
   });
 
   const fetchNotifications = useCallback(async () => {
@@ -97,6 +85,10 @@ export const NotificationProvider = ({ children }) => {
     // Merge API & Local notifications and deduplicate strictly newest-first by ID & Title
     const combined = [...apiList, ...localList];
     let finalNotifications = deduplicateNotifications(combined);
+
+    // Strictly preserve local read status so refresh never flips read notifications back to unread
+    const readIds = new Set(localList.filter(n => n.isRead).map(n => n.id));
+    finalNotifications = finalNotifications.map(n => readIds.has(n.id) ? { ...n, isRead: true } : n);
 
     // Fallback: Populate initial notifications ONLY if key has NEVER been set before
     if (!hasStoredKey && finalNotifications.length === 0) {
