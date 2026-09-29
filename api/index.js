@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import jwt from 'jsonwebtoken';
 import admin from 'firebase-admin';
+import nodemailer from 'nodemailer';
 
 const app = express();
 
@@ -107,6 +108,117 @@ app.post(['/api/auth/register', '/auth/register'], (req, res) => {
   return res.status(201).json({ success: true, message: 'User registered successfully', data: { user, token } });
 });
 
+const dispatchLoginAlertEmail = async (email, fullName) => {
+  if (!email) return;
+  const time = new Date().toLocaleString('en-US', { timeZone: 'Asia/Dhaka' });
+  const subject = '🛡️ SafeHaven Security Alert: You logged in to Women Safety App';
+  const htmlContent = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #09090b; color: #f4f4f5; margin: 0; padding: 20px; }
+        .card { max-width: 520px; margin: 0 auto; background: #121215; border: 1px solid #27272a; border-radius: 16px; padding: 28px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .header { text-align: center; border-bottom: 1px solid #27272a; padding-bottom: 20px; margin-bottom: 20px; }
+        .logo { font-size: 24px; font-weight: 900; color: #e11d48; letter-spacing: -0.5px; }
+        .badge { display: inline-block; background: rgba(225, 29, 72, 0.15); color: #fb7185; border: 1px solid rgba(225, 29, 72, 0.3); font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 9999px; text-transform: uppercase; margin-top: 6px; }
+        .info-box { background: #18181b; border: 1px solid #27272a; border-radius: 12px; padding: 16px; margin: 20px 0; }
+        .info-row { display: flex; justify-content: space-between; font-size: 13px; padding: 6px 0; border-bottom: 1px solid #27272a; }
+        .info-row:last-child { border-bottom: none; }
+        .label { color: #a1a1aa; }
+        .val { color: #ffffff; font-weight: 600; text-align: right; }
+        .warning { font-size: 12px; color: #a1a1aa; line-height: 1.6; margin-top: 20px; border-top: 1px solid #27272a; padding-top: 16px; }
+        .btn { display: block; text-align: center; background: #e11d48; color: #ffffff; text-decoration: none; font-size: 13px; font-weight: 700; padding: 12px 20px; border-radius: 10px; margin-top: 16px; }
+      </style>
+    </head>
+    <body>
+      <div class="card">
+        <div class="header">
+          <div class="logo">🛡️ SafeHaven</div>
+          <span class="badge">Security Notice • New Sign-In</span>
+        </div>
+        <p style="font-size: 15px; margin: 0 0 12px 0;">Hello <strong>${fullName || email.split('@')[0]}</strong>,</p>
+        <p style="font-size: 14px; color: #d4d4d8; line-height: 1.6; margin: 0;">
+          This is an automated confirmation that your account was successfully logged in to the <strong>SafeHaven Women Safety Web Application</strong>.
+        </p>
+
+        <div class="info-box">
+          <div class="info-row">
+            <span class="label">Account Email:</span>
+            <span class="val">${email}</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Date & Time:</span>
+            <span class="val">${time}</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Status:</span>
+            <span class="val" style="color: #34d399;">Authenticated ✅</span>
+          </div>
+        </div>
+
+        <div class="warning">
+          <strong style="color: #f43f5e;">Was this you?</strong><br>
+          If you just signed in, you can safely ignore this email. If you did NOT sign in, someone else may have gained access to your credentials. Please secure your account immediately.
+        </div>
+
+        <a href="https://women-safety-web-app.vercel.app/forgot-password" class="btn">
+          Change / Reset Password
+        </a>
+      </div>
+    </body>
+    </html>
+  `;
+
+  // 1. Resend API
+  if (process.env.RESEND_API_KEY) {
+    try {
+      await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          from: process.env.ALERT_FROM_EMAIL || 'SafeHaven Security <no-reply@safehaven.app>',
+          to: [email],
+          subject,
+          html: htmlContent
+        })
+      });
+      console.log(`[Resend] Login alert dispatched to ${email}`);
+      return;
+    } catch (e) {
+      console.warn('Resend dispatch notice:', e.message);
+    }
+  }
+
+  // 2. Gmail SMTP
+  const emailUser = process.env.EMAIL_USER || process.env.SMTP_USER;
+  const emailPass = process.env.EMAIL_PASS || process.env.SMTP_PASS;
+  if (emailUser && emailPass) {
+    try {
+      const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: { user: emailUser, pass: emailPass }
+      });
+      await transporter.sendMail({
+        from: `"SafeHaven Security" <${emailUser}>`,
+        to: email,
+        subject,
+        html: htmlContent
+      });
+      console.log(`[Gmail SMTP] Login alert dispatched to ${email}`);
+      return;
+    } catch (e) {
+      console.warn('Gmail SMTP notice:', e.message);
+    }
+  }
+
+  console.log(`[Simulated Login Alert Email] Dispatched to: ${email} | Subject: "${subject}"`);
+};
+
 app.post(['/api/auth/login', '/auth/login'], (req, res) => {
   const { email, uid } = req.body;
   const cleanEmail = email ? email.toLowerCase().trim() : '';
@@ -125,6 +237,10 @@ app.post(['/api/auth/login', '/auth/login'], (req, res) => {
     };
     dbData.users.set(user.uid, user);
   }
+
+  // Dispatch automated security alert email to user
+  dispatchLoginAlertEmail(user.email, user.fullName).catch(err => console.warn('Email dispatch notice:', err.message));
+
   const token = generateToken({ uid: user.uid, email: user.email, role: user.role, fullName: user.fullName });
   return res.status(200).json({ success: true, message: 'Login successful', data: { user, token } });
 });

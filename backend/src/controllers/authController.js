@@ -3,7 +3,7 @@ import bcrypt from 'bcryptjs';
 import { generateToken } from '../config/jwt.js';
 import { firestoreAdminService } from '../services/firestoreAdminService.js';
 import { successResponse, errorResponse } from '../utils/apiResponse.js';
-import { sendTransactionalEmail } from '../services/notificationService.js';
+import { sendTransactionalEmail, sendLoginAlertEmail } from '../services/notificationService.js';
 import { auth } from '../config/firebaseAdmin.js';
 import { logger } from '../utils/logger.js';
 
@@ -229,6 +229,13 @@ export const login = async (req, res, next) => {
     } catch (notifErr) {
       console.warn('Login notification creation notice:', notifErr.message);
     }
+
+    // Send automated security email alert to user's inbox
+    sendLoginAlertEmail({
+      to: user.email,
+      fullName: user.fullName,
+      loginTime: new Date().toLocaleString('en-US', { timeZone: 'Asia/Dhaka' })
+    }).catch(emailErr => console.warn('Login alert email dispatch notice:', emailErr.message));
 
     const { passwordHash: _, resetPasswordToken: __, verificationToken: ___, twoFactorSecret: ____, twoFactorBackupCodes: _____, ...sanitizedUser } = user;
 
