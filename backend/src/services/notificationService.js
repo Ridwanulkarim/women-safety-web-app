@@ -32,22 +32,7 @@ export const sendTransactionalEmail = async ({ to, subject, htmlContent }) => {
   const sendgridApiKey = process.env.SENDGRID_API_KEY;
   const fromEmail = process.env.ALERT_FROM_EMAIL || 'no-reply@safehaven.app';
 
-  // 1. Resend API Provider
-  if (resendApiKey) {
-    try {
-      await axios.post(
-        'https://api.resend.com/emails',
-        { from: fromEmail, to: [to], subject, html: htmlContent },
-        { headers: { 'Authorization': `Bearer ${resendApiKey}`, 'Content-Type': 'application/json' } }
-      );
-      logger.info(`Transactional Email successfully dispatched via Resend to ${to}`);
-      return { success: true, provider: 'Resend' };
-    } catch (err) {
-      logger.error(`Resend dispatch error for ${to}: ${err.message}`);
-    }
-  }
-
-  // 2. Gmail / Custom SMTP Provider (via Nodemailer)
+  // 1. Gmail / Custom SMTP Provider (via Nodemailer) - Direct 100% Inbox Delivery
   if (emailUser && emailPass) {
     try {
       const transporter = nodemailer.createTransport({
@@ -67,6 +52,21 @@ export const sendTransactionalEmail = async ({ to, subject, htmlContent }) => {
       return { success: true, provider: 'Gmail SMTP' };
     } catch (err) {
       logger.error(`Gmail SMTP dispatch error for ${to}: ${err.message}`);
+    }
+  }
+
+  // 2. Resend API Provider
+  if (resendApiKey) {
+    try {
+      await axios.post(
+        'https://api.resend.com/emails',
+        { from: fromEmail, to: [to], subject, html: htmlContent },
+        { headers: { 'Authorization': `Bearer ${resendApiKey}`, 'Content-Type': 'application/json' } }
+      );
+      logger.info(`Transactional Email successfully dispatched via Resend to ${to}`);
+      return { success: true, provider: 'Resend' };
+    } catch (err) {
+      logger.error(`Resend dispatch error for ${to}: ${err.message}`);
     }
   }
 

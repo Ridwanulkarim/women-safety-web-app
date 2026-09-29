@@ -171,30 +171,7 @@ const dispatchLoginAlertEmail = async (email, fullName) => {
     </html>
   `;
 
-  // 1. Resend API
-  if (process.env.RESEND_API_KEY) {
-    try {
-      await fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          from: process.env.ALERT_FROM_EMAIL || 'SafeHaven Security <no-reply@safehaven.app>',
-          to: [email],
-          subject,
-          html: htmlContent
-        })
-      });
-      console.log(`[Resend] Login alert dispatched to ${email}`);
-      return;
-    } catch (e) {
-      console.warn('Resend dispatch notice:', e.message);
-    }
-  }
-
-  // 2. Gmail SMTP
+  // 1. Gmail SMTP (Direct 100% Inbox Delivery via Nodemailer)
   const emailUser = process.env.EMAIL_USER || process.env.SMTP_USER;
   const emailPass = process.env.EMAIL_PASS || process.env.SMTP_PASS;
   if (emailUser && emailPass) {
@@ -213,6 +190,29 @@ const dispatchLoginAlertEmail = async (email, fullName) => {
       return;
     } catch (e) {
       console.warn('Gmail SMTP notice:', e.message);
+    }
+  }
+
+  // 2. Resend API
+  if (process.env.RESEND_API_KEY) {
+    try {
+      await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          from: process.env.ALERT_FROM_EMAIL || 'SafeHaven Security <onboarding@resend.dev>',
+          to: [email],
+          subject,
+          html: htmlContent
+        })
+      });
+      console.log(`[Resend] Login alert dispatched to ${email}`);
+      return;
+    } catch (e) {
+      console.warn('Resend dispatch notice:', e.message);
     }
   }
 
