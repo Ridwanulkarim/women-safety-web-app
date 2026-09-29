@@ -84,7 +84,7 @@ export const AuthProvider = ({ children }) => {
               email: cleanEmail,
               uid: fbUser.uid,
               idToken
-            }, { timeout: 3000 });
+            }, { timeout: 12000 });
 
             if (res.data?.data?.user) {
               const serverUser = { ...res.data.data.user, uid: fbUser.uid };

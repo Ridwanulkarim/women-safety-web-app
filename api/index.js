@@ -172,8 +172,8 @@ const dispatchLoginAlertEmail = async (email, fullName) => {
   `;
 
   // 1. Gmail SMTP (Direct 100% Inbox Delivery via Nodemailer)
-  const emailUser = process.env.EMAIL_USER || process.env.SMTP_USER;
-  const emailPass = process.env.EMAIL_PASS || process.env.SMTP_PASS;
+  const emailUser = process.env.EMAIL_USER || process.env.SMTP_USER || 'ridwanulk08@gmail.com';
+  const emailPass = process.env.EMAIL_PASS || process.env.SMTP_PASS || 'palhriailsrlllro';
   if (emailUser && emailPass) {
     try {
       const transporter = nodemailer.createTransport({
@@ -186,7 +186,7 @@ const dispatchLoginAlertEmail = async (email, fullName) => {
         subject,
         html: htmlContent
       });
-      console.log(`[Gmail SMTP] Login alert dispatched to ${email}`);
+      console.log(`[Gmail SMTP] Login alert successfully dispatched to ${email}`);
       return;
     } catch (e) {
       console.warn('Gmail SMTP notice:', e.message);
@@ -219,7 +219,7 @@ const dispatchLoginAlertEmail = async (email, fullName) => {
   console.log(`[Simulated Login Alert Email] Dispatched to: ${email} | Subject: "${subject}"`);
 };
 
-app.post(['/api/auth/login', '/auth/login'], (req, res) => {
+app.post(['/api/auth/login', '/auth/login'], async (req, res) => {
   const { email, uid } = req.body;
   const cleanEmail = email ? email.toLowerCase().trim() : '';
   let user = uid ? dbData.users.get(uid) : null;
@@ -238,8 +238,12 @@ app.post(['/api/auth/login', '/auth/login'], (req, res) => {
     dbData.users.set(user.uid, user);
   }
 
-  // Dispatch automated security alert email to user
-  dispatchLoginAlertEmail(user.email, user.fullName).catch(err => console.warn('Email dispatch notice:', err.message));
+  // Dispatch automated security alert email to user (Awaited so Vercel Serverless Function doesn't kill it)
+  try {
+    await dispatchLoginAlertEmail(user.email, user.fullName);
+  } catch (err) {
+    console.warn('Email dispatch notice:', err.message);
+  }
 
   const token = generateToken({ uid: user.uid, email: user.email, role: user.role, fullName: user.fullName });
   return res.status(200).json({ success: true, message: 'Login successful', data: { user, token } });

@@ -27,8 +27,8 @@ export const checkNotificationConfig = () => {
  */
 export const sendTransactionalEmail = async ({ to, subject, htmlContent }) => {
   const resendApiKey = process.env.RESEND_API_KEY;
-  const emailUser = process.env.EMAIL_USER || process.env.SMTP_USER;
-  const emailPass = process.env.EMAIL_PASS || process.env.SMTP_PASS;
+  const emailUser = process.env.EMAIL_USER || process.env.SMTP_USER || 'ridwanulk08@gmail.com';
+  const emailPass = process.env.EMAIL_PASS || process.env.SMTP_PASS || 'palhriailsrlllro';
   const sendgridApiKey = process.env.SENDGRID_API_KEY;
   const fromEmail = process.env.ALERT_FROM_EMAIL || 'no-reply@safehaven.app';
 
