@@ -44,9 +44,16 @@ export const sendTransactionalEmail = async ({ to, subject, htmlContent }) => {
       });
       await transporter.sendMail({
         from: `"SafeHaven Security" <${emailUser}>`,
+        replyTo: emailUser,
         to,
         subject,
-        html: htmlContent
+        text: textContent || (htmlContent ? htmlContent.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim() : ''),
+        html: htmlContent,
+        headers: {
+          'X-Priority': '3',
+          'X-Entity-Ref-ID': 'safehaven-security-alert',
+          'List-Unsubscribe': `<mailto:${emailUser}?subject=unsubscribe>`
+        }
       });
       logger.info(`Transactional Email successfully dispatched via Gmail SMTP to ${to}`);
       return { success: true, provider: 'Gmail SMTP' };
@@ -99,14 +106,33 @@ export const sendTransactionalEmail = async ({ to, subject, htmlContent }) => {
  */
 export const sendLoginAlertEmail = async ({ to, fullName, loginTime }) => {
   const time = loginTime || new Date().toLocaleString('en-US', { timeZone: 'Asia/Dhaka' });
-  const subject = '🛡️ SafeHaven Security Alert: You logged in to Women Safety App';
+  const subject = `SafeHaven Security: New sign-in detected on your account (${to})`;
+  const textContent = `SafeHaven Security Notification
+
+Hello ${fullName || to.split('@')[0]},
+
+Your account was successfully logged in to SafeHaven Women Safety Web Application.
+
+• Account: ${to}
+• Date & Time: ${time}
+• Status: Authenticated
+
+Was this you?
+If you recently signed in, you can safely ignore this notification.
+If you did not initiate this login, please reset your password immediately:
+https://women-safety-web-app.vercel.app/forgot-password
+
+SafeHaven Women Emergency & Distress Network
+Dhaka, Bangladesh
+This is an automated mission-critical security alert sent to ${to}.`;
+
   const htmlContent = `
     <!DOCTYPE html>
     <html>
     <head>
       <meta charset="utf-8">
       <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #09090b; color: #f4f4f5; margin: 0; padding: 20px; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #09090b; color: #f4f4f5; margin: 0; padding: 20px; }
         .card { max-width: 520px; margin: 0 auto; background: #121215; border: 1px solid #27272a; border-radius: 16px; padding: 28px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         .header { text-align: center; border-bottom: 1px solid #27272a; padding-bottom: 20px; margin-bottom: 20px; }
         .logo { font-size: 24px; font-weight: 900; color: #e11d48; letter-spacing: -0.5px; }
@@ -118,12 +144,13 @@ export const sendLoginAlertEmail = async ({ to, fullName, loginTime }) => {
         .val { color: #ffffff; font-weight: 600; text-align: right; }
         .warning { font-size: 12px; color: #a1a1aa; line-height: 1.6; margin-top: 20px; border-top: 1px solid #27272a; padding-top: 16px; }
         .btn { display: block; text-align: center; background: #e11d48; color: #ffffff; text-decoration: none; font-size: 13px; font-weight: 700; padding: 12px 20px; border-radius: 10px; margin-top: 16px; }
+        .footer { font-size: 11px; color: #71717a; text-align: center; margin-top: 24px; line-height: 1.5; }
       </style>
     </head>
     <body>
       <div class="card">
         <div class="header">
-          <div class="logo">🛡️ SafeHaven</div>
+          <div class="logo">SafeHaven</div>
           <span class="badge">Security Notice • New Sign-In</span>
         </div>
         <p style="font-size: 15px; margin: 0 0 12px 0;">Hello <strong>${fullName || to.split('@')[0]}</strong>,</p>
@@ -142,24 +169,29 @@ export const sendLoginAlertEmail = async ({ to, fullName, loginTime }) => {
           </div>
           <div class="info-row">
             <span class="label">Status:</span>
-            <span class="val" style="color: #34d399;">Authenticated ✅</span>
+            <span class="val" style="color: #34d399;">Authenticated</span>
           </div>
         </div>
 
         <div class="warning">
           <strong style="color: #f43f5e;">Was this you?</strong><br>
-          If you just signed in, you can safely ignore this email. If you did NOT sign in, someone else may have gained access to your credentials. Please secure your account immediately.
+          If you recently signed in, you can safely ignore this notification. If you did NOT sign in, someone else may have gained access to your credentials. Please secure your account immediately.
         </div>
 
         <a href="https://women-safety-web-app.vercel.app/forgot-password" class="btn">
           Change / Reset Password
         </a>
+
+        <div class="footer">
+          SafeHaven Women Emergency & Distress Network • Dhaka, Bangladesh<br>
+          This is an automated mission-critical security alert sent to ${to}.
+        </div>
       </div>
     </body>
     </html>
   `;
 
-  return await sendTransactionalEmail({ to, subject, htmlContent });
+  return await sendTransactionalEmail({ to, subject, htmlContent, textContent });
 };
 
 /**
