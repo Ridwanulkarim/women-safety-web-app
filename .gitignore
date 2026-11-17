@@ -36,3 +36,7 @@ logs/
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# Local Presentation & Proposal files
+SafeHaven_Presentation.html
+SafeHaven_Project_Proposal.md

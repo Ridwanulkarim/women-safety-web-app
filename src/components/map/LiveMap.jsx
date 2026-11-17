@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, Circle, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, Circle, useMap, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 
 /**
@@ -15,6 +15,20 @@ function RecenterOnUpdate({ latitude, longitude, zoom }) {
   return null;
 }
 
+/**
+ * Captures user click on map to manually update location
+ */
+function MapClickHandler({ onLocationChange }) {
+  useMapEvents({
+    click(e) {
+      if (onLocationChange) {
+        onLocationChange(e.latlng.lat, e.latlng.lng);
+      }
+    }
+  });
+  return null;
+}
+
 // Custom SVG map marker icon for Leaflet
 const createCustomIcon = (color = '#E91E63') => {
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="${color}" width="36" height="36"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>`;
@@ -27,7 +41,16 @@ const createCustomIcon = (color = '#E91E63') => {
   });
 };
 
-const LiveMap = ({ latitude = 23.8103, longitude = 90.4125, accuracy = null, zoom = 14, title = "Live Location", markers = [] }) => {
+const LiveMap = ({ 
+  latitude = 22.3569, 
+  longitude = 91.7832, 
+  accuracy = null, 
+  zoom = 15, 
+  title = "Live Location", 
+  markers = [],
+  onLocationChange = null,
+  allowManualAdjustment = true
+}) => {
   const googleApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
   const [googleMapsLoaded, setGoogleMapsLoaded] = useState(false);
 
@@ -67,18 +90,34 @@ const LiveMap = ({ latitude = 23.8103, longitude = 90.4125, accuracy = null, zoo
         className="w-full h-full"
       >
         <RecenterOnUpdate latitude={latitude} longitude={longitude} zoom={zoom} />
+        {onLocationChange && <MapClickHandler onLocationChange={onLocationChange} />}
         
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
 
-        {/* User Current Position */}
-        <Marker position={[latitude, longitude]} icon={userIcon}>
+        {/* User Current Position (Draggable if onLocationChange provided) */}
+        <Marker 
+          position={[latitude, longitude]} 
+          icon={userIcon}
+          draggable={Boolean(onLocationChange && allowManualAdjustment)}
+          eventHandlers={{
+            dragend: (e) => {
+              if (onLocationChange) {
+                const pos = e.target.getLatLng();
+                onLocationChange(pos.lat, pos.lng);
+              }
+            }
+          }}
+        >
           <Popup>
             <div className="p-1 text-center font-heading">
               <strong className="text-pink-600 block text-xs uppercase">{title}</strong>
-              <span className="text-[11px] text-slate-700">Lat: {latitude.toFixed(4)}, Lng: {longitude.toFixed(4)}</span>
+              <span className="text-[11px] text-slate-700 block">Lat: {latitude.toFixed(5)}, Lng: {longitude.toFixed(5)}</span>
+              {onLocationChange && allowManualAdjustment && (
+                <span className="text-[9px] text-zinc-500 italic mt-0.5 block">Drag marker or tap map to fine-tune</span>
+              )}
             </div>
           </Popup>
         </Marker>
@@ -86,7 +125,7 @@ const LiveMap = ({ latitude = 23.8103, longitude = 90.4125, accuracy = null, zoo
         {/* Accuracy Range Circle */}
         <Circle
           center={[latitude, longitude]}
-          radius={accuracy || 400}
+          radius={accuracy || 200}
           pathOptions={{ fillColor: '#E91E63', fillOpacity: 0.15, color: '#E91E63', weight: 1 }}
         />
 
