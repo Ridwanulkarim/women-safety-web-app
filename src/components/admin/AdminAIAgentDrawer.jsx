@@ -34,6 +34,7 @@ const AdminAIAgentDrawer = ({ defaultMode = 'SOS_REPORTS', isOpen, onClose }) =>
   const messagesEndRef = useRef(null);
   const recognitionRef = useRef(null);
   const synthRef = useRef(window.speechSynthesis || null);
+  const audioRef = useRef(null);
 
   // Synchronize alerts and users on update
   useEffect(() => {
@@ -101,35 +102,80 @@ const AdminAIAgentDrawer = ({ defaultMode = 'SOS_REPORTS', isOpen, onClose }) =>
     }
   }, [language]);
 
-  // Fresh Modern Voice (TTS) Synthesizer with Full Bangla & English Support
-  const speakText = (text) => {
-    if (!voiceEnabled || !synthRef.current) return;
+  // Studio-Grade Natural Voice (TTS) with Google AI Audio + Web Speech Fallback
+  const speakText = (text, customSpokenPhrase = null) => {
+    if (!voiceEnabled) return;
 
-    // Cancel ongoing speech
+    // Stop any ongoing audio or speech
+    stopSpeaking();
+
+    const isBengaliText = /[\u0980-\u09FF]/.test(text) || language === 'bn';
+    
+    // Clean, natural spoken phrase (no markdown syntax, bullets, or English acronym junk)
+    let spokenSentence = customSpokenPhrase;
+    if (!spokenSentence) {
+      spokenSentence = text
+        .replace(/[*_#`~•\-]/g, '')
+        .replace(/\[.*?\]/g, '')
+        .replace(/https?:\/\/\S+/g, '')
+        .replace(/\n+/g, '. ')
+        .trim();
+      // Keep only first 2 concise sentences for audio playback to prevent voice droning
+      const sentences = spokenSentence.split(/(?<=[.?!।])/);
+      spokenSentence = sentences.slice(0, 2).join(' ').trim();
+    }
+
+    if (!spokenSentence) return;
+
+    // Method 1: Google Natural Bangla Audio (Crystal Clear Female AI Voice)
+    if (isBengaliText) {
+      try {
+        const encoded = encodeURIComponent(spokenSentence.slice(0, 200));
+        const googleAudioUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encoded}&tl=bn&client=tw-ob`;
+        
+        const audio = new Audio(googleAudioUrl);
+        audioRef.current = audio;
+
+        audio.onplay = () => setIsSpeaking(true);
+        audio.onended = () => setIsSpeaking(false);
+        audio.onerror = () => {
+          // If network audio blocked, fallback to browser synthesis
+          speakViaWebSpeech(spokenSentence, true);
+        };
+
+        const playPromise = audio.play();
+        if (playPromise !== undefined) {
+          playPromise.catch((err) => {
+            console.warn('Audio auto-play prevented, falling back to Web Speech:', err);
+            speakViaWebSpeech(spokenSentence, true);
+          });
+        }
+        return;
+      } catch (err) {
+        console.warn('Google Audio playback failed, using fallback:', err);
+      }
+    }
+
+    // Method 2: High quality Web Speech for English or fallback
+    speakViaWebSpeech(spokenSentence, isBengaliText);
+  };
+
+  const speakViaWebSpeech = (phrase, isBengali) => {
+    if (!synthRef.current) return;
     synthRef.current.cancel();
 
-    // Clean markdown asterisks and bullets for clean speech
-    const cleanSpeech = text
-      .replace(/[*_#`~]/g, '')
-      .replace(/\[.*?\]/g, '')
-      .replace(/https?:\/\/\S+/g, 'link')
-      .trim();
-
-    const utterance = new SpeechSynthesisUtterance(cleanSpeech);
-
-    const isBengaliText = /[\u0980-\u09FF]/.test(cleanSpeech) || language === 'bn';
+    const utterance = new SpeechSynthesisUtterance(phrase);
     const voices = synthRef.current.getVoices();
 
-    if (isBengaliText) {
+    if (isBengali) {
       utterance.lang = 'bn-BD';
-      // Find native Bengali voice (Google Bangla, Microsoft Bangla, or Indian Bengali)
       const bnVoice = voices.find(v => 
         (v.lang && (v.lang.toLowerCase().includes('bn') || v.lang.toLowerCase().includes('ben'))) ||
         (v.name && (v.name.toLowerCase().includes('bangla') || v.name.toLowerCase().includes('bengali')))
       );
       if (bnVoice) utterance.voice = bnVoice;
-      utterance.rate = 0.96; // optimal pacing for clean Bengali cadence
-      utterance.pitch = 1.02;
+      utterance.rate = 1.0;
+      utterance.pitch = 1.05;
     } else {
       utterance.lang = 'en-US';
       const enVoice = voices.find(v => 
@@ -149,10 +195,15 @@ const AdminAIAgentDrawer = ({ defaultMode = 'SOS_REPORTS', isOpen, onClose }) =>
   };
 
   const stopSpeaking = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+      audioRef.current = null;
+    }
     if (synthRef.current) {
       synthRef.current.cancel();
-      setIsSpeaking(false);
     }
+    setIsSpeaking(false);
   };
 
   const toggleMic = () => {
@@ -314,6 +365,7 @@ const AdminAIAgentDrawer = ({ defaultMode = 'SOS_REPORTS', isOpen, onClose }) =>
 
     // Generate Contextual Structured Response (Bangla or English)
     let botResponse = '';
+    let spokenPhrase = '';
     const traceNotes = [];
 
     // Check query types
@@ -326,6 +378,7 @@ const AdminAIAgentDrawer = ({ defaultMode = 'SOS_REPORTS', isOpen, onClose }) =>
     if (isSummaryQuery) {
       traceNotes.push('ACTION: COMPREHENSIVE_SOS_SUMMARY');
       if (isBengali) {
+        spokenPhrase = `সেফহ্যাভেন সিস্টেমে মোট ${analyticsEngine.total}টি রিপোর্ট এসেছে। বর্তমানে ${analyticsEngine.active}টি সক্রিয় এবং ${analyticsEngine.resolved}টি সমাধান করা হয়েছে। স্টকিং এবং রাস্তায় হয়রানি প্রধান সমস্যা হিসেবে পাওয়া গেছে।`;
         botResponse = `**📋 জরুরি এসওএস ইনসিডেন্ট সারাংশ:**\n\n` +
           `• **মোট রিপোর্ট সংখ্যা:** ${analyticsEngine.total} টি নথিভুক্ত ঘটনা।\n` +
           `• **বর্তমানে সক্রিয় অ্যালার্ট:** ${analyticsEngine.active} টি পেন্ডিং।\n` +
@@ -337,6 +390,7 @@ const AdminAIAgentDrawer = ({ defaultMode = 'SOS_REPORTS', isOpen, onClose }) =>
           `• মেডিকেল ও জরুরি সহায়তা: **${analyticsEngine.issueCategories.MedicalEmergency}** টি\n\n` +
           `**সর্বোচ্চ ঝুঁকির এলাকা:** ${Object.keys(analyticsEngine.locationCounts).slice(0, 3).join(', ') || 'প্রধান ট্রানজিট রুটসমূহ'}।`;
       } else {
+        spokenPhrase = `Total ${analyticsEngine.total} reports recorded with ${analyticsEngine.resolved} resolved and ${analyticsEngine.active} currently active.`;
         botResponse = `**📋 Executive SOS Incident Summary:**\n\n` +
           `• **Total Distress Logs:** ${analyticsEngine.total} reported events.\n` +
           `• **Current Active Alerts:** ${analyticsEngine.active} pending response.\n` +
@@ -352,6 +406,7 @@ const AdminAIAgentDrawer = ({ defaultMode = 'SOS_REPORTS', isOpen, onClose }) =>
     else if (isIssueQuery) {
       traceNotes.push('ACTION: ISSUE_DIAGNOSIS');
       if (isBengali) {
+        spokenPhrase = `ফরেনসিক রিপোর্টে দেখা গেছে, স্টকিং বা পিছু নেওয়া এবং রাস্তায় হয়রানি প্রধান কারণ হিসেবে এসেছে। বিশেষ করে রাতের বেলা সতর্কতা বাড়ানো প্রয়োজন।`;
         botResponse = `**🔬 মূল সমস্যা ও ইনসিডেন্ট কারণ বিশ্লেষণ:**\n\n` +
           `ব্যবহারকারীদের পাঠানো বার্তা ও ফরেনসিক ডেটা অনুযায়ী প্রধান ৩টি সমস্যা শনাক্ত হয়েছে:\n\n` +
           `১. **স্টকিং বা পিছু নেওয়া:** রাতের নির্জন রাস্তায় সন্দেহভাজন ব্যক্তি বা গাড়ি ধীরগতিতে পিছু নেওয়ার ঘটনা।\n` +
@@ -359,6 +414,7 @@ const AdminAIAgentDrawer = ({ defaultMode = 'SOS_REPORTS', isOpen, onClose }) =>
           `৩. **শারীরিক ও জরুরি আক্রমণ:** সরাসরি বিপদের মুহূর্তে জরুরি কন্টাক্টদের কাছে জিপিএস কো-অর্ডিনেট পাঠানো হয়েছে।\n\n` +
           `**প্রস্তাবিত পদক্ষেপ:** বিশেষ করে **${analyticsEngine.peakHour}** সময়ে কমিউনিটি সতর্কতা ও পেট্রোলিং বাড়ানো প্রয়োজন।`;
       } else {
+        spokenPhrase = `Stalking and late night transit harassment were diagnosed as the primary distress causes.`;
         botResponse = `**🔬 Root Cause & Incident Diagnostics:**\n\n` +
           `Based on forensic telemetry and user distress dispatches, the top issues encountered are:\n\n` +
           `1. **Stalking & Suspicious Tracking:** Users reported slow-moving vehicles or unidentified individuals tailing them in dimly lit streets.\n` +
@@ -370,6 +426,7 @@ const AdminAIAgentDrawer = ({ defaultMode = 'SOS_REPORTS', isOpen, onClose }) =>
     else if (isCountQuery) {
       traceNotes.push('ACTION: QUANTITATIVE_ANALYTICS_QUERY');
       if (isBengali) {
+        spokenPhrase = `এখন পর্যন্ত মোট ${analyticsEngine.total}টি ইনসিডেন্ট হয়েছে। ইনসিডেন্ট সমাধানের হার ${analyticsEngine.rate} শতাংশ।`;
         botResponse = `**📊 লাইভ অ্যানালিটিক্স ও সিস্টেম মেট্রিক্স:**\n\n` +
           `• **মোট নথিভুক্ত ঘটনা:** ${analyticsEngine.total} টি\n` +
           `• **বর্তমানে সক্রিয় অ্যালার্ট:** ${analyticsEngine.active} টি\n` +
@@ -378,6 +435,7 @@ const AdminAIAgentDrawer = ({ defaultMode = 'SOS_REPORTS', isOpen, onClose }) =>
           `• **মোট সুরক্ষিত অ্যাকাউন্ট:** ${analyticsEngine.totalUsers} জন\n` +
           `• **সর্বোচ্চ বিপদের সময়কাল:** ${analyticsEngine.peakHour}`;
       } else {
+        spokenPhrase = `Total ${analyticsEngine.total} incidents recorded with an overall resolution rate of ${analyticsEngine.rate} percent.`;
         botResponse = `**📊 Live Analytics Telemetry Metrics:**\n\n` +
           `• **Total Recorded Incidents:** ${analyticsEngine.total}\n` +
           `• **Active Distress Signals:** ${analyticsEngine.active}\n` +
@@ -392,6 +450,7 @@ const AdminAIAgentDrawer = ({ defaultMode = 'SOS_REPORTS', isOpen, onClose }) =>
       const latest = alerts[0];
       if (latest) {
         if (isBengali) {
+          spokenPhrase = `সর্বশেষ রিপোর্টটি ${latest.userName || 'ব্যবহারকারী'} থেকে এসেছে এবং এর স্ট্যাটাস সক্রিয়।`;
           botResponse = `**🚨 সর্বশেষ রিপোর্টকৃত বিপদের বিবরণ:**\n\n` +
             `• **রিপোর্ট আইডি:** \`${latest.id}\`\n` +
             `• **রিপোর্টার:** **${latest.userName || 'নাম প্রকাশে অনিচ্ছুক'}** (${latest.userPhone || 'সরাসরি জরুরি কল'})\n` +
@@ -400,6 +459,7 @@ const AdminAIAgentDrawer = ({ defaultMode = 'SOS_REPORTS', isOpen, onClose }) =>
             `• **বর্তমান অবস্থা:** **${latest.status === 'ACTIVE' ? 'সক্রিয় (Active)' : 'সমাধানকৃত (Resolved)'}**\n` +
             `• **সময়কাল:** ${new Date(latest.timestamp || Date.now()).toLocaleString()}`;
         } else {
+          spokenPhrase = `The most recent distress alert was logged from ${latest.userName || 'a registered user'} and is currently ${latest.status}.`;
           botResponse = `**🚨 Most Recent Distress Report Details:**\n\n` +
             `• **Report ID:** \`${latest.id}\`\n` +
             `• **Reporter:** **${latest.userName || 'Anonymous User'}** (${latest.userPhone || 'Emergency Direct'})\n` +
@@ -409,17 +469,20 @@ const AdminAIAgentDrawer = ({ defaultMode = 'SOS_REPORTS', isOpen, onClose }) =>
             `• **Timestamp:** ${new Date(latest.timestamp || Date.now()).toLocaleString()}`;
         }
       } else {
+        spokenPhrase = isBengali ? "আর্কাইভে কোনো রিপোর্ট পাওয়া যায়নি।" : "No recent incident logs found.";
         botResponse = isBengali ? "আর্কাইভে কোনো রিপোর্ট পাওয়া যায়নি।" : "No recent incident logs found in the archive.";
       }
     }
     else if (isPeakQuery) {
       traceNotes.push('ACTION: TEMPORAL_RISK_ANALYSIS');
       if (isBengali) {
+        spokenPhrase = `বিশ্লেষণে দেখা গেছে, ${analyticsEngine.peakHour} সময়ে সবচেয়ে বেশি বিপদ সংকেত রেকর্ড হয়েছে।`;
         botResponse = `**⏱️ সর্বোচ্চ ঝুঁকির সময় বিশ্লেষণ:**\n\n` +
           `• **সবচেয়ে ঝুঁকিপূর্ণ সময়:** **${analyticsEngine.peakHour}** সময়ে সর্বাধিক বিপদ সংকেত এসেছে।\n` +
           `• **মূল কারণ:** রাতে মানুষের চলাচল ও খোলা দোকান কমে যাওয়া, পর্যাপ্ত আলোর অভাব।\n` +
           `• **প্রস্তাবিত পদক্ষেপ:** এই সময়ে ট্রাভেলরত ব্যবহারকারীদের কাছে স্বয়ংক্রিয় সেফটি চেক-ইন অ্যালার্ট পাঠানো।`;
       } else {
+        spokenPhrase = `Peak distress alerts occurred during ${analyticsEngine.peakHour}.`;
         botResponse = `**⏱️ Temporal Risk & Peak Hour Analysis:**\n\n` +
           `• **Critical Incident Interval:** **${analyticsEngine.peakHour}** represents the highest frequency window for distress triggers.\n` +
           `• **Contributing Factors:** Decreased street transit density and low lighting.\n` +
@@ -429,11 +492,13 @@ const AdminAIAgentDrawer = ({ defaultMode = 'SOS_REPORTS', isOpen, onClose }) =>
     else {
       traceNotes.push('ACTION: GENERAL_QNA_SYNTHESIS');
       if (isBengali) {
+        spokenPhrase = `সেফহ্যাভেনে বর্তমানে ${analyticsEngine.total}টি রিপোর্ট সংরক্ষিত আছে। আপনি সামারি বা মেট্রিক্স জানতে চাইতে পারেন।`;
         botResponse = `**💡 সেফহ্যাভেন এআই বিশ্লেষণ:**\n\n` +
           `আপনার প্রশ্ন "${userPrompt}" সম্পর্কে:\n` +
           `সেফহ্যাভেন সিস্টেমে বর্তমানে **${analyticsEngine.total}টি রিপোর্ট** এবং **${analyticsEngine.totalUsers} জন নিবন্ধিত ব্যবহারকারী** সুরক্ষিত রয়েছেন।\n\n` +
           `আপনি আমাকে বলতে পারেন: **সব রিপোর্ট সামারি করো**, **কী কী সমস্যা হয়েছিল**, **কয়টি ইনসিডেন্ট হয়েছে** অথবা **সর্বশেষ ঘটনার বিবরণ দাও**।`;
       } else {
+        spokenPhrase = `SafeHaven is monitoring ${analyticsEngine.total} total incident logs.`;
         botResponse = `**💡 SafeHaven Agent Analysis:**\n\n` +
           `Regarding "${userPrompt}":\n` +
           `The SafeHaven system currently monitors **${analyticsEngine.total} total incident logs** across **${analyticsEngine.totalUsers} registered users**.\n\n` +
@@ -447,6 +512,7 @@ const AdminAIAgentDrawer = ({ defaultMode = 'SOS_REPORTS', isOpen, onClose }) =>
     const botMsg = {
       role: 'assistant',
       text: botResponse,
+      spokenPhrase,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       trace: traceNotes
     };
@@ -455,8 +521,8 @@ const AdminAIAgentDrawer = ({ defaultMode = 'SOS_REPORTS', isOpen, onClose }) =>
     setAgentState(AGENT_NODES.IDLE);
     setActiveStepTrace([]);
 
-    // 6. Speak out fresh voice response (Bangla or English based on text)
-    speakText(botResponse);
+    // 6. Speak out fresh studio voice response (Bangla or English based on text)
+    speakText(botResponse, spokenPhrase);
   };
 
   const quickPrompts = language === 'bn' ? (
@@ -602,7 +668,19 @@ const AdminAIAgentDrawer = ({ defaultMode = 'SOS_REPORTS', isOpen, onClose }) =>
                 <span className="font-semibold text-zinc-300">
                   {msg.role === 'user' ? 'Admin' : 'SafeHaven Intelligence Copilot'}
                 </span>
-                <span>{msg.timestamp}</span>
+                <div className="flex items-center gap-2">
+                  {msg.role === 'assistant' && (
+                    <button
+                      onClick={() => speakText(msg.text, msg.spokenPhrase)}
+                      className="text-zinc-400 hover:text-rose-400 transition flex items-center gap-1"
+                      title="Play / Replay Voice"
+                    >
+                      <FiVolume2 className="text-xs" />
+                      <span className="text-[9px]">Replay</span>
+                    </button>
+                  )}
+                  <span>{msg.timestamp}</span>
+                </div>
               </div>
 
               {/* Message Body */}
@@ -702,7 +780,7 @@ const AdminAIAgentDrawer = ({ defaultMode = 'SOS_REPORTS', isOpen, onClose }) =>
           <div className="mt-2 flex items-center justify-between text-[11px] text-rose-400 bg-rose-500/10 px-3 py-1.5 rounded-lg border border-rose-500/20">
             <span className="flex items-center gap-1.5 font-mono">
               <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-ping"></span> 
-              {language === 'bn' ? 'ন্যাচারাল বাংলা ভয়েসে উত্তর শোনাচ্ছে...' : 'Speaking via Natural Voice Engine...'}
+              {language === 'bn' ? 'স্টুডিও-কোয়ালিটি ন্যাচারাল বাংলা অডিও বাজছে...' : 'Speaking via Natural Voice Engine...'}
             </span>
             <button
               onClick={stopSpeaking}
