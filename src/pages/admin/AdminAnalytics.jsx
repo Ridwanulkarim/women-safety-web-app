@@ -51,10 +51,10 @@ const AdminAnalytics = () => {
               <span className="w-1.5 h-1.5 rounded-full bg-rose-500 telemetry-dot"></span> PLATFORM METRICS
             </span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold font-heading text-white tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-extrabold font-heading text-zinc-900 dark:text-white tracking-tight">
             Emergency System <span className="gradient-text-rose">Analytics</span>
           </h1>
-          <p className="text-xs text-zinc-400">
+          <p className="text-xs text-zinc-500 dark:text-zinc-400">
             Statistical telemetry distribution of emergency distress alerts, resolution efficacy, and user growth.
           </p>
         </div>
@@ -76,47 +76,47 @@ const AdminAnalytics = () => {
 
       {/* KPI Overview */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-        <div className="glass-card p-6 rounded-2xl border border-zinc-800 space-y-2">
-          <span className="text-[10px] font-bold text-zinc-400 font-mono uppercase">Incident Resolution Rate</span>
+        <div className="glass-card-xl p-6 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 space-y-2">
+          <span className="text-[10px] font-bold text-zinc-500 dark:text-zinc-400 font-mono uppercase">Incident Resolution Rate</span>
           <div className="flex items-baseline gap-2">
-            <span className="text-3xl font-black font-heading text-emerald-400">{resolutionRate}%</span>
+            <span className="text-3xl font-black font-heading text-emerald-600 dark:text-emerald-400">{resolutionRate}%</span>
             <span className="text-xs text-zinc-500 font-mono">({resolvedAlerts}/{totalAlerts || 0})</span>
           </div>
-          <p className="text-[11px] text-zinc-400">Resolution efficacy of handled distress signals.</p>
+          <p className="text-[11px] text-zinc-600 dark:text-zinc-400">Resolution efficacy of handled distress signals.</p>
         </div>
 
-        <div className="glass-card p-6 rounded-2xl border border-zinc-800 space-y-2">
-          <span className="text-[10px] font-bold text-zinc-400 font-mono uppercase">Gateway Readiness</span>
+        <div className="glass-card-xl p-6 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 space-y-2">
+          <span className="text-[10px] font-bold text-zinc-500 dark:text-zinc-400 font-mono uppercase">Gateway Readiness</span>
           <div className="flex items-baseline gap-2">
-            <span className="text-3xl font-black font-heading text-rose-500">100%</span>
-            <span className="text-xs text-emerald-400 font-mono">ONLINE</span>
+            <span className="text-3xl font-black font-heading text-rose-600 dark:text-rose-500">100%</span>
+            <span className="text-xs text-emerald-600 dark:text-emerald-400 font-mono font-bold">ONLINE</span>
           </div>
-          <p className="text-[11px] text-zinc-400">National 999 & Emergency Hotlines active.</p>
+          <p className="text-[11px] text-zinc-600 dark:text-zinc-400">National 999 & Emergency Hotlines active.</p>
         </div>
 
-        <div className="glass-card p-6 rounded-2xl border border-zinc-800 space-y-2">
-          <span className="text-[10px] font-bold text-zinc-400 font-mono uppercase">Total Verified Accounts</span>
+        <div className="glass-card-xl p-6 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 space-y-2">
+          <span className="text-[10px] font-bold text-zinc-500 dark:text-zinc-400 font-mono uppercase">Total Verified Accounts</span>
           <div className="flex items-baseline gap-2">
-            <span className="text-3xl font-black font-heading text-white">{users.length}</span>
-            <span className="text-xs text-zinc-500 font-mono">CITIZENS</span>
+            <span className="text-3xl font-black font-heading text-zinc-900 dark:text-white">{users.length}</span>
+            <span className="text-xs text-zinc-500 font-mono font-bold">CITIZENS</span>
           </div>
-          <p className="text-[11px] text-zinc-400">Registered platform user base.</p>
+          <p className="text-[11px] text-zinc-600 dark:text-zinc-400">Registered platform user base.</p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 glass-card p-6 sm:p-8 rounded-3xl space-y-4 border border-zinc-800">
+        <div className="lg:col-span-2 glass-card-xl p-6 sm:p-8 rounded-3xl space-y-4 border border-zinc-200/80 dark:border-zinc-800">
           <div>
-            <h3 className="text-base font-bold font-heading text-zinc-100">User Growth Adoption Curve</h3>
-            <p className="text-xs text-zinc-400">Verified platform member progression</p>
+            <h3 className="text-base font-bold font-heading text-zinc-900 dark:text-zinc-100">User Growth Adoption Curve</h3>
+            <p className="text-xs text-zinc-500 dark:text-zinc-400">Verified platform member progression</p>
           </div>
           <UserGrowthChart usersCount={users.length} />
         </div>
 
-        <div className="glass-card p-6 sm:p-8 rounded-3xl space-y-4 border border-zinc-800">
+        <div className="glass-card-xl p-6 sm:p-8 rounded-3xl space-y-4 border border-zinc-200/80 dark:border-zinc-800">
           <div>
-            <h3 className="text-base font-bold font-heading text-zinc-100">Distress Category Breakdown</h3>
-            <p className="text-xs text-zinc-400">Categorical incident distribution</p>
+            <h3 className="text-base font-bold font-heading text-zinc-900 dark:text-zinc-100">Distress Category Breakdown</h3>
+            <p className="text-xs text-zinc-500 dark:text-zinc-400">Categorical incident distribution</p>
           </div>
           <SeverityPieChart data={categoryData} />
         </div>

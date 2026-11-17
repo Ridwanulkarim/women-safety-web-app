@@ -54,7 +54,7 @@ export const SOSChart = ({ data = [] }) => {
     scales: {
       x: { grid: { display: false }, ticks: { color: '#71717a', font: { family: 'monospace' } } },
       y: {
-        grid: { color: 'rgba(255,255,255,0.04)' },
+        grid: { color: 'rgba(150, 150, 150, 0.15)' },
         ticks: { color: '#71717a', font: { family: 'monospace' }, stepSize: 1 }
       }
     }
@@ -114,7 +114,7 @@ export const UserGrowthChart = ({ usersCount = 0, data }) => {
     scales: {
       x: { grid: { display: false }, ticks: { color: '#71717a', font: { family: 'monospace' } } },
       y: {
-        grid: { color: 'rgba(255,255,255,0.04)' },
+        grid: { color: 'rgba(150, 150, 150, 0.15)' },
         ticks: { color: '#71717a', font: { family: 'monospace' }, stepSize: 1 }
       }
     }

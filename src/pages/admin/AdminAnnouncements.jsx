@@ -43,25 +43,25 @@ const AdminAnnouncements = () => {
             <span className="w-1.5 h-1.5 rounded-full bg-rose-500 telemetry-dot"></span> EMERGENCY BROADCAST
           </span>
         </div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold font-heading text-white tracking-tight">
+        <h1 className="text-2xl sm:text-3xl font-extrabold font-heading text-zinc-900 dark:text-white tracking-tight">
           System Announcement <span className="gradient-text-rose">Broadcaster</span>
         </h1>
-        <p className="text-xs text-zinc-400">
+        <p className="text-xs text-zinc-500 dark:text-zinc-400">
           Publish platform security advisories, severe weather notifications, and safety updates to all citizens.
         </p>
       </div>
 
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="glass-card p-6 sm:p-8 rounded-3xl space-y-4 border border-zinc-800 shadow-xl"
+        className="glass-card-xl p-6 sm:p-8 rounded-3xl space-y-4 border border-zinc-200/80 dark:border-zinc-800 shadow-xl"
       >
-        <div className="flex items-center gap-2 border-b border-zinc-800 pb-3">
+        <div className="flex items-center gap-2 border-b border-zinc-200 dark:border-zinc-800 pb-3">
           <FiVolume2 className="text-rose-500 text-lg" />
-          <h3 className="text-base font-bold font-heading text-zinc-100">Create New Advisory Broadcast</h3>
+          <h3 className="text-base font-bold font-heading text-zinc-900 dark:text-zinc-100">Create New Advisory Broadcast</h3>
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-zinc-300 mb-1 font-mono uppercase">
+          <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1 font-mono uppercase">
             Advisory Title
           </label>
           <input
@@ -69,18 +69,18 @@ const AdminAnnouncements = () => {
             required
             placeholder="e.g. Extreme Monsoon Weather Advisory / Area Alert"
             {...register('title')}
-            className="w-full px-4 py-3 rounded-xl bg-zinc-900 border border-zinc-800 text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-rose-500 transition"
+            className="w-full px-4 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-800 text-xs text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:border-rose-500 transition shadow-sm"
           />
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-semibold text-zinc-300 mb-1 font-mono uppercase">
+            <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1 font-mono uppercase">
               Priority Level
             </label>
             <select
               {...register('priority')}
-              className="w-full px-4 py-3 rounded-xl bg-zinc-900 border border-zinc-800 text-xs text-zinc-100 focus:outline-none focus:border-rose-500 transition"
+              className="w-full px-4 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-800 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-rose-500 transition shadow-sm"
             >
               <option value="normal">Standard Notice (Normal)</option>
               <option value="high">High Priority (Security Alert)</option>
@@ -90,7 +90,7 @@ const AdminAnnouncements = () => {
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-zinc-300 mb-1 font-mono uppercase">
+          <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1 font-mono uppercase">
             Advisory Message Body
           </label>
           <textarea
@@ -98,7 +98,7 @@ const AdminAnnouncements = () => {
             required
             placeholder="Detail the safety advisory, guidance, or operational update..."
             {...register('content')}
-            className="w-full px-4 py-3 rounded-xl bg-zinc-900 border border-zinc-800 text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-rose-500 transition"
+            className="w-full px-4 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-800 text-xs text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:border-rose-500 transition shadow-sm"
           ></textarea>
         </div>
 
@@ -114,15 +114,15 @@ const AdminAnnouncements = () => {
       <div className="space-y-4">
         <div className="flex items-center gap-2">
           <FiRadio className="text-rose-500" />
-          <h3 className="text-sm font-bold font-mono text-zinc-200 uppercase tracking-wider">
+          <h3 className="text-sm font-bold font-mono text-zinc-800 dark:text-zinc-200 uppercase tracking-wider">
             Published Advisory History ({announcements.length})
           </h3>
         </div>
 
         {announcements.length === 0 ? (
-          <div className="glass-card p-10 rounded-2xl text-center space-y-2 border border-zinc-800 text-zinc-500">
+          <div className="glass-card-xl p-10 rounded-2xl text-center space-y-2 border border-zinc-200 dark:border-zinc-800 text-zinc-500 shadow-sm">
             <FiRadio className="w-10 h-10 mx-auto opacity-30 text-rose-500" />
-            <p className="text-xs font-bold text-zinc-400">No Broadcasts Active</p>
+            <p className="text-xs font-bold text-zinc-700 dark:text-zinc-400">No Broadcasts Active</p>
             <p className="text-[11px] text-zinc-500">
               No platform-wide advisories have been dispatched yet. Use the form above to post one.
             </p>
@@ -131,32 +131,32 @@ const AdminAnnouncements = () => {
           announcements.map((ann) => (
             <div
               key={ann.id}
-              className="glass-card p-5 sm:p-6 rounded-2xl flex items-start justify-between gap-4 border border-zinc-800 hover:border-zinc-700 transition"
+              className="glass-card-xl p-5 sm:p-6 rounded-2xl flex items-start justify-between gap-4 border border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 transition shadow-sm"
             >
               <div className="space-y-1.5">
                 <div className="flex items-center gap-2">
                   <span
                     className={`px-2 py-0.5 rounded-full text-[9px] font-mono font-bold uppercase ${
                       ann.priority === 'critical'
-                        ? 'bg-red-500/20 text-red-400 border border-red-500/30'
+                        ? 'bg-red-500/15 text-red-600 dark:text-red-400 border border-red-500/30'
                         : ann.priority === 'high'
-                        ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
-                        : 'bg-zinc-800 text-zinc-300'
+                        ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30'
+                        : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700'
                     }`}
                   >
                     {ann.priority || 'NORMAL'}
                   </span>
-                  <h4 className="font-bold text-sm text-zinc-100">{ann.title}</h4>
+                  <h4 className="font-bold text-sm text-zinc-900 dark:text-zinc-100">{ann.title}</h4>
                 </div>
-                <p className="text-xs text-zinc-300 leading-relaxed">{ann.content}</p>
-                <span className="text-[10px] text-zinc-500 font-mono flex items-center gap-1">
-                  <FiClock className="text-zinc-600" /> {formatDate(ann.createdAt)}
+                <p className="text-xs text-zinc-600 dark:text-zinc-300 leading-relaxed">{ann.content}</p>
+                <span className="text-[10px] text-zinc-400 dark:text-zinc-500 font-mono flex items-center gap-1">
+                  <FiClock className="text-zinc-400 dark:text-zinc-600" /> {formatDate(ann.createdAt)}
                 </span>
               </div>
 
               <button
                 onClick={() => handleDelete(ann.id)}
-                className="p-2 rounded-xl bg-zinc-800/80 hover:bg-red-500/20 text-zinc-400 hover:text-red-400 border border-zinc-700/50 transition flex-shrink-0"
+                className="p-2 rounded-xl bg-zinc-100 hover:bg-red-500/20 text-zinc-500 hover:text-red-600 dark:bg-zinc-800/80 dark:hover:bg-red-500/20 dark:text-zinc-400 dark:hover:text-red-400 border border-zinc-200 dark:border-zinc-700/50 transition flex-shrink-0"
                 title="Remove Broadcast"
               >
                 <FiTrash2 className="w-3.5 h-3.5" />

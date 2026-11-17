@@ -98,10 +98,10 @@ const AdminDashboard = () => {
             <span className="w-1.5 h-1.5 rounded-full bg-rose-500 telemetry-dot"></span> COMMAND TELEMETRY
           </span>
         </div>
-        <h1 className="text-3xl font-extrabold font-heading text-white tracking-tight">
+        <h1 className="text-3xl font-extrabold font-heading text-zinc-900 dark:text-white tracking-tight">
           Admin <span className="gradient-text-rose">Control Center</span>
         </h1>
-        <p className="text-xs text-zinc-400">
+        <p className="text-xs text-zinc-500 dark:text-zinc-400">
           Real-time emergency telemetry monitoring, verified citizen registrations, and active incident response.
         </p>
       </div>
@@ -110,15 +110,15 @@ const AdminDashboard = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 relative z-10">
         <div className="glass-card-xl p-6 sm:p-7 border-l-4 border-l-blue-500 space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-bold text-zinc-400 uppercase font-mono">Total Verified Users</span>
-            <div className="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center text-lg">
+            <span className="text-[10px] font-bold text-zinc-500 dark:text-zinc-400 uppercase font-mono">Total Verified Users</span>
+            <div className="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-500 dark:text-blue-400 flex items-center justify-center text-lg">
               <FiUsers />
             </div>
           </div>
-          <p className="text-3xl font-black font-heading text-white">{totalUsers}</p>
+          <p className="text-3xl font-black font-heading text-zinc-900 dark:text-white">{totalUsers}</p>
           <div className="flex items-center justify-between pt-1 text-[11px] text-zinc-500 font-mono">
             <span>Dynamic Registry</span>
-            <Link to="/admin/users" className="text-blue-400 hover:underline flex items-center gap-1">
+            <Link to="/admin/users" className="text-blue-500 dark:text-blue-400 hover:underline flex items-center gap-1">
               View <FiArrowUpRight />
             </Link>
           </div>
@@ -126,7 +126,7 @@ const AdminDashboard = () => {
 
         <div className="glass-card-xl p-6 sm:p-7 border-l-4 border-l-rose-500 space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-bold text-zinc-400 uppercase font-mono">Active Distress Alerts</span>
+            <span className="text-[10px] font-bold text-zinc-500 dark:text-zinc-400 uppercase font-mono">Active Distress Alerts</span>
             <div className="w-10 h-10 rounded-xl bg-rose-500/10 text-rose-500 flex items-center justify-center text-lg">
               <FiAlertTriangle className={activeAlerts > 0 ? 'animate-pulse' : ''} />
             </div>
@@ -134,7 +134,7 @@ const AdminDashboard = () => {
           <p className="text-3xl font-black font-heading text-rose-500">{activeAlerts}</p>
           <div className="flex items-center justify-between pt-1 text-[11px] text-zinc-500 font-mono">
             <span>{activeAlerts === 0 ? 'All beacons clear' : 'Immediate dispatch'}</span>
-            <Link to="/admin/alerts" className="text-rose-400 hover:underline flex items-center gap-1">
+            <Link to="/admin/alerts" className="text-rose-500 dark:text-rose-400 hover:underline flex items-center gap-1">
               Monitor <FiArrowUpRight />
             </Link>
           </div>
@@ -142,15 +142,15 @@ const AdminDashboard = () => {
 
         <div className="glass-card-xl p-6 sm:p-7 border-l-4 border-l-emerald-500 space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-bold text-zinc-400 uppercase font-mono">Resolved Incidents</span>
-            <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-lg">
+            <span className="text-[10px] font-bold text-zinc-500 dark:text-zinc-400 uppercase font-mono">Resolved Incidents</span>
+            <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-500 dark:text-emerald-400 flex items-center justify-center text-lg">
               <FiCheckCircle />
             </div>
           </div>
-          <p className="text-3xl font-black font-heading text-emerald-400">{resolvedAlerts}</p>
+          <p className="text-3xl font-black font-heading text-emerald-500 dark:text-emerald-400">{resolvedAlerts}</p>
           <div className="flex items-center justify-between pt-1 text-[11px] text-zinc-500 font-mono">
             <span>Completed Dispatches</span>
-            <Link to="/admin/sos-reports" className="text-emerald-400 hover:underline flex items-center gap-1">
+            <Link to="/admin/sos-reports" className="text-emerald-500 dark:text-emerald-400 hover:underline flex items-center gap-1">
               Reports <FiArrowUpRight />
             </Link>
           </div>
@@ -158,15 +158,15 @@ const AdminDashboard = () => {
 
         <div className="glass-card-xl p-6 sm:p-7 border-l-4 border-l-purple-500 space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-bold text-zinc-400 uppercase font-mono">Lifetime SOS Signals</span>
-            <div className="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center text-lg">
+            <span className="text-[10px] font-bold text-zinc-500 dark:text-zinc-400 uppercase font-mono">Lifetime SOS Signals</span>
+            <div className="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-500 dark:text-purple-400 flex items-center justify-center text-lg">
               <FiPieChart />
             </div>
           </div>
-          <p className="text-3xl font-black font-heading text-purple-400">{totalSOSAlerts}</p>
+          <p className="text-3xl font-black font-heading text-purple-500 dark:text-purple-400">{totalSOSAlerts}</p>
           <div className="flex items-center justify-between pt-1 text-[11px] text-zinc-500 font-mono">
             <span>Total Logged</span>
-            <Link to="/admin/analytics" className="text-purple-400 hover:underline flex items-center gap-1">
+            <Link to="/admin/analytics" className="text-purple-500 dark:text-purple-400 hover:underline flex items-center gap-1">
               Analytics <FiArrowUpRight />
             </Link>
           </div>
@@ -176,16 +176,16 @@ const AdminDashboard = () => {
       {/* Chart Visualizations */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 relative z-10">
         <div className="glass-card-xl p-6 sm:p-8 space-y-4">
-          <div className="border-b border-zinc-800/80 pb-3">
-            <h3 className="text-base font-extrabold font-heading text-white">Monthly SOS Distress Incident Trends</h3>
+          <div className="border-b border-zinc-200 dark:border-zinc-800/80 pb-3">
+            <h3 className="text-base font-extrabold font-heading text-zinc-900 dark:text-white">Monthly SOS Distress Incident Trends</h3>
             <p className="text-xs text-zinc-500">Real incident telemetry grouped by monthly operational cycles</p>
           </div>
           <SOSChart data={monthlySOSStats} />
         </div>
 
         <div className="glass-card-xl p-6 sm:p-8 space-y-4">
-          <div className="border-b border-zinc-800/80 pb-3">
-            <h3 className="text-base font-extrabold font-heading text-white">User Base Growth & Adoption</h3>
+          <div className="border-b border-zinc-200 dark:border-zinc-800/80 pb-3">
+            <h3 className="text-base font-extrabold font-heading text-zinc-900 dark:text-white">User Base Growth & Adoption</h3>
             <p className="text-xs text-zinc-500">Dynamic registered user verification curve</p>
           </div>
           <UserGrowthChart usersCount={totalUsers} />
@@ -193,39 +193,39 @@ const AdminDashboard = () => {
       </div>
 
       {/* Recent SOS Activity Section */}
-      <div className="glass-card-xl rounded-3xl overflow-hidden border border-zinc-800/80 relative z-10">
-        <div className="p-5 border-b border-zinc-800/80 flex items-center justify-between bg-zinc-900/40">
+      <div className="glass-card-xl rounded-3xl overflow-hidden border border-zinc-200 dark:border-zinc-800/80 relative z-10">
+        <div className="p-5 border-b border-zinc-200 dark:border-zinc-800/80 flex items-center justify-between bg-zinc-50/80 dark:bg-zinc-900/40">
           <div className="flex items-center gap-2">
             <FiActivity className="text-rose-500" />
-            <h3 className="text-xs font-bold text-zinc-200 uppercase tracking-wider font-mono">
+            <h3 className="text-xs font-bold text-zinc-800 dark:text-zinc-200 uppercase tracking-wider font-mono">
               Live SOS Distress Stream ({recentAlerts.length})
             </h3>
           </div>
-          <Link to="/admin/alerts" className="text-xs text-rose-400 hover:text-rose-300 font-bold font-mono">
+          <Link to="/admin/alerts" className="text-xs text-rose-500 dark:text-rose-400 hover:underline font-bold font-mono">
             View Live Dispatch →
           </Link>
         </div>
 
         {recentAlerts.length === 0 ? (
           <div className="p-8 text-center text-zinc-500 text-xs space-y-1">
-            <p className="font-semibold text-zinc-400">Zero Active Distress Signals</p>
+            <p className="font-semibold text-zinc-700 dark:text-zinc-400">Zero Active Distress Signals</p>
             <p>All emergency channels quiescent. Incoming distress beacons will appear instantly.</p>
           </div>
         ) : (
-          <div className="divide-y divide-zinc-800/80">
+          <div className="divide-y divide-zinc-200 dark:divide-zinc-800/80">
             {recentAlerts.map((a) => (
-              <div key={a.id} className="p-4 sm:px-6 flex items-center justify-between gap-4 hover:bg-zinc-900/40 transition">
+              <div key={a.id} className="p-4 sm:px-6 flex items-center justify-between gap-4 hover:bg-zinc-50 dark:hover:bg-zinc-900/40 transition">
                 <div className="flex items-center gap-3">
-                  <div className={`w-2.5 h-2.5 rounded-full ${a.status === 'ACTIVE' ? 'bg-rose-500 animate-ping' : 'bg-zinc-600'}`} />
+                  <div className={`w-2.5 h-2.5 rounded-full ${a.status === 'ACTIVE' ? 'bg-rose-500 animate-ping' : 'bg-zinc-400 dark:bg-zinc-600'}`} />
                   <div>
-                    <p className="text-xs font-bold text-zinc-200">{a.userName} <span className="text-[10px] text-zinc-500 font-mono">({a.userPhone})</span></p>
-                    <p className="text-[11px] text-zinc-400 truncate max-w-sm">{a.address}</p>
+                    <p className="text-xs font-bold text-zinc-900 dark:text-zinc-200">{a.userName} <span className="text-[10px] text-zinc-500 font-mono">({a.userPhone})</span></p>
+                    <p className="text-[11px] text-zinc-500 dark:text-zinc-400 truncate max-w-sm">{a.address}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
                   <span className="text-[10px] text-zinc-500 font-mono hidden sm:inline">{formatDate(a.timestamp)}</span>
                   <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase ${
-                    a.status === 'ACTIVE' ? 'bg-rose-500/20 text-rose-400' : 'bg-emerald-500/20 text-emerald-400'
+                    a.status === 'ACTIVE' ? 'bg-rose-500/20 text-rose-500 dark:text-rose-400' : 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400'
                   }`}>
                     {a.status}
                   </span>

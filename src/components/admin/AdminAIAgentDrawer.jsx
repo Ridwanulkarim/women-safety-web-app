@@ -554,21 +554,21 @@ const AdminAIAgentDrawer = ({ defaultMode = 'SOS_REPORTS', isOpen, onClose }) =>
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-y-0 right-0 z-50 w-full max-w-lg bg-[#0b0f19] border-l border-zinc-800 shadow-2xl flex flex-col font-sans backdrop-blur-2xl">
+    <div className="fixed inset-y-0 right-0 z-50 w-full max-w-lg bg-white dark:bg-[#0b0f19] border-l border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col font-sans backdrop-blur-2xl transition-colors duration-200">
       {/* Top Header */}
-      <div className="p-4 border-b border-zinc-800/80 bg-slate-900/50 flex items-center justify-between">
+      <div className="p-4 border-b border-zinc-200/80 dark:border-zinc-800/80 bg-zinc-50/80 dark:bg-slate-900/50 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-rose-600 to-indigo-600 flex items-center justify-center text-white text-lg shadow-lg shadow-rose-600/30">
             <FiCpu />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-sm font-bold text-white tracking-tight">SafeHaven AI Copilot</h2>
-              <span className="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+              <h2 className="text-sm font-bold text-zinc-900 dark:text-white tracking-tight">SafeHaven AI Copilot</h2>
+              <span className="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-indigo-500/15 text-indigo-600 dark:text-indigo-300 border border-indigo-500/30">
                 LangGraph State Machine
               </span>
             </div>
-            <p className="text-[11px] text-zinc-400">
+            <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
               {mode === 'SOS_REPORTS' 
                 ? (language === 'bn' ? 'এসওএস রিপোর্ট ডায়াগনস্টিকস ও প্রশ্নোত্তর' : 'SOS Reports Diagnostics & Q&A')
                 : (language === 'bn' ? 'ভয়েস ও রিয়েল-টাইম অ্যানালিটিক্স ইন্টেলিজেন্স' : 'Conversational Analytics Intelligence')}
@@ -585,10 +585,10 @@ const AdminAIAgentDrawer = ({ defaultMode = 'SOS_REPORTS', isOpen, onClose }) =>
               setLanguage(newLang);
               toast.success(newLang === 'bn' ? 'বাংলা ভয়েস ও টেক্সট মোড চালু হয়েছে 🇧🇩' : 'Switched to English Voice & Text 🇬🇧');
             }}
-            className="px-2.5 py-1.5 rounded-lg text-xs font-mono font-bold border transition bg-zinc-800/90 hover:bg-zinc-700 border-zinc-700 text-zinc-200 flex items-center gap-1.5"
+            className="px-2.5 py-1.5 rounded-lg text-xs font-mono font-bold border transition bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800/90 dark:hover:bg-zinc-700 border-zinc-300 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 flex items-center gap-1.5 shadow-sm"
             title="Toggle Voice & Text Language (বাংলা / English)"
           >
-            <FiGlobe className="text-rose-400" />
+            <FiGlobe className="text-rose-500 dark:text-rose-400" />
             <span>{language === 'bn' ? 'বাংলা' : 'EN'}</span>
           </button>
 
@@ -600,17 +600,17 @@ const AdminAIAgentDrawer = ({ defaultMode = 'SOS_REPORTS', isOpen, onClose }) =>
             }}
             className={`p-2 rounded-lg text-xs border transition ${
               voiceEnabled 
-                ? 'bg-rose-500/10 border-rose-500/30 text-rose-400' 
-                : 'bg-zinc-800 border-zinc-700 text-zinc-500'
+                ? 'bg-rose-500/15 border-rose-500/30 text-rose-600 dark:text-rose-400' 
+                : 'bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 border-zinc-300 dark:border-zinc-700 text-zinc-500 dark:text-zinc-500'
             }`}
             title={voiceEnabled ? 'Natural Voice ON (Click to Mute)' : 'Natural Voice OFF'}
           >
-            {isSpeaking ? <FiVolume2 className="animate-pulse text-rose-400" /> : voiceEnabled ? <FiVolume2 /> : <FiVolumeX />}
+            {isSpeaking ? <FiVolume2 className="animate-pulse text-rose-500 dark:text-rose-400" /> : voiceEnabled ? <FiVolume2 /> : <FiVolumeX />}
           </button>
 
           <button
             onClick={onClose}
-            className="p-2 rounded-lg bg-zinc-800/80 hover:bg-zinc-700 text-zinc-400 hover:text-white transition"
+            className="p-2 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800/80 dark:hover:bg-zinc-700 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition"
           >
             <FiX />
           </button>
@@ -618,13 +618,13 @@ const AdminAIAgentDrawer = ({ defaultMode = 'SOS_REPORTS', isOpen, onClose }) =>
       </div>
 
       {/* Mode Switcher Tabs */}
-      <div className="flex border-b border-zinc-800 text-xs font-semibold bg-slate-950/40">
+      <div className="flex border-b border-zinc-200 dark:border-zinc-800 text-xs font-semibold bg-zinc-100/60 dark:bg-slate-950/40">
         <button
           onClick={() => setMode('SOS_REPORTS')}
           className={`flex-1 py-2.5 px-3 flex items-center justify-center gap-1.5 border-b-2 transition ${
             mode === 'SOS_REPORTS'
-              ? 'border-rose-500 text-rose-400 bg-rose-500/5'
-              : 'border-transparent text-zinc-400 hover:text-zinc-200'
+              ? 'border-rose-500 text-rose-600 dark:text-rose-400 bg-rose-500/5 font-bold'
+              : 'border-transparent text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
           }`}
         >
           <FiFileText /> {language === 'bn' ? 'এসওএস রিপোর্ট কোপাইলট' : 'SOS Reports Copilot'}
@@ -633,8 +633,8 @@ const AdminAIAgentDrawer = ({ defaultMode = 'SOS_REPORTS', isOpen, onClose }) =>
           onClick={() => setMode('ANALYTICS')}
           className={`flex-1 py-2.5 px-3 flex items-center justify-center gap-1.5 border-b-2 transition ${
             mode === 'ANALYTICS'
-              ? 'border-indigo-500 text-indigo-400 bg-indigo-500/5'
-              : 'border-transparent text-zinc-400 hover:text-zinc-200'
+              ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400 bg-indigo-500/5 font-bold'
+              : 'border-transparent text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
           }`}
         >
           <FiPieChart /> {language === 'bn' ? 'অ্যানালিটিক্স কিউএনএ এজেন্ট' : 'Analytics Q&A Agent'}
@@ -643,36 +643,36 @@ const AdminAIAgentDrawer = ({ defaultMode = 'SOS_REPORTS', isOpen, onClose }) =>
 
       {/* Execution Trace Bar (Shows LangGraph active node) */}
       {agentState !== AGENT_NODES.IDLE && (
-        <div className="px-4 py-2 bg-indigo-950/40 border-b border-indigo-900/50 flex items-center gap-2 text-[11px] text-indigo-300 font-mono animate-pulse">
-          <FiZap className="text-indigo-400 shrink-0" />
+        <div className="px-4 py-2 bg-indigo-50 dark:bg-indigo-950/40 border-b border-indigo-200 dark:border-indigo-900/50 flex items-center gap-2 text-[11px] text-indigo-700 dark:text-indigo-300 font-mono animate-pulse">
+          <FiZap className="text-indigo-600 dark:text-indigo-400 shrink-0" />
           <span className="truncate">{activeStepTrace.join(' ➔ ')}</span>
         </div>
       )}
 
       {/* Chat Messages Log */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 text-xs">
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 text-xs bg-zinc-50/40 dark:bg-transparent">
         {chatHistory.map((msg, index) => (
           <div
             key={index}
             className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}
           >
             <div
-              className={`max-w-[88%] rounded-2xl p-4 space-y-1.5 leading-relaxed shadow-md ${
+              className={`max-w-[88%] rounded-2xl p-4 space-y-1.5 leading-relaxed shadow-sm ${
                 msg.role === 'user'
-                  ? 'bg-gradient-to-r from-rose-600 to-rose-700 text-white rounded-br-none'
-                  : 'bg-slate-900/90 border border-zinc-800/80 text-zinc-200 rounded-bl-none'
+                  ? 'bg-gradient-to-r from-rose-600 to-rose-700 text-white rounded-br-none shadow-md shadow-rose-600/20'
+                  : 'bg-white dark:bg-slate-900/90 border border-zinc-200 dark:border-zinc-800/80 text-zinc-800 dark:text-zinc-200 rounded-bl-none'
               }`}
             >
               {/* Message Header */}
-              <div className="flex items-center justify-between gap-3 text-[10px] text-zinc-400 pb-1 border-b border-white/5 font-mono">
-                <span className="font-semibold text-zinc-300">
+              <div className="flex items-center justify-between gap-3 text-[10px] text-zinc-500 dark:text-zinc-400 pb-1 border-b border-zinc-200/80 dark:border-white/5 font-mono">
+                <span className="font-semibold text-zinc-700 dark:text-zinc-300">
                   {msg.role === 'user' ? 'Admin' : 'SafeHaven Intelligence Copilot'}
                 </span>
                 <div className="flex items-center gap-2">
                   {msg.role === 'assistant' && (
                     <button
                       onClick={() => speakText(msg.text, msg.spokenPhrase)}
-                      className="text-zinc-400 hover:text-rose-400 transition flex items-center gap-1"
+                      className="text-zinc-500 dark:text-zinc-400 hover:text-rose-600 dark:hover:text-rose-400 transition flex items-center gap-1"
                       title="Play / Replay Voice"
                     >
                       <FiVolume2 className="text-xs" />
@@ -692,7 +692,7 @@ const AdminAIAgentDrawer = ({ defaultMode = 'SOS_REPORTS', isOpen, onClose }) =>
               {msg.trace && msg.trace.length > 0 && (
                 <div className="pt-2 flex flex-wrap gap-1">
                   {msg.trace.map((tr, i) => (
-                    <span key={i} className="text-[9px] px-1.5 py-0.5 rounded bg-zinc-800 text-indigo-400 font-mono border border-indigo-500/20">
+                    <span key={i} className="text-[9px] px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-indigo-700 dark:text-indigo-400 font-mono border border-indigo-200 dark:border-indigo-500/20">
                       ⚡ {tr}
                     </span>
                   ))}
@@ -713,7 +713,7 @@ const AdminAIAgentDrawer = ({ defaultMode = 'SOS_REPORTS', isOpen, onClose }) =>
       </div>
 
       {/* Quick Demonstration Prompts */}
-      <div className="p-2.5 bg-slate-950/60 border-t border-zinc-800/60 overflow-x-auto">
+      <div className="p-2.5 bg-zinc-100/70 dark:bg-slate-950/60 border-t border-zinc-200 dark:border-zinc-800/60 overflow-x-auto">
         <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider block mb-1.5 px-1">
           {language === 'bn' ? 'কুইক প্রশ্নাবলি (Quick Prompts):' : 'Quick Q&A Prompts:'}
         </span>
@@ -722,7 +722,7 @@ const AdminAIAgentDrawer = ({ defaultMode = 'SOS_REPORTS', isOpen, onClose }) =>
             <button
               key={idx}
               onClick={() => handleProcessQuery(p)}
-              className="text-[11px] px-2.5 py-1 rounded-full bg-zinc-900/90 hover:bg-zinc-800 text-zinc-300 border border-zinc-700/60 whitespace-nowrap transition shrink-0"
+              className="text-[11px] px-2.5 py-1 rounded-full bg-white hover:bg-zinc-200 dark:bg-zinc-900/90 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-300 dark:border-zinc-700/60 whitespace-nowrap transition shrink-0 shadow-sm"
             >
               {p}
             </button>
@@ -731,7 +731,7 @@ const AdminAIAgentDrawer = ({ defaultMode = 'SOS_REPORTS', isOpen, onClose }) =>
       </div>
 
       {/* Input Box & Voice STT Bar */}
-      <div className="p-3 bg-slate-900/90 border-t border-zinc-800">
+      <div className="p-3 bg-white dark:bg-slate-900/90 border-t border-zinc-200 dark:border-zinc-800">
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -746,7 +746,7 @@ const AdminAIAgentDrawer = ({ defaultMode = 'SOS_REPORTS', isOpen, onClose }) =>
             className={`p-3 rounded-xl transition flex items-center justify-center shrink-0 ${
               isListening
                 ? 'bg-rose-600 text-white animate-bounce shadow-lg shadow-rose-600/50'
-                : 'bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-700'
+                : 'bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 border border-zinc-300 dark:border-zinc-700 shadow-sm'
             }`}
             title={language === 'bn' ? 'মুখে বাংলায় প্রশ্ন বলুন (ভয়েস-টু-টেক্সট)' : 'Speak query in English (Voice-to-Text)'}
           >
@@ -764,7 +764,7 @@ const AdminAIAgentDrawer = ({ defaultMode = 'SOS_REPORTS', isOpen, onClose }) =>
                   ? (language === 'bn' ? 'ইনসিডেন্ট, সমস্যা বা সামারি সম্পর্কে বাংলায় জিজ্ঞাসা করুন...' : 'Ask about incidents, issues, or summarize reports...') 
                   : (language === 'bn' ? 'মোট ইনসিডেন্ট, সমাধানের হার বা সময় সম্পর্কে বাংলায় জিজ্ঞাসা করুন...' : 'Ask about incident counts, resolution rates, peak times...')
             }
-            className="flex-1 bg-zinc-950/80 border border-zinc-800 focus:border-rose-500 rounded-xl px-4 py-2.5 text-xs text-white placeholder-zinc-500 focus:outline-none transition"
+            className="flex-1 bg-zinc-50 dark:bg-zinc-950/80 border border-zinc-300 dark:border-zinc-800 focus:border-rose-500 rounded-xl px-4 py-2.5 text-xs text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none transition shadow-sm"
           />
 
           <button
@@ -777,14 +777,14 @@ const AdminAIAgentDrawer = ({ defaultMode = 'SOS_REPORTS', isOpen, onClose }) =>
         </form>
 
         {isSpeaking && (
-          <div className="mt-2 flex items-center justify-between text-[11px] text-rose-400 bg-rose-500/10 px-3 py-1.5 rounded-lg border border-rose-500/20">
+          <div className="mt-2 flex items-center justify-between text-[11px] text-rose-600 dark:text-rose-400 bg-rose-500/10 px-3 py-1.5 rounded-lg border border-rose-500/20">
             <span className="flex items-center gap-1.5 font-mono">
               <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-ping"></span> 
               {language === 'bn' ? 'স্টুডিও-কোয়ালিটি ন্যাচারাল বাংলা অডিও বাজছে...' : 'Speaking via Natural Voice Engine...'}
             </span>
             <button
               onClick={stopSpeaking}
-              className="text-[10px] uppercase font-bold text-zinc-400 hover:text-white"
+              className="text-[10px] uppercase font-bold text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
             >
               {language === 'bn' ? 'অডিও থামান' : 'Stop Audio'}
             </button>

@@ -114,17 +114,17 @@ const AdminAlerts = () => {
               <span className="w-1.5 h-1.5 rounded-full bg-rose-500 telemetry-dot"></span> LIVE DISPATCH
             </span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold font-heading text-white tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-extrabold font-heading text-zinc-900 dark:text-white tracking-tight">
             Emergency <span className="gradient-text-rose">SOS Distress Monitor</span>
           </h1>
-          <p className="text-xs text-zinc-400">
+          <p className="text-xs text-zinc-500 dark:text-zinc-400">
             Real-time telemetry and dispatch coordination for emergency citizen distress signals.
           </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
           {/* Filter Badges */}
-          <div className="flex items-center gap-1 bg-zinc-900/80 p-1 rounded-2xl border border-zinc-800">
+          <div className="flex items-center gap-1 bg-zinc-100 dark:bg-zinc-900/80 p-1 rounded-2xl border border-zinc-200 dark:border-zinc-800">
             {['ALL', 'ACTIVE', 'ACKNOWLEDGED', 'RESOLVED'].map((tab) => (
               <button
                 key={tab}
@@ -132,7 +132,7 @@ const AdminAlerts = () => {
                 className={`px-3 py-1.5 rounded-xl text-[10px] font-mono font-bold uppercase transition ${
                   filter === tab
                     ? 'bg-rose-600 text-white shadow-md shadow-rose-600/30'
-                    : 'text-zinc-400 hover:text-zinc-200'
+                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
                 }`}
               >
                 {tab} {tab === 'ACTIVE' && activeCount > 0 && `(${activeCount})`}
@@ -143,7 +143,7 @@ const AdminAlerts = () => {
           <button
             onClick={handleManualSync}
             disabled={syncing}
-            className="p-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 hover:text-white transition"
+            className="p-2.5 rounded-xl bg-white hover:bg-zinc-100 dark:bg-zinc-900 dark:hover:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition shadow-sm"
             title="Refresh from Cloud"
           >
             <FiRefreshCw className={`w-4 h-4 ${syncing ? 'animate-spin text-rose-500' : ''}`} />
@@ -153,19 +153,19 @@ const AdminAlerts = () => {
 
       {/* Alerts Feed */}
       {filteredAlerts.length === 0 ? (
-        <div className="glass-card p-12 sm:p-16 rounded-3xl text-center space-y-4 border border-zinc-800/80">
-          <div className="w-16 h-16 mx-auto rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 text-3xl shadow-lg shadow-emerald-500/10">
+        <div className="glass-card-xl p-12 sm:p-16 rounded-3xl text-center space-y-4 border border-zinc-200/80 dark:border-zinc-800/80 shadow-xl">
+          <div className="w-16 h-16 mx-auto rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400 text-3xl shadow-lg shadow-emerald-500/10">
             <FiCheckCircle />
           </div>
           <div className="space-y-1">
-            <h3 className="text-lg font-bold text-white">All Clear — No Active Distress Signals</h3>
-            <p className="text-xs text-zinc-400 max-w-md mx-auto">
+            <h3 className="text-lg font-bold text-zinc-900 dark:text-white">All Clear — No Active Distress Signals</h3>
+            <p className="text-xs text-zinc-500 dark:text-zinc-400 max-w-md mx-auto">
               {filter === 'ALL'
                 ? 'There are currently zero emergency distress beacons triggered. The system is actively listening for incoming user SOS broadcasts.'
                 : `No emergency alerts match the "${filter}" filter status.`}
             </p>
           </div>
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[11px] font-mono">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-[11px] font-mono">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
             DISPATCH GATEWAY LISTENING
           </div>
@@ -175,10 +175,10 @@ const AdminAlerts = () => {
           {filteredAlerts.map((alert) => (
             <div
               key={alert.id}
-              className={`glass-card p-6 sm:p-7 rounded-3xl space-y-6 border transition-all duration-300 ${
+              className={`glass-card-xl p-6 sm:p-7 rounded-3xl space-y-6 border transition-all duration-300 ${
                 alert.status === 'ACTIVE'
-                  ? 'border-rose-500/50 bg-rose-950/10 shadow-2xl shadow-rose-900/20 ring-1 ring-rose-500/20'
-                  : 'border-zinc-800/80'
+                  ? 'border-rose-500/50 bg-rose-50/40 dark:bg-rose-950/10 shadow-2xl shadow-rose-900/10 ring-1 ring-rose-500/20'
+                  : 'border-zinc-200/80 dark:border-zinc-800/80'
               }`}
             >
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -188,24 +188,24 @@ const AdminAlerts = () => {
                       alert.status === 'ACTIVE'
                         ? 'bg-rose-500/20 text-rose-500 animate-pulse border border-rose-500/40'
                         : alert.status === 'ACKNOWLEDGED'
-                        ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
-                        : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                        ? 'bg-amber-500/20 text-amber-500 dark:text-amber-400 border border-amber-500/30'
+                        : 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30'
                     }`}
                   >
                     <FiAlertTriangle />
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <h3 className="text-lg font-extrabold text-zinc-100 font-heading">
+                      <h3 className="text-lg font-extrabold text-zinc-900 dark:text-zinc-100 font-heading">
                         {alert.userName || 'Anonymous User'}
                       </h3>
-                      <span className="text-[10px] font-mono text-zinc-500">#{alert.id}</span>
+                      <span className="text-[10px] font-mono text-zinc-400 dark:text-zinc-500">#{alert.id}</span>
                     </div>
-                    <p className="text-xs text-zinc-400 flex items-center gap-2 mt-0.5 font-mono">
+                    <p className="text-xs text-zinc-500 dark:text-zinc-400 flex items-center gap-2 mt-0.5 font-mono">
                       <span>Phone: {alert.userPhone || 'Not Given'}</span>
                       <span>•</span>
                       <span className="flex items-center gap-1">
-                        <FiClock className="text-zinc-500" /> {formatDate(alert.timestamp)}
+                        <FiClock className="text-zinc-400 dark:text-zinc-500" /> {formatDate(alert.timestamp)}
                       </span>
                     </p>
                   </div>
@@ -215,10 +215,10 @@ const AdminAlerts = () => {
                   <span
                     className={`px-3 py-1 rounded-full text-[10px] font-mono font-black uppercase ${
                       alert.status === 'ACTIVE'
-                        ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30'
+                        ? 'bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-500/30'
                         : alert.status === 'ACKNOWLEDGED'
-                        ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
-                        : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                        ? 'bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/30'
+                        : 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30'
                     }`}
                   >
                     {alert.status}
@@ -227,7 +227,7 @@ const AdminAlerts = () => {
                   {alert.status === 'ACTIVE' && (
                     <button
                       onClick={() => handleUpdateStatus(alert.id, 'ACKNOWLEDGED')}
-                      className="px-3.5 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/30 text-amber-300 font-bold text-xs uppercase font-mono transition"
+                      className="px-3.5 py-1.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-600 dark:text-amber-300 font-bold text-xs uppercase font-mono transition"
                     >
                       Acknowledge
                     </button>
@@ -244,7 +244,7 @@ const AdminAlerts = () => {
 
                   <button
                     onClick={() => handleDeleteAlert(alert.id)}
-                    className="p-2 rounded-xl bg-zinc-800/80 hover:bg-red-500/20 text-zinc-400 hover:text-red-400 border border-zinc-700/50 transition"
+                    className="p-2 rounded-xl bg-zinc-100 hover:bg-red-500/20 text-zinc-500 hover:text-red-600 dark:bg-zinc-800/80 dark:hover:bg-red-500/20 dark:text-zinc-400 dark:hover:text-red-400 border border-zinc-200 dark:border-zinc-700/50 transition"
                     title="Delete Alert Record"
                   >
                     <FiTrash2 className="w-3.5 h-3.5" />
@@ -253,18 +253,18 @@ const AdminAlerts = () => {
               </div>
 
               {/* Location telemetry box */}
-              <div className="p-3.5 rounded-2xl bg-zinc-900/60 border border-zinc-800/80 flex items-center justify-between text-xs text-zinc-300">
+              <div className="p-3.5 rounded-2xl bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800/80 flex items-center justify-between text-xs text-zinc-700 dark:text-zinc-300">
                 <div className="flex items-center gap-2">
                   <FiMapPin className="text-rose-500 text-sm flex-shrink-0" />
-                  <span className="font-semibold text-zinc-200">{alert.address || 'Unknown Location'}</span>
+                  <span className="font-semibold text-zinc-900 dark:text-zinc-200">{alert.address || 'Unknown Location'}</span>
                 </div>
-                <div className="font-mono text-[11px] text-zinc-400">
+                <div className="font-mono text-[11px] text-zinc-500 dark:text-zinc-400">
                   {alert.latitude?.toFixed(4)}, {alert.longitude?.toFixed(4)}
                 </div>
               </div>
 
               {/* Live interactive map */}
-              <div className="rounded-2xl overflow-hidden border border-zinc-800/80">
+              <div className="rounded-2xl overflow-hidden border border-zinc-200 dark:border-zinc-800/80">
                 <LiveMap
                   latitude={alert.latitude || 23.8103}
                   longitude={alert.longitude || 90.4125}

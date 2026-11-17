@@ -27,18 +27,18 @@ const AdminLayout = () => {
   const isActive = (path) => location.pathname === path;
 
   return (
-    <div className="min-h-screen flex bg-[#08080c] text-zinc-100 font-sans">
+    <div className="min-h-screen flex bg-zinc-50 dark:bg-[#08080c] text-zinc-900 dark:text-zinc-100 font-sans transition-colors duration-200">
       <ScrollToTop />
 
       {/* Sidebar Desktop */}
-      <aside className="hidden lg:flex flex-col w-64 bg-[#0d0d12]/95 backdrop-blur-xl border-r border-zinc-800/80 p-5 sticky top-0 h-screen z-30 shadow-2xl">
+      <aside className="hidden lg:flex flex-col w-64 bg-white/95 dark:bg-[#0d0d12]/95 backdrop-blur-xl border-r border-zinc-200/80 dark:border-zinc-800/80 p-5 sticky top-0 h-screen z-30 shadow-sm transition-colors duration-200">
         <div className="flex items-center justify-between mb-6">
           <Link to="/admin" className="flex items-center gap-3 group">
             <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-rose-600 to-rose-700 flex items-center justify-center text-white font-bold shadow-lg shadow-rose-600/30 group-hover:scale-105 transition-transform duration-200">
               <FiShield className="w-5 h-5" />
             </div>
             <div>
-              <span className="text-base font-extrabold font-heading text-white tracking-tight block">
+              <span className="text-base font-extrabold font-heading text-zinc-900 dark:text-white tracking-tight block">
                 SafeHaven
               </span>
               <span className="text-[10px] font-mono font-bold text-rose-500 uppercase tracking-wider flex items-center gap-1">
@@ -50,7 +50,7 @@ const AdminLayout = () => {
 
         <Link
           to="/dashboard"
-          className="mb-4 px-3.5 py-2.5 rounded-xl bg-zinc-900/80 hover:bg-zinc-800 border border-zinc-800/80 text-xs font-semibold text-zinc-300 flex items-center gap-2 transition"
+          className="mb-4 px-3.5 py-2.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-900/80 dark:hover:bg-zinc-800 border border-zinc-200 dark:border-zinc-800/80 text-xs font-semibold text-zinc-700 dark:text-zinc-300 flex items-center gap-2 transition"
         >
           <FiArrowLeft className="text-rose-500" /> Return to User Portal
         </Link>
@@ -67,10 +67,10 @@ const AdminLayout = () => {
                 className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all duration-200 ${
                   active
                     ? 'bg-gradient-to-r from-rose-600 to-rose-700 text-white shadow-md shadow-rose-600/25 font-bold'
-                    : 'text-zinc-400 hover:bg-zinc-900 hover:text-zinc-200'
+                    : 'text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-900 dark:hover:text-zinc-200'
                 }`}
               >
-                <Icon className={`w-4 h-4 ${active ? 'text-white' : 'text-zinc-400'}`} />
+                <Icon className={`w-4 h-4 ${active ? 'text-white' : 'text-zinc-500 dark:text-zinc-400'}`} />
                 <span>{item.name}</span>
               </Link>
             );
@@ -78,9 +78,9 @@ const AdminLayout = () => {
         </nav>
 
         {/* Footer */}
-        <div className="pt-4 border-t border-zinc-800/80 flex items-center justify-between">
+        <div className="pt-4 border-t border-zinc-200/80 dark:border-zinc-800/80 flex items-center justify-between">
           <div className="text-left">
-            <p className="text-xs font-bold text-zinc-200 truncate max-w-[130px]">{user?.fullName || 'Admin User'}</p>
+            <p className="text-xs font-bold text-zinc-900 dark:text-zinc-200 truncate max-w-[130px]">{user?.fullName || 'Admin User'}</p>
             <p className="text-[10px] text-rose-500 uppercase font-mono font-bold">Administrator</p>
           </div>
           <button
@@ -88,7 +88,7 @@ const AdminLayout = () => {
               logoutUser();
               navigate('/login');
             }}
-            className="p-2 rounded-xl text-zinc-400 hover:text-rose-500 hover:bg-rose-500/10 transition"
+            className="p-2 rounded-xl text-zinc-500 hover:text-rose-500 hover:bg-rose-500/10 transition"
             title="Logout"
           >
             <FiLogOut className="w-4 h-4" />
@@ -98,24 +98,24 @@ const AdminLayout = () => {
 
       {/* Main Body */}
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="bg-[#0e0e13]/90 backdrop-blur-xl border-b border-zinc-800/80 px-4 py-3 flex items-center justify-between sticky top-0 z-20">
+        <header className="bg-white/90 dark:bg-[#0e0e13]/90 backdrop-blur-xl border-b border-zinc-200/80 dark:border-zinc-800/80 px-4 py-3 flex items-center justify-between sticky top-0 z-20 transition-colors duration-200">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="p-2 rounded-xl lg:hidden bg-zinc-800 text-zinc-200"
+              className="p-2 rounded-xl lg:hidden bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700"
             >
               {sidebarOpen ? <FiX className="w-5 h-5" /> : <FiMenu className="w-5 h-5" />}
             </button>
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-purple-500 animate-ping"></span>
-              <h1 className="text-xs sm:text-sm font-bold font-heading text-purple-400">Admin Command Center</h1>
+              <h1 className="text-xs sm:text-sm font-bold font-heading text-purple-600 dark:text-purple-400">Admin Command Center</h1>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
             <Link
               to="/dashboard"
-              className="px-3 py-1.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-semibold flex items-center gap-1.5 transition border border-zinc-700/60"
+              className="px-3 py-1.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 text-xs font-semibold flex items-center gap-1.5 transition border border-zinc-200 dark:border-zinc-700/60"
               title="Return to User Dashboard"
             >
               <FiArrowLeft className="text-rose-500" />
@@ -126,14 +126,16 @@ const AdminLayout = () => {
         </header>
 
         {sidebarOpen && (
-          <div className="lg:hidden bg-slate-900 border-b border-slate-800 p-4 space-y-1">
+          <div className="lg:hidden bg-white dark:bg-slate-900 border-b border-zinc-200 dark:border-slate-800 p-4 space-y-1 shadow-lg">
             {adminMenu.map((item) => (
               <Link
                 key={item.path}
                 to={item.path}
                 onClick={() => setSidebarOpen(false)}
                 className={`block px-4 py-2.5 rounded-xl text-xs font-semibold ${
-                  isActive(item.path) ? 'bg-purple-600 text-white' : 'text-slate-300'
+                  isActive(item.path) 
+                    ? 'bg-purple-600 text-white' 
+                    : 'text-zinc-700 dark:text-slate-300 hover:bg-zinc-100 dark:hover:bg-slate-800'
                 }`}
               >
                 {item.name}
