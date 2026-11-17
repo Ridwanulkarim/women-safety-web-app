@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { 
   FiCpu, FiSend, FiMic, FiMicOff, FiVolume2, FiVolumeX, 
   FiRefreshCw, FiCheckCircle, FiAlertTriangle, FiActivity, 
-  FiLayers, FiX, FiCornerDownLeft, FiZap, FiFileText, FiPieChart 
+  FiLayers, FiX, FiCornerDownLeft, FiZap, FiFileText, FiPieChart, FiGlobe 
 } from 'react-icons/fi';
 import { getGlobalSOSAlerts, getRegisteredUsers } from '../../utils/adminDataRegistry';
 import toast from 'react-hot-toast';
@@ -20,6 +20,7 @@ const AGENT_NODES = {
 
 const AdminAIAgentDrawer = ({ defaultMode = 'SOS_REPORTS', isOpen, onClose }) => {
   const [mode, setMode] = useState(defaultMode); // 'SOS_REPORTS' | 'ANALYTICS'
+  const [language, setLanguage] = useState('bn'); // 'bn' | 'en'
   const [query, setQuery] = useState('');
   const [isListening, setIsListening] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
@@ -53,15 +54,15 @@ const AdminAIAgentDrawer = ({ defaultMode = 'SOS_REPORTS', isOpen, onClose }) =>
     if (defaultMode) setMode(defaultMode);
   }, [defaultMode]);
 
-  // Initial welcome message based on mode
+  // Initial welcome message based on mode & language
   const [chatHistory, setChatHistory] = useState(() => [
     {
       role: 'assistant',
       text: defaultMode === 'SOS_REPORTS'
-        ? "Hello Admin. I am your SafeHaven Incident Intelligence Agent (powered by LangGraph-style workflow). I can summarize distress logs, diagnose root issues, or answer questions about individual emergency events. You can type or tap the microphone to speak."
-        : "Hello Admin. I am your SafeHaven Analytics Copilot. I analyze real-time incident trends, calculate resolution metrics, and predict peak danger intervals. Ask me any analytical question by voice or text.",
+        ? "আসসালামু আলাইকুম অ্যাডমিন। আমি সেফহ্যাভেন ইন্টেলিজেন্স এজেন্ট (LangGraph-style workflow চালিত)। আমি সব এসওএস রিপোর্ট সামারাইজ করতে পারি, কী কী সমস্যা হয়েছে তা ডায়াগনসিস করতে পারি এবং যেকোনো ঘটনার বিস্তারিত প্রশ্নের উত্তর দিতে পারি। আপনি বাংলায় মুখে কথা বলে বা লিখে প্রশ্ন করতে পারেন।"
+        : "আসসালামু আলাইকুম অ্যাডমিন। আমি সেফহ্যাভেন অ্যানালিটিক্স কোপাইলট। লাইভ ইনসিডেন্ট সংখ্যা, সমাধানের হার বা দিনের কোন সময়ে বেশি বিপদ ঘটে—যেকোনো প্রশ্ন বাংলায় মুখে বলুন বা লিখে জানান।",
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      trace: ['INITIALIZED', 'DATA_REGISTRY_LOADED']
+      trace: ['INITIALIZED', 'DATA_REGISTRY_LOADED', 'BANGLA_VOICE_ENGINE_ACTIVE']
     }
   ]);
 
@@ -70,14 +71,14 @@ const AdminAIAgentDrawer = ({ defaultMode = 'SOS_REPORTS', isOpen, onClose }) =>
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [chatHistory, agentState]);
 
-  // Initialize Speech-to-Text (STT)
+  // Initialize Speech-to-Text (STT) with Dynamic Language Support
   useEffect(() => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (SpeechRecognition) {
       const recognition = new SpeechRecognition();
       recognition.continuous = false;
       recognition.interimResults = false;
-      recognition.lang = 'en-US'; // Supports 'bn-BD' or 'en-US'
+      recognition.lang = language === 'bn' ? 'bn-BD' : 'en-US';
 
       recognition.onstart = () => setIsListening(true);
       recognition.onend = () => setIsListening(false);
@@ -85,7 +86,7 @@ const AdminAIAgentDrawer = ({ defaultMode = 'SOS_REPORTS', isOpen, onClose }) =>
         console.warn('Speech recognition error:', e.error);
         setIsListening(false);
         if (e.error === 'not-allowed') {
-          toast.error('Microphone permission denied.');
+          toast.error(language === 'bn' ? 'মাইক্রোফোনের অনুমতি পাওয়া যায়নি।' : 'Microphone permission denied.');
         }
       };
       recognition.onresult = (event) => {
@@ -98,9 +99,9 @@ const AdminAIAgentDrawer = ({ defaultMode = 'SOS_REPORTS', isOpen, onClose }) =>
 
       recognitionRef.current = recognition;
     }
-  }, []);
+  }, [language]);
 
-  // Fresh Modern Voice (TTS) Synthesizer
+  // Fresh Modern Voice (TTS) Synthesizer with Full Bangla & English Support
   const speakText = (text) => {
     if (!voiceEnabled || !synthRef.current) return;
 
@@ -116,18 +117,29 @@ const AdminAIAgentDrawer = ({ defaultMode = 'SOS_REPORTS', isOpen, onClose }) =>
 
     const utterance = new SpeechSynthesisUtterance(cleanSpeech);
 
-    // Pick a fresh, high-quality modern voice if available
+    const isBengaliText = /[\u0980-\u09FF]/.test(cleanSpeech) || language === 'bn';
     const voices = synthRef.current.getVoices();
-    const naturalVoice = voices.find(v => 
-      (v.name.includes('Natural') || v.name.includes('Google') || v.name.includes('Samantha') || v.name.includes('Aria') || v.name.includes('Jenny')) &&
-      (v.lang.startsWith('en') || v.lang.startsWith('bn'))
-    ) || voices.find(v => v.lang.startsWith('en')) || voices[0];
 
-    if (naturalVoice) utterance.voice = naturalVoice;
-    
-    // Natural humanized cadence (fresh tone)
-    utterance.rate = 1.0;
-    utterance.pitch = 1.05;
+    if (isBengaliText) {
+      utterance.lang = 'bn-BD';
+      // Find native Bengali voice (Google Bangla, Microsoft Bangla, or Indian Bengali)
+      const bnVoice = voices.find(v => 
+        (v.lang && (v.lang.toLowerCase().includes('bn') || v.lang.toLowerCase().includes('ben'))) ||
+        (v.name && (v.name.toLowerCase().includes('bangla') || v.name.toLowerCase().includes('bengali')))
+      );
+      if (bnVoice) utterance.voice = bnVoice;
+      utterance.rate = 0.96; // optimal pacing for clean Bengali cadence
+      utterance.pitch = 1.02;
+    } else {
+      utterance.lang = 'en-US';
+      const enVoice = voices.find(v => 
+        (v.name.includes('Natural') || v.name.includes('Google') || v.name.includes('Samantha') || v.name.includes('Aria') || v.name.includes('Jenny')) &&
+        v.lang.startsWith('en')
+      ) || voices.find(v => v.lang.startsWith('en')) || voices[0];
+      if (enVoice) utterance.voice = enVoice;
+      utterance.rate = 1.0;
+      utterance.pitch = 1.05;
+    }
 
     utterance.onstart = () => setIsSpeaking(true);
     utterance.onend = () => setIsSpeaking(false);
@@ -152,8 +164,16 @@ const AdminAIAgentDrawer = ({ defaultMode = 'SOS_REPORTS', isOpen, onClose }) =>
       recognitionRef.current.stop();
     } else {
       stopSpeaking();
-      recognitionRef.current.start();
-      toast('Listening... Speak your query', { icon: '🎙️' });
+      recognitionRef.current.lang = language === 'bn' ? 'bn-BD' : 'en-US';
+      try {
+        recognitionRef.current.start();
+        toast(
+          language === 'bn' ? 'বাংলায় কথা বলুন... শুনছি 🎙️' : 'Listening... Speak your query 🎙️', 
+          { icon: '🎙️' }
+        );
+      } catch (err) {
+        console.warn('Mic start error:', err);
+      }
     }
   };
 
@@ -191,13 +211,13 @@ const AdminAIAgentDrawer = ({ defaultMode = 'SOS_REPORTS', isOpen, onClose }) =>
 
       // Issue diagnosis based on text/address keywords
       const text = `${a.userName} ${a.address} ${a.status} ${a.category || ''}`.toLowerCase();
-      if (text.includes('stalk') || text.includes('follow') || text.includes('car')) {
+      if (text.includes('stalk') || text.includes('follow') || text.includes('car') || text.includes('পিছু')) {
         issueCategories.Stalking++;
-      } else if (text.includes('assault') || text.includes('attack') || text.includes('beat')) {
+      } else if (text.includes('assault') || text.includes('attack') || text.includes('beat') || text.includes('আক্রমণ')) {
         issueCategories.PhysicalAssault++;
-      } else if (text.includes('medical') || text.includes('health') || text.includes('ambulance') || text.includes('faint')) {
+      } else if (text.includes('medical') || text.includes('health') || text.includes('ambulance') || text.includes('চিকিৎসা')) {
         issueCategories.MedicalEmergency++;
-      } else if (text.includes('harass') || text.includes('threat') || text.includes('verbal')) {
+      } else if (text.includes('harass') || text.includes('threat') || text.includes('verbal') || text.includes('হয়রানি')) {
         issueCategories.Harassment++;
       } else {
         issueCategories.GeneralDistress++;
@@ -222,7 +242,7 @@ const AdminAIAgentDrawer = ({ defaultMode = 'SOS_REPORTS', isOpen, onClose }) =>
       locationCounts,
       hourCounts,
       issueCategories,
-      peakHour: peakHour !== null ? `${peakHour}:00 - ${parseInt(peakHour) + 1}:00` : 'Evening (20:00 - 23:00)',
+      peakHour: peakHour !== null ? `${peakHour}:00 - ${parseInt(peakHour) + 1}:00` : 'রাত ৮:০০ - ১১:০০ (20:00 - 23:00)',
       totalUsers: users.length
     };
   }, [alerts, users]);
@@ -237,6 +257,8 @@ const AdminAIAgentDrawer = ({ defaultMode = 'SOS_REPORTS', isOpen, onClose }) =>
     setQuery('');
     stopSpeaking();
 
+    const isBengali = /[\u0980-\u09FF]/.test(userPrompt) || language === 'bn';
+
     // 1. Append user message to history
     const userMsg = {
       role: 'user',
@@ -247,13 +269,17 @@ const AdminAIAgentDrawer = ({ defaultMode = 'SOS_REPORTS', isOpen, onClose }) =>
 
     // 2. Node: Intent Router
     setAgentState(AGENT_NODES.INTENT_ROUTING);
-    setActiveStepTrace(['Node: INTENT_ROUTER', 'Classifying user query intent...']);
+    setActiveStepTrace([
+      'Node: INTENT_ROUTER', 
+      isBengali ? 'ইনটেন্ট ও প্রশ্নের উদ্দেশ্য বিশ্লেষণ করা হচ্ছে...' : 'Classifying user query intent...'
+    ]);
 
     await new Promise(r => setTimeout(r, 400));
 
     const lower = userPrompt.toLowerCase();
     const isAnalyticsIntent = 
       lower.includes('how many') || lower.includes('koita') || lower.includes('koyta') || 
+      lower.includes('কয়টি') || lower.includes('কয়টি') || lower.includes('সংখ্যা') || lower.includes('হার') ||
       lower.includes('count') || lower.includes('rate') || lower.includes('percentage') || 
       lower.includes('statistic') || lower.includes('analytics') || lower.includes('peak') || 
       lower.includes('total') || lower.includes('trend') || lower.includes('users') ||
@@ -265,13 +291,13 @@ const AdminAIAgentDrawer = ({ defaultMode = 'SOS_REPORTS', isOpen, onClose }) =>
       setActiveStepTrace([
         'Node: TOOL_EXECUTION',
         'Invoking Tool: compute_analytics_metrics()',
-        `Scanning ${alerts.length} SOS logs & ${users.length} registered profiles...`
+        isBengali ? `${alerts.length}টি এসওএস লগ ও ${users.length}টি প্রোফাইল স্ক্যান করা হচ্ছে...` : `Scanning ${alerts.length} SOS logs...`
       ]);
     } else {
       setActiveStepTrace([
         'Node: TOOL_EXECUTION',
         'Invoking Tool: query_sos_incident_database()',
-        `Retrieved ${alerts.length} real distress records with GPS telemetry.`
+        isBengali ? `${alerts.length}টি লাইভ বিপদ সংকেত ডাটাবেজ থেকে রিট্রিভ করা হয়েছে।` : `Retrieved ${alerts.length} real distress records.`
       ]);
     }
 
@@ -279,74 +305,140 @@ const AdminAIAgentDrawer = ({ defaultMode = 'SOS_REPORTS', isOpen, onClose }) =>
 
     // 4. Node: LLM Reasoning & Synthesis
     setAgentState(AGENT_NODES.LLM_REASONING);
-    setActiveStepTrace(['Node: LLM_SYNTHESIS', 'Synthesizing response & formatting root cause insights...']);
+    setActiveStepTrace([
+      'Node: LLM_SYNTHESIS', 
+      isBengali ? 'ল্যাংগ্রাফ সিন্থেসিস ও ভয়েস রেসপন্স প্রস্তুত হচ্ছে...' : 'Synthesizing response & insights...'
+    ]);
 
     await new Promise(r => setTimeout(r, 600));
 
-    // Generate Contextual Structured Response
+    // Generate Contextual Structured Response (Bangla or English)
     let botResponse = '';
     const traceNotes = [];
 
-    if (lower.includes('summar') || lower.includes('overview') || lower.includes('all report')) {
+    // Check query types
+    const isSummaryQuery = lower.includes('summar') || lower.includes('overview') || lower.includes('all report') || lower.includes('সামারি') || lower.includes('সব') || lower.includes('বিবরণ');
+    const isIssueQuery = lower.includes('issue') || lower.includes('cause') || lower.includes('problem') || lower.includes('সমস্যা') || lower.includes('কারণ');
+    const isCountQuery = lower.includes('koita') || lower.includes('koyta') || lower.includes('কয়টি') || lower.includes('কয়টি') || lower.includes('count') || lower.includes('total') || lower.includes('rate') || lower.includes('হার');
+    const isLatestQuery = lower.includes('last') || lower.includes('recent') || lower.includes('latest') || lower.includes('সর্বশেষ') || lower.includes('লাস্ট');
+    const isPeakQuery = lower.includes('peak') || lower.includes('time') || lower.includes('hour') || lower.includes('সময়') || lower.includes('ঝুঁকি');
+
+    if (isSummaryQuery) {
       traceNotes.push('ACTION: COMPREHENSIVE_SOS_SUMMARY');
-      botResponse = `**📋 Executive SOS Incident Summary:**\n\n` +
-        `• **Total Distress Logs:** ${analyticsEngine.total} reported events.\n` +
-        `• **Current Active Alerts:** ${analyticsEngine.active} pending response.\n` +
-        `• **Resolved Incidents:** ${analyticsEngine.resolved} (${analyticsEngine.rate}% resolution efficacy).\n\n` +
-        `**🔍 Primary Root Issues Diagnosed:**\n` +
-        `• Stalking / Pursuit Incidents: **${analyticsEngine.issueCategories.Stalking}**\n` +
-        `• Harassment & Verbal Threats: **${analyticsEngine.issueCategories.Harassment}**\n` +
-        `• Physical Assault / Immediate Danger: **${analyticsEngine.issueCategories.PhysicalAssault}**\n` +
-        `• Medical Emergencies: **${analyticsEngine.issueCategories.MedicalEmergency}**\n\n` +
-        `**High-Frequency Hotspots:** ${Object.keys(analyticsEngine.locationCounts).slice(0, 3).join(', ') || 'Metropolitan Transit Corridors'}.`;
+      if (isBengali) {
+        botResponse = `**📋 জরুরি এসওএস ইনসিডেন্ট সারাংশ:**\n\n` +
+          `• **মোট রিপোর্ট সংখ্যা:** ${analyticsEngine.total} টি নথিভুক্ত ঘটনা।\n` +
+          `• **বর্তমানে সক্রিয় অ্যালার্ট:** ${analyticsEngine.active} টি পেন্ডিং।\n` +
+          `• **সফলভাবে সমাধানকৃত:** ${analyticsEngine.resolved} টি (সমাধানের হার **${analyticsEngine.rate}%**)।\n\n` +
+          `**🔍 শনাক্তকৃত প্রধান সমস্যা ও কারণসমূহ:**\n` +
+          `• পিছু নেওয়া বা স্টকিং: **${analyticsEngine.issueCategories.Stalking}** টি\n` +
+          `• রাস্তায় হয়রানি ও হুমকি: **${analyticsEngine.issueCategories.Harassment}** টি\n` +
+          `• প্রত্যক্ষ আক্রমণ ও শারীরিক আঘাত: **${analyticsEngine.issueCategories.PhysicalAssault}** টি\n` +
+          `• মেডিকেল ও জরুরি সহায়তা: **${analyticsEngine.issueCategories.MedicalEmergency}** টি\n\n` +
+          `**সর্বোচ্চ ঝুঁকির এলাকা:** ${Object.keys(analyticsEngine.locationCounts).slice(0, 3).join(', ') || 'প্রধান ট্রানজিট রুটসমূহ'}।`;
+      } else {
+        botResponse = `**📋 Executive SOS Incident Summary:**\n\n` +
+          `• **Total Distress Logs:** ${analyticsEngine.total} reported events.\n` +
+          `• **Current Active Alerts:** ${analyticsEngine.active} pending response.\n` +
+          `• **Resolved Incidents:** ${analyticsEngine.resolved} (${analyticsEngine.rate}% resolution efficacy).\n\n` +
+          `**🔍 Primary Root Issues Diagnosed:**\n` +
+          `• Stalking / Pursuit Incidents: **${analyticsEngine.issueCategories.Stalking}**\n` +
+          `• Harassment & Verbal Threats: **${analyticsEngine.issueCategories.Harassment}**\n` +
+          `• Physical Assault / Immediate Danger: **${analyticsEngine.issueCategories.PhysicalAssault}**\n` +
+          `• Medical Emergencies: **${analyticsEngine.issueCategories.MedicalEmergency}**\n\n` +
+          `**High-Frequency Hotspots:** ${Object.keys(analyticsEngine.locationCounts).slice(0, 3).join(', ') || 'Metropolitan Transit Corridors'}.`;
+      }
     } 
-    else if (lower.includes('issue') || lower.includes('cause') || lower.includes('problem') || lower.includes('ki ki issue')) {
+    else if (isIssueQuery) {
       traceNotes.push('ACTION: ISSUE_DIAGNOSIS');
-      botResponse = `**🔬 Root Cause & Incident Diagnostics:**\n\n` +
-        `Based on forensic telemetry and user distress dispatches, the top issues encountered are:\n\n` +
-        `1. **Stalking & Suspicious Tracking:** Users reported slow-moving vehicles or unidentified individuals tailing them in dimly lit streets.\n` +
-        `2. **Public Transit & Street Harassment:** Verbal intimidation and route cornering reported during late-night commutes.\n` +
-        `3. **Physical & Domestic Threats:** Immediate panic triggers requiring emergency contact broadcasting.\n\n` +
-        `**Key Mitigation Recommendation:** Deploy additional community safety beacons and prioritize rapid-response dispatches during ${analyticsEngine.peakHour}.`;
+      if (isBengali) {
+        botResponse = `**🔬 মূল সমস্যা ও ইনসিডেন্ট কারণ বিশ্লেষণ:**\n\n` +
+          `ব্যবহারকারীদের পাঠানো বার্তা ও ফরেনসিক ডেটা অনুযায়ী প্রধান ৩টি সমস্যা শনাক্ত হয়েছে:\n\n` +
+          `১. **স্টকিং বা পিছু নেওয়া:** রাতের নির্জন রাস্তায় সন্দেহভাজন ব্যক্তি বা গাড়ি ধীরগতিতে পিছু নেওয়ার ঘটনা।\n` +
+          `২. **রাস্তায় ও গণপরিবহনে হয়রানি:** রাতে চলাচলের সময় মৌখিক হুমকি ও পথরোধ।\n` +
+          `৩. **শারীরিক ও জরুরি আক্রমণ:** সরাসরি বিপদের মুহূর্তে জরুরি কন্টাক্টদের কাছে জিপিএস কো-অর্ডিনেট পাঠানো হয়েছে।\n\n` +
+          `**প্রস্তাবিত পদক্ষেপ:** বিশেষ করে **${analyticsEngine.peakHour}** সময়ে কমিউনিটি সতর্কতা ও পেট্রোলিং বাড়ানো প্রয়োজন।`;
+      } else {
+        botResponse = `**🔬 Root Cause & Incident Diagnostics:**\n\n` +
+          `Based on forensic telemetry and user distress dispatches, the top issues encountered are:\n\n` +
+          `1. **Stalking & Suspicious Tracking:** Users reported slow-moving vehicles or unidentified individuals tailing them in dimly lit streets.\n` +
+          `2. **Public Transit & Street Harassment:** Verbal intimidation and route cornering reported during late-night commutes.\n` +
+          `3. **Physical & Domestic Threats:** Immediate panic triggers requiring emergency contact broadcasting.\n\n` +
+          `**Key Mitigation Recommendation:** Prioritize rapid-response dispatches during ${analyticsEngine.peakHour}.`;
+      }
     }
-    else if (lower.includes('koita') || lower.includes('koyta') || lower.includes('incident') || lower.includes('count') || lower.includes('total') || lower.includes('rate')) {
+    else if (isCountQuery) {
       traceNotes.push('ACTION: QUANTITATIVE_ANALYTICS_QUERY');
-      botResponse = `**📊 Live Analytics Telemetry Metrics:**\n\n` +
-        `• **Total Recorded Incidents:** ${analyticsEngine.total}\n` +
-        `• **Active Distress Signals:** ${analyticsEngine.active}\n` +
-        `• **Successfully Resolved:** ${analyticsEngine.resolved}\n` +
-        `• **Resolution Success Rate:** **${analyticsEngine.rate}%**\n` +
-        `• **Total Registered Accounts Protected:** ${analyticsEngine.totalUsers}\n` +
-        `• **Peak Risk Interval:** ${analyticsEngine.peakHour}`;
+      if (isBengali) {
+        botResponse = `**📊 লাইভ অ্যানালিটিক্স ও সিস্টেম মেট্রিক্স:**\n\n` +
+          `• **মোট নথিভুক্ত ঘটনা:** ${analyticsEngine.total} টি\n` +
+          `• **বর্তমানে সক্রিয় অ্যালার্ট:** ${analyticsEngine.active} টি\n` +
+          `• **সফল সমাধান সংখ্যা:** ${analyticsEngine.resolved} টি\n` +
+          `• **সমাধানের হার (Resolution Rate):** **${analyticsEngine.rate}%**\n` +
+          `• **মোট সুরক্ষিত অ্যাকাউন্ট:** ${analyticsEngine.totalUsers} জন\n` +
+          `• **সর্বোচ্চ বিপদের সময়কাল:** ${analyticsEngine.peakHour}`;
+      } else {
+        botResponse = `**📊 Live Analytics Telemetry Metrics:**\n\n` +
+          `• **Total Recorded Incidents:** ${analyticsEngine.total}\n` +
+          `• **Active Distress Signals:** ${analyticsEngine.active}\n` +
+          `• **Successfully Resolved:** ${analyticsEngine.resolved}\n` +
+          `• **Resolution Success Rate:** **${analyticsEngine.rate}%**\n` +
+          `• **Total Registered Accounts Protected:** ${analyticsEngine.totalUsers}\n` +
+          `• **Peak Risk Interval:** ${analyticsEngine.peakHour}`;
+      }
     }
-    else if (lower.includes('last') || lower.includes('recent') || lower.includes('latest')) {
+    else if (isLatestQuery) {
       traceNotes.push('ACTION: LATEST_INCIDENT_INSPECTION');
       const latest = alerts[0];
       if (latest) {
-        botResponse = `**🚨 Most Recent Distress Report Details:**\n\n` +
-          `• **Report ID:** \`${latest.id}\`\n` +
-          `• **Reporter:** **${latest.userName || 'Anonymous User'}** (${latest.userPhone || 'Emergency Direct'})\n` +
-          `• **Reported Location:** ${latest.address || 'GPS Coordinates Registered'}\n` +
-          `• **Coordinates:** \`${latest.latitude || 22.3569}° N, ${latest.longitude || 91.7832}° E\`\n` +
-          `• **Incident Status:** **${latest.status}**\n` +
-          `• **Timestamp:** ${new Date(latest.timestamp || Date.now()).toLocaleString()}`;
+        if (isBengali) {
+          botResponse = `**🚨 সর্বশেষ রিপোর্টকৃত বিপদের বিবরণ:**\n\n` +
+            `• **রিপোর্ট আইডি:** \`${latest.id}\`\n` +
+            `• **রিপোর্টার:** **${latest.userName || 'নাম প্রকাশে অনিচ্ছুক'}** (${latest.userPhone || 'সরাসরি জরুরি কল'})\n` +
+            `• **লোকেশন:** ${latest.address || 'জিপিএস কো-অর্ডিনেট সংরক্ষিত'}\n` +
+            `• **কো-অর্ডিনেট:** \`${latest.latitude || 22.3569}° N, ${latest.longitude || 91.7832}° E\`\n` +
+            `• **বর্তমান অবস্থা:** **${latest.status === 'ACTIVE' ? 'সক্রিয় (Active)' : 'সমাধানকৃত (Resolved)'}**\n` +
+            `• **সময়কাল:** ${new Date(latest.timestamp || Date.now()).toLocaleString()}`;
+        } else {
+          botResponse = `**🚨 Most Recent Distress Report Details:**\n\n` +
+            `• **Report ID:** \`${latest.id}\`\n` +
+            `• **Reporter:** **${latest.userName || 'Anonymous User'}** (${latest.userPhone || 'Emergency Direct'})\n` +
+            `• **Reported Location:** ${latest.address || 'GPS Coordinates Registered'}\n` +
+            `• **Coordinates:** \`${latest.latitude || 22.3569}° N, ${latest.longitude || 91.7832}° E\`\n` +
+            `• **Incident Status:** **${latest.status}**\n` +
+            `• **Timestamp:** ${new Date(latest.timestamp || Date.now()).toLocaleString()}`;
+        }
       } else {
-        botResponse = "No recent incident logs found in the archive.";
+        botResponse = isBengali ? "আর্কাইভে কোনো রিপোর্ট পাওয়া যায়নি।" : "No recent incident logs found in the archive.";
       }
     }
-    else if (lower.includes('peak') || lower.includes('time') || lower.includes('hour')) {
+    else if (isPeakQuery) {
       traceNotes.push('ACTION: TEMPORAL_RISK_ANALYSIS');
-      botResponse = `**⏱️ Temporal Risk & Peak Hour Analysis:**\n\n` +
-        `• **Critical Incident Interval:** **${analyticsEngine.peakHour}** represents the highest frequency window for distress triggers.\n` +
-        `• **Contributing Factors:** Decreased street transit density, low commercial lighting, and late evening commutes.\n` +
-        `• **Administrative Action:** Recommend automated safety check-in push notifications to vulnerable commuters during this window.`;
+      if (isBengali) {
+        botResponse = `**⏱️ সর্বোচ্চ ঝুঁকির সময় বিশ্লেষণ:**\n\n` +
+          `• **সবচেয়ে ঝুঁকিপূর্ণ সময়:** **${analyticsEngine.peakHour}** সময়ে সর্বাধিক বিপদ সংকেত এসেছে।\n` +
+          `• **মূল কারণ:** রাতে মানুষের চলাচল ও খোলা দোকান কমে যাওয়া, পর্যাপ্ত আলোর অভাব।\n` +
+          `• **প্রস্তাবিত পদক্ষেপ:** এই সময়ে ট্রাভেলরত ব্যবহারকারীদের কাছে স্বয়ংক্রিয় সেফটি চেক-ইন অ্যালার্ট পাঠানো।`;
+      } else {
+        botResponse = `**⏱️ Temporal Risk & Peak Hour Analysis:**\n\n` +
+          `• **Critical Incident Interval:** **${analyticsEngine.peakHour}** represents the highest frequency window for distress triggers.\n` +
+          `• **Contributing Factors:** Decreased street transit density and low lighting.\n` +
+          `• **Administrative Action:** Recommend automated safety check-in push notifications to vulnerable commuters during this window.`;
+      }
     }
     else {
       traceNotes.push('ACTION: GENERAL_QNA_SYNTHESIS');
-      botResponse = `**💡 SafeHaven Agent Analysis:**\n\n` +
-        `Regarding "${userPrompt}":\n` +
-        `The SafeHaven system currently monitors **${analyticsEngine.total} total incident logs** across **${analyticsEngine.totalUsers} registered users**. All distress signals are archived with cryptographic timestamps and GPS coordinates.\n\n` +
-        `You can ask me to: **summarize all reports**, **break down root causes**, **show peak danger hours**, or **inspect the latest incident**.`;
+      if (isBengali) {
+        botResponse = `**💡 সেফহ্যাভেন এআই বিশ্লেষণ:**\n\n` +
+          `আপনার প্রশ্ন "${userPrompt}" সম্পর্কে:\n` +
+          `সেফহ্যাভেন সিস্টেমে বর্তমানে **${analyticsEngine.total}টি রিপোর্ট** এবং **${analyticsEngine.totalUsers} জন নিবন্ধিত ব্যবহারকারী** সুরক্ষিত রয়েছেন।\n\n` +
+          `আপনি আমাকে বলতে পারেন: **সব রিপোর্ট সামারি করো**, **কী কী সমস্যা হয়েছিল**, **কয়টি ইনসিডেন্ট হয়েছে** অথবা **সর্বশেষ ঘটনার বিবরণ দাও**।`;
+      } else {
+        botResponse = `**💡 SafeHaven Agent Analysis:**\n\n` +
+          `Regarding "${userPrompt}":\n` +
+          `The SafeHaven system currently monitors **${analyticsEngine.total} total incident logs** across **${analyticsEngine.totalUsers} registered users**.\n\n` +
+          `You can ask me to: **summarize all reports**, **break down root causes**, **show peak danger hours**, or **inspect the latest incident**.`;
+      }
     }
 
     setAgentState(AGENT_NODES.RESPONSE_READY);
@@ -363,21 +455,35 @@ const AdminAIAgentDrawer = ({ defaultMode = 'SOS_REPORTS', isOpen, onClose }) =>
     setAgentState(AGENT_NODES.IDLE);
     setActiveStepTrace([]);
 
-    // 6. Speak out fresh voice response
+    // 6. Speak out fresh voice response (Bangla or English based on text)
     speakText(botResponse);
   };
 
-  const quickPrompts = mode === 'SOS_REPORTS' ? [
-    'Summarize all SOS incident reports',
-    'What were the main issues and root causes?',
-    'Show details of the most recent distress call',
-    'Which locations have the highest emergency alerts?'
-  ] : [
-    'How many incidents occurred in total?',
-    'What is the incident resolution rate?',
-    'What are the peak danger hours of the day?',
-    'Give me a complete analytics summary'
-  ];
+  const quickPrompts = language === 'bn' ? (
+    mode === 'SOS_REPORTS' ? [
+      'সবগুলো এসওএস রিপোর্টের সামারি বলো',
+      'কী কী সমস্যা এবং কারণ ছিল?',
+      'সর্বশেষ ইনসিডেন্টের বিস্তারিত দেখাও',
+      'কোন এলাকায় সবচেয়ে বেশি এলার্ট এসেছে?'
+    ] : [
+      'মোট কয়টি ইনসিডেন্ট হয়েছে?',
+      'ইনসিডেন্ট সমাধানের হার কত শতাংশ?',
+      'দিনের কোন সময়ে সবচেয়ে বেশি বিপদ ঘটে?',
+      'সম্পূর্ণ অ্যানালিটিক্স রিপোর্ট দেখাও'
+    ]
+  ) : (
+    mode === 'SOS_REPORTS' ? [
+      'Summarize all SOS incident reports',
+      'What were the main issues and root causes?',
+      'Show details of the most recent distress call',
+      'Which locations have the highest emergency alerts?'
+    ] : [
+      'How many incidents occurred in total?',
+      'What is the incident resolution rate?',
+      'What are the peak danger hours of the day?',
+      'Give me a complete analytics summary'
+    ]
+  );
 
   if (!isOpen) return null;
 
@@ -397,12 +503,29 @@ const AdminAIAgentDrawer = ({ defaultMode = 'SOS_REPORTS', isOpen, onClose }) =>
               </span>
             </div>
             <p className="text-[11px] text-zinc-400">
-              {mode === 'SOS_REPORTS' ? 'SOS Reports Diagnostics & Q&A' : 'Conversational Analytics Intelligence'}
+              {mode === 'SOS_REPORTS' 
+                ? (language === 'bn' ? 'এসওএস রিপোর্ট ডায়াগনস্টিকস ও প্রশ্নোত্তর' : 'SOS Reports Diagnostics & Q&A')
+                : (language === 'bn' ? 'ভয়েস ও রিয়েল-টাইম অ্যানালিটিক্স ইন্টেলিজেন্স' : 'Conversational Analytics Intelligence')}
             </p>
           </div>
         </div>
 
         <div className="flex items-center gap-2">
+          {/* Bilingual Toggle Button (বাংলা / English) */}
+          <button
+            onClick={() => {
+              stopSpeaking();
+              const newLang = language === 'bn' ? 'en' : 'bn';
+              setLanguage(newLang);
+              toast.success(newLang === 'bn' ? 'বাংলা ভয়েস ও টেক্সট মোড চালু হয়েছে 🇧🇩' : 'Switched to English Voice & Text 🇬🇧');
+            }}
+            className="px-2.5 py-1.5 rounded-lg text-xs font-mono font-bold border transition bg-zinc-800/90 hover:bg-zinc-700 border-zinc-700 text-zinc-200 flex items-center gap-1.5"
+            title="Toggle Voice & Text Language (বাংলা / English)"
+          >
+            <FiGlobe className="text-rose-400" />
+            <span>{language === 'bn' ? 'বাংলা' : 'EN'}</span>
+          </button>
+
           {/* Fresh Voice Toggle */}
           <button
             onClick={() => {
@@ -438,7 +561,7 @@ const AdminAIAgentDrawer = ({ defaultMode = 'SOS_REPORTS', isOpen, onClose }) =>
               : 'border-transparent text-zinc-400 hover:text-zinc-200'
           }`}
         >
-          <FiFileText /> SOS Reports Copilot
+          <FiFileText /> {language === 'bn' ? 'এসওএস রিপোর্ট কোপাইলট' : 'SOS Reports Copilot'}
         </button>
         <button
           onClick={() => setMode('ANALYTICS')}
@@ -448,7 +571,7 @@ const AdminAIAgentDrawer = ({ defaultMode = 'SOS_REPORTS', isOpen, onClose }) =>
               : 'border-transparent text-zinc-400 hover:text-zinc-200'
           }`}
         >
-          <FiPieChart /> Analytics Q&A Agent
+          <FiPieChart /> {language === 'bn' ? 'অ্যানালিটিক্স কিউএনএ এজেন্ট' : 'Analytics Q&A Agent'}
         </button>
       </div>
 
@@ -504,7 +627,7 @@ const AdminAIAgentDrawer = ({ defaultMode = 'SOS_REPORTS', isOpen, onClose }) =>
         {agentState !== AGENT_NODES.IDLE && (
           <div className="flex items-center gap-2 text-zinc-500 text-xs italic p-2 font-mono">
             <FiRefreshCw className="animate-spin text-rose-500" />
-            <span>Agent executing LangGraph workflow...</span>
+            <span>{language === 'bn' ? 'এজেন্ট ল্যাংগ্রাফ ওয়ার্কফ্লো এক্সিকিউট করছে...' : 'Agent executing LangGraph workflow...'}</span>
           </div>
         )}
 
@@ -514,7 +637,7 @@ const AdminAIAgentDrawer = ({ defaultMode = 'SOS_REPORTS', isOpen, onClose }) =>
       {/* Quick Demonstration Prompts */}
       <div className="p-2.5 bg-slate-950/60 border-t border-zinc-800/60 overflow-x-auto">
         <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider block mb-1.5 px-1">
-          Quick Q&A Prompts:
+          {language === 'bn' ? 'কুইক প্রশ্নাবলি (Quick Prompts):' : 'Quick Q&A Prompts:'}
         </span>
         <div className="flex gap-1.5 overflow-x-auto pb-1">
           {quickPrompts.map((p, idx) => (
@@ -547,7 +670,7 @@ const AdminAIAgentDrawer = ({ defaultMode = 'SOS_REPORTS', isOpen, onClose }) =>
                 ? 'bg-rose-600 text-white animate-bounce shadow-lg shadow-rose-600/50'
                 : 'bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-700'
             }`}
-            title="Speak query (Voice-to-Text)"
+            title={language === 'bn' ? 'মুখে বাংলায় প্রশ্ন বলুন (ভয়েস-টু-টেক্সট)' : 'Speak query in English (Voice-to-Text)'}
           >
             {isListening ? <FiMicOff /> : <FiMic />}
           </button>
@@ -558,10 +681,10 @@ const AdminAIAgentDrawer = ({ defaultMode = 'SOS_REPORTS', isOpen, onClose }) =>
             onChange={(e) => setQuery(e.target.value)}
             placeholder={
               isListening 
-                ? 'Listening to your voice...' 
+                ? (language === 'bn' ? 'শুনছি... আপনার প্রশ্নটি মুখে বলুন' : 'Listening to your voice...') 
                 : mode === 'SOS_REPORTS' 
-                  ? 'Ask about incidents, issues, or summarize reports...' 
-                  : 'Ask about incident counts, resolution rates, peak times...'
+                  ? (language === 'bn' ? 'ইনসিডেন্ট, সমস্যা বা সামারি সম্পর্কে বাংলায় জিজ্ঞাসা করুন...' : 'Ask about incidents, issues, or summarize reports...') 
+                  : (language === 'bn' ? 'মোট ইনসিডেন্ট, সমাধানের হার বা সময় সম্পর্কে বাংলায় জিজ্ঞাসা করুন...' : 'Ask about incident counts, resolution rates, peak times...')
             }
             className="flex-1 bg-zinc-950/80 border border-zinc-800 focus:border-rose-500 rounded-xl px-4 py-2.5 text-xs text-white placeholder-zinc-500 focus:outline-none transition"
           />
@@ -578,13 +701,14 @@ const AdminAIAgentDrawer = ({ defaultMode = 'SOS_REPORTS', isOpen, onClose }) =>
         {isSpeaking && (
           <div className="mt-2 flex items-center justify-between text-[11px] text-rose-400 bg-rose-500/10 px-3 py-1.5 rounded-lg border border-rose-500/20">
             <span className="flex items-center gap-1.5 font-mono">
-              <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-ping"></span> Speaking via Natural Voice Engine...
+              <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-ping"></span> 
+              {language === 'bn' ? 'ন্যাচারাল বাংলা ভয়েসে উত্তর শোনাচ্ছে...' : 'Speaking via Natural Voice Engine...'}
             </span>
             <button
               onClick={stopSpeaking}
               className="text-[10px] uppercase font-bold text-zinc-400 hover:text-white"
             >
-              Stop Audio
+              {language === 'bn' ? 'অডিও থামান' : 'Stop Audio'}
             </button>
           </div>
         )}
