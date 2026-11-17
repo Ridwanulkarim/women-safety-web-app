@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { FiPieChart, FiActivity, FiShield, FiCheckCircle } from 'react-icons/fi';
+import { FiPieChart, FiActivity, FiShield, FiCheckCircle, FiCpu } from 'react-icons/fi';
 import { UserGrowthChart, SeverityPieChart, SOSChart } from '../../components/charts/DashboardCharts';
 import { getGlobalSOSAlerts, getRegisteredUsers } from '../../utils/adminDataRegistry';
+import AdminAIAgentDrawer from '../../components/admin/AdminAIAgentDrawer';
 
 const AdminAnalytics = () => {
   const [alerts, setAlerts] = useState(() => getGlobalSOSAlerts());
   const [users, setUsers] = useState(() => getRegisteredUsers());
+  const [isAIAgentOpen, setIsAIAgentOpen] = useState(false);
 
   useEffect(() => {
     const handleUpdate = () => {
@@ -42,19 +44,35 @@ const AdminAnalytics = () => {
 
   return (
     <div className="space-y-8 font-sans">
-      <div>
-        <div className="flex items-center gap-2">
-          <span className="mono-tag mono-tag-rose text-[10px]">
-            <span className="w-1.5 h-1.5 rounded-full bg-rose-500 telemetry-dot"></span> PLATFORM METRICS
-          </span>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+          <div className="flex items-center gap-2">
+            <span className="mono-tag mono-tag-rose text-[10px]">
+              <span className="w-1.5 h-1.5 rounded-full bg-rose-500 telemetry-dot"></span> PLATFORM METRICS
+            </span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-extrabold font-heading text-white tracking-tight">
+            Emergency System <span className="gradient-text-rose">Analytics</span>
+          </h1>
+          <p className="text-xs text-zinc-400">
+            Statistical telemetry distribution of emergency distress alerts, resolution efficacy, and user growth.
+          </p>
         </div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold font-heading text-white tracking-tight">
-          Emergency System <span className="gradient-text-rose">Analytics</span>
-        </h1>
-        <p className="text-xs text-zinc-400">
-          Statistical telemetry distribution of emergency distress alerts, resolution efficacy, and user growth.
-        </p>
+
+        <button
+          onClick={() => setIsAIAgentOpen(true)}
+          className="px-5 py-3 rounded-2xl font-bold text-xs uppercase tracking-wider flex items-center gap-2 font-mono transition shadow-lg bg-gradient-to-r from-indigo-600 via-purple-600 to-rose-600 hover:from-indigo-500 hover:to-rose-500 text-white shadow-indigo-600/30"
+        >
+          <FiCpu className="text-base" /> AI Analytics Agent (Voice & Q&A)
+        </button>
       </div>
+
+      {/* LangGraph-Style Analytics AI Copilot Drawer */}
+      <AdminAIAgentDrawer
+        defaultMode="ANALYTICS"
+        isOpen={isAIAgentOpen}
+        onClose={() => setIsAIAgentOpen(false)}
+      />
 
       {/* KPI Overview */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">

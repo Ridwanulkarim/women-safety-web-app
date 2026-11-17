@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { FiFileText, FiDownload, FiMapPin, FiCheckCircle, FiClock, FiAlertTriangle } from 'react-icons/fi';
+import { FiFileText, FiDownload, FiMapPin, FiCheckCircle, FiClock, FiAlertTriangle, FiCpu } from 'react-icons/fi';
 import { formatDate } from '../../utils/helpers';
 import toast from 'react-hot-toast';
 import { getGlobalSOSAlerts } from '../../utils/adminDataRegistry';
+import AdminAIAgentDrawer from '../../components/admin/AdminAIAgentDrawer';
 
 const AdminSOSReports = () => {
   const [reports, setReports] = useState(() => getGlobalSOSAlerts());
+  const [isAIAgentOpen, setIsAIAgentOpen] = useState(false);
 
   useEffect(() => {
     const handleUpdate = () => {
@@ -69,18 +71,34 @@ const AdminSOSReports = () => {
           </p>
         </div>
 
-        <button
-          onClick={handleExportCSV}
-          disabled={reports.length === 0}
-          className={`px-5 py-3 rounded-2xl font-bold text-xs uppercase tracking-wider flex items-center gap-2 font-mono transition shadow-lg ${
-            reports.length === 0
-              ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed border border-zinc-700/50'
-              : 'bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-500 hover:to-rose-600 text-white shadow-rose-600/30'
-          }`}
-        >
-          <FiDownload /> Export Reports (CSV)
-        </button>
+        <div className="flex items-center gap-3 w-full sm:w-auto">
+          <button
+            onClick={() => setIsAIAgentOpen(true)}
+            className="flex-1 sm:flex-initial px-5 py-3 rounded-2xl font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 font-mono transition shadow-lg bg-gradient-to-r from-indigo-600 via-purple-600 to-rose-600 hover:from-indigo-500 hover:to-rose-500 text-white shadow-indigo-600/30"
+          >
+            <FiCpu className="text-base" /> AI Incident Copilot
+          </button>
+
+          <button
+            onClick={handleExportCSV}
+            disabled={reports.length === 0}
+            className={`flex-1 sm:flex-initial px-5 py-3 rounded-2xl font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 font-mono transition shadow-lg ${
+              reports.length === 0
+                ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed border border-zinc-700/50'
+                : 'bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-zinc-200'
+            }`}
+          >
+            <FiDownload /> Export CSV
+          </button>
+        </div>
       </div>
+
+      {/* LangGraph-Style AI Copilot Drawer */}
+      <AdminAIAgentDrawer
+        defaultMode="SOS_REPORTS"
+        isOpen={isAIAgentOpen}
+        onClose={() => setIsAIAgentOpen(false)}
+      />
 
       <div className="glass-card rounded-3xl overflow-hidden border border-zinc-800/80 shadow-2xl">
         <div className="p-4 sm:p-5 border-b border-zinc-800/80 flex items-center justify-between bg-zinc-900/40">
