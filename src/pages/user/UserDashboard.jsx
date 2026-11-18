@@ -9,6 +9,7 @@ import ContactCard from '../../components/contacts/ContactCard';
 import FakeCallModal from '../../components/safety/FakeCallModal';
 import SirenAlarmButton from '../../components/safety/SirenAlarmButton';
 import MedicalIDModal from '../../components/safety/MedicalIDModal';
+import VoiceSOSGuardianWidget from '../../components/safety/VoiceSOSGuardianWidget';
 
 const UserDashboard = () => {
   const { user } = useAuth();
@@ -60,6 +61,9 @@ const UserDashboard = () => {
           </button>
         </div>
       </div>
+
+      {/* AI Voice-Activated Hands-Free SOS Guardian */}
+      <VoiceSOSGuardianWidget />
 
       {/* Main Grid: SOS Button & Quick Contacts */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

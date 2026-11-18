@@ -10,6 +10,9 @@ import { useSOS } from '../context/SOSContext';
 import ThemeToggle from '../components/common/ThemeToggle';
 import LanguageToggle from '../components/common/LanguageToggle';
 import SOSModal from '../components/sos/SOSModal';
+import VoiceSOSAlarmModal from '../components/safety/VoiceSOSAlarmModal';
+import { useVoiceSOS } from '../context/VoiceSOSContext';
+import { FiMic } from 'react-icons/fi';
 import ScrollToTop from '../components/common/ScrollToTop';
 import MobileBottomBar from '../components/common/MobileBottomBar';
 
@@ -17,6 +20,7 @@ const DashboardLayout = () => {
   const { user, logoutUser, isAdmin } = useAuth();
   const { unreadCount } = useNotifications();
   const { openSOSModal } = useSOS();
+  const { isGuardianActive } = useVoiceSOS();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const location = useLocation();
@@ -154,6 +158,12 @@ const DashboardLayout = () => {
             <h1 className="text-xs sm:text-sm font-bold font-heading text-zinc-900 dark:text-white truncate max-w-[130px] sm:max-w-none">
               User Control Panel
             </h1>
+            {isGuardianActive && (
+              <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-[10px] font-mono font-bold animate-pulse">
+                <FiMic className="animate-bounce text-xs" />
+                <span>Voice Guardian: LISTENING ("বাঁচাও" / "Help")</span>
+              </div>
+            )}
           </div>
 
           <div className="flex items-center gap-1.5 sm:gap-2">
@@ -238,6 +248,7 @@ const DashboardLayout = () => {
       </div>
 
       <SOSModal />
+      <VoiceSOSAlarmModal />
       <MobileBottomBar />
     </div>
   );
