@@ -154,31 +154,67 @@ const Home = () => {
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5">
-            {EMERGENCY_NUMBERS.map((num) => (
-              <a
-                key={num.id}
-                href={`tel:${num.number}`}
-                className="p-4 rounded-2xl bg-zinc-50/90 dark:bg-zinc-900/60 hover:bg-rose-500/10 border border-zinc-200/80 dark:border-zinc-800/80 transition-all duration-200 group text-center space-y-1.5 hover-lift"
-              >
-                <span className="block text-[10px] uppercase font-mono text-zinc-400 font-bold">{num.category}</span>
-                <h4 className="font-semibold text-xs text-zinc-800 dark:text-zinc-200 truncate">{num.name}</h4>
-                <span className="block text-base font-extrabold text-rose-600 dark:text-rose-400 font-mono">
-                  {num.number}
-                </span>
-              </a>
-            ))}
+            {EMERGENCY_NUMBERS.map((num) => {
+              const categoryMap = {
+                'National Hotline': isBn ? 'জাতীয় হটলাইন' : 'National Hotline',
+                'Law Enforcement': isBn ? 'আইন শৃঙ্খলা' : 'Law Enforcement',
+                'Specialized Hotline': isBn ? 'বিশেষ হটলাইন' : 'Specialized Hotline',
+                'Child Protection': isBn ? 'শিশু সুরক্ষা' : 'Child Protection',
+                'Medical Advice': isBn ? 'স্বাস্থ্য পরামর্শ' : 'Medical Advice'
+              };
+              const nameMap = {
+                'National Emergency Service': isBn ? 'জাতীয় জরুরি সেবা' : 'National Emergency Service',
+                'Police Emergency Helpline': isBn ? 'পুলিশ জরুরি হেল্পলাইন' : 'Police Emergency Helpline',
+                'National Women Helpline': isBn ? 'জাতীয় নারী হেল্পলাইন' : 'National Women Helpline',
+                'Child Helpline Bangladesh': isBn ? 'চাইল্ড হেল্পলাইন' : 'Child Helpline Bangladesh',
+                'Shasthyo Batayon': isBn ? 'স্বাস্থ্য বাতায়ন' : 'Shasthyo Batayon'
+              };
+              const numberMap = {
+                '999': isBn ? '৯৯৯' : '999',
+                '109': isBn ? '১০৯' : '109',
+                '1098': isBn ? '১০৯৮' : '1098',
+                '16263': isBn ? '১৬২৬৩' : '16263'
+              };
+
+              return (
+                <a
+                  key={num.id}
+                  href={`tel:${num.number}`}
+                  className="p-4 rounded-2xl bg-zinc-50/90 dark:bg-zinc-900/60 hover:bg-rose-500/10 border border-zinc-200/80 dark:border-zinc-800/80 transition-all duration-200 group text-center space-y-1.5 hover-lift"
+                >
+                  <span className="block text-[10px] uppercase font-mono text-zinc-400 font-bold">
+                    {categoryMap[num.category] || num.category}
+                  </span>
+                  <h4 className="font-semibold text-xs text-zinc-800 dark:text-zinc-200 truncate">
+                    {nameMap[num.name] || num.name}
+                  </h4>
+                  <span className="block text-base font-extrabold text-rose-600 dark:text-rose-400 font-mono">
+                    {numberMap[num.number] || num.number}
+                  </span>
+                </a>
+              );
+            })}
           </div>
         </div>
       </section>
 
       {/* Geolocation Telemetry Radar Bento Card */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4 relative z-10">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2.5">
             <div className="w-7 h-7 rounded-lg bg-emerald-500/10 text-emerald-500 flex items-center justify-center font-bold">
               <FiRadio />
             </div>
             <h2 className="text-lg font-extrabold text-zinc-900 dark:text-white font-heading">{t('home.monitoringRadar')}</h2>
+            {location.isApproximate ? (
+              <span className="mono-tag mono-tag-amber text-[10px] py-0.5">
+                {isBn ? '⚠️ আনুমানিক নেটওয়ার্ক পয়েন্ট' : '⚠️ Approximate Network IP'}
+              </span>
+            ) : (
+              <span className="mono-tag mono-tag-emerald text-[10px] py-0.5">
+                {isBn ? '🛰️ লাইভ জিপিএস লক' : '🛰️ Live GPS Locked'}
+              </span>
+            )}
           </div>
           <span className="mono-tag mono-tag-zinc hidden sm:inline-flex">
             {isBn ? 'লিফলেট / ওপেনস্ট্রিটম্যাপ ডুয়াল ইঞ্জিন' : 'Leaflet / OpenStreetMap Dual Engine'}
@@ -190,10 +226,14 @@ const Home = () => {
             latitude={location.latitude}
             longitude={location.longitude}
             accuracy={location.accuracy}
+            source={location.source}
+            isApproximate={location.isApproximate}
+            permissionDenied={location.permissionDenied}
             title={isBn ? 'সেফহ্যাভেন লাইভ লোকেশন রাডার' : 'SafeHaven Geolocation Radar'}
             onLocationChange={(lat, lng, acc, addr) => {
               location.setManualLocation(lat, lng, addr);
             }}
+            onRefreshGPS={location.refreshLocation}
           />
         </div>
       </section>

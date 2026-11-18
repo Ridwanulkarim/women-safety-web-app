@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { FiMic, FiSquare, FiPlay, FiPause, FiDownload, FiTrash2, FiRadio, FiFileText } from 'react-icons/fi';
 import LegalEvidenceExporterModal from './LegalEvidenceExporterModal';
+import { useLanguage } from '../../context/LanguageContext';
 import toast from 'react-hot-toast';
 
 const AudioEvidenceRecorder = ({ autoStart = false }) => {
@@ -8,6 +9,9 @@ const AudioEvidenceRecorder = ({ autoStart = false }) => {
   const [recordingTime, setRecordingTime] = useState(0);
   const [selectedExportItem, setSelectedExportItem] = useState(null);
   const [exporterOpen, setExporterOpen] = useState(false);
+  const { language } = useLanguage();
+  const isBn = language === 'bn';
+
   const [recordings, setRecordings] = useState(() => {
     try {
       const saved = localStorage.getItem('safehaven_audio_evidence');
@@ -54,7 +58,7 @@ const AudioEvidenceRecorder = ({ autoStart = false }) => {
           const updated = [newRecording, ...recordings];
           setRecordings(updated);
           localStorage.setItem('safehaven_audio_evidence', JSON.stringify(updated));
-          toast.success('🎙️ Emergency Voice Recording Saved to Evidence Vault!');
+          toast.success(isBn ? '🎙️ জরুরি ভয়েস রেকর্ডিং ভল্টে সংরক্ষিত হয়েছে!' : '🎙️ Emergency Voice Recording Saved to Evidence Vault!');
         };
 
         stream.getTracks().forEach((t) => t.stop());
@@ -63,15 +67,14 @@ const AudioEvidenceRecorder = ({ autoStart = false }) => {
       mediaRecorderRef.current.start();
       setIsRecording(true);
       setRecordingTime(0);
+      toast.error(isBn ? '🎙️ জরুরি অডিও রেকর্ডিং শুরু হয়েছে!' : '🎙️ Emergency Audio Recording Started!');
 
       timerRef.current = setInterval(() => {
         setRecordingTime((prev) => prev + 1);
       }, 1000);
-
-      toast.error('🎙️ Emergency Audio Recording Active!');
     } catch (err) {
-      console.warn('Audio Recording Access Denied:', err.message);
-      toast.error('Microphone permission required for voice recording');
+      console.warn('Microphone error:', err.message);
+      toast.error(isBn ? 'মাইক্রোফোন পারমিশন প্রয়োজন' : 'Microphone permission denied');
     }
   };
 
@@ -87,7 +90,7 @@ const AudioEvidenceRecorder = ({ autoStart = false }) => {
     const updated = recordings.filter((r) => r.id !== id);
     setRecordings(updated);
     localStorage.setItem('safehaven_audio_evidence', JSON.stringify(updated));
-    toast.success('Audio evidence removed');
+    toast.success(isBn ? 'অডিও প্রমাণ মুছে ফেলা হয়েছে' : 'Audio evidence removed');
   };
 
   const handleOpenExporter = (rec) => {
@@ -102,23 +105,25 @@ const AudioEvidenceRecorder = ({ autoStart = false }) => {
   };
 
   return (
-    <div className="product-card p-6 space-y-6">
+    <div className="product-card p-6 space-y-6 font-sans">
       <div className="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 pb-3">
         <div className="flex items-center gap-2">
           <FiMic className="text-rose-600 dark:text-rose-400 text-lg" />
           <div>
             <h3 className="text-sm font-bold uppercase tracking-wider text-zinc-900 dark:text-white font-heading">
-              Emergency Voice Recorder
+              {isBn ? 'জরুরি ভয়েস রেকর্ডার' : 'Emergency Voice Recorder'}
             </h3>
-            <p className="text-xs text-zinc-500">Captures background audio telemetry for legal evidence</p>
+            <p className="text-xs text-zinc-500">
+              {isBn ? 'আইনি প্রমাণের জন্য ব্যাকগ্রাউন্ড অডিও রেকর্ড করে' : 'Captures background audio telemetry for legal evidence'}
+            </p>
           </div>
         </div>
         {isRecording ? (
           <span className="mono-tag mono-tag-rose animate-pulse">
-            <span className="w-2 h-2 rounded-full bg-rose-600 telemetry-dot"></span> RECORDING ({formatTime(recordingTime)})
+            <span className="w-2 h-2 rounded-full bg-rose-600 telemetry-dot"></span> {isBn ? `রেকর্ডিং চলছে (${formatTime(recordingTime)})` : `RECORDING (${formatTime(recordingTime)})`}
           </span>
         ) : (
-          <span className="mono-tag mono-tag-emerald">Ready</span>
+          <span className="mono-tag mono-tag-emerald">{isBn ? 'প্রস্তুত' : 'Ready'}</span>
         )}
       </div>
 
@@ -129,14 +134,14 @@ const AudioEvidenceRecorder = ({ autoStart = false }) => {
             onClick={stopRecording}
             className="w-full btn-danger py-3 text-xs font-mono font-bold uppercase tracking-wider flex items-center justify-center gap-2 animate-pulse"
           >
-            <FiSquare /> STOP RECORDING ({formatTime(recordingTime)})
+            <FiSquare /> {isBn ? `রেকর্ড বন্ধ করুন (${formatTime(recordingTime)})` : `STOP RECORDING (${formatTime(recordingTime)})`}
           </button>
         ) : (
           <button
             onClick={startRecording}
             className="w-full btn-solid py-3 text-xs font-mono font-bold uppercase tracking-wider flex items-center justify-center gap-2"
           >
-            <FiMic /> START EMERGENCY RECORDING
+            <FiMic /> {isBn ? 'জরুরি অডিও রেকর্ড শুরু করুন' : 'START EMERGENCY RECORDING'}
           </button>
         )}
       </div>
@@ -144,11 +149,13 @@ const AudioEvidenceRecorder = ({ autoStart = false }) => {
       {/* Audio Evidence Locker List */}
       <div className="space-y-3 pt-2">
         <h4 className="text-xs font-mono font-bold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">
-          Saved Audio Vault ({recordings.length})
+          {isBn ? `সংরক্ষিত অডিও ভল্ট (${recordings.length})` : `Saved Audio Vault (${recordings.length})`}
         </h4>
 
         {recordings.length === 0 ? (
-          <p className="text-xs text-zinc-400 italic py-2">No audio evidence captured yet.</p>
+          <p className="text-xs text-zinc-400 italic py-2">
+            {isBn ? 'কোনো অডিও প্রমাণ এখনো ধারণ করা হয়নি।' : 'No audio evidence captured yet.'}
+          </p>
         ) : (
           <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
             {recordings.map((rec) => (
@@ -164,22 +171,22 @@ const AudioEvidenceRecorder = ({ autoStart = false }) => {
                   <button
                     onClick={() => handleOpenExporter(rec)}
                     className="p-2 rounded-lg bg-rose-500/10 text-rose-600 dark:text-rose-400 hover:bg-rose-500/20 transition flex items-center gap-1 font-mono text-[10px] font-bold"
-                    title="Export Chain-of-Custody PDF Docket"
+                    title={isBn ? 'আইনি প্রমাণপত্র ডাউনলোড' : 'Export Chain-of-Custody PDF Docket'}
                   >
-                    <FiFileText /> Legal PDF
+                    <FiFileText /> {isBn ? 'আইনি PDF' : 'Legal PDF'}
                   </button>
                   <a
                     href={rec.dataUrl}
                     download={`Evidence_Audio_${rec.id}.webm`}
                     className="p-2 rounded-lg bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200 hover:text-rose-600 transition"
-                    title="Download Evidence"
+                    title={isBn ? 'ডাউনলোড' : 'Download Evidence'}
                   >
                     <FiDownload />
                   </a>
                   <button
                     onClick={() => deleteRecording(rec.id)}
                     className="p-2 rounded-lg bg-rose-500/10 text-rose-600 hover:bg-rose-500/20 transition"
-                    title="Delete Evidence"
+                    title={isBn ? 'মুছুন' : 'Delete Evidence'}
                   >
                     <FiTrash2 />
                   </button>

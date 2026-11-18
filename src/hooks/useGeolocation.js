@@ -1,20 +1,35 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
-// Default fallback coordinates (Dhaka center or previously stored user coordinates)
+// Helper to detect generic Dhaka IP coordinates (Kalachandpur / Baridhara center)
+const isGenericDhaka = (lat, lng) => {
+  return Math.abs(lat - 23.8103) < 0.005 && Math.abs(lng - 90.4125) < 0.005;
+};
+
+// Clear cached location from localStorage
+export const clearLocationCache = () => {
+  try {
+    localStorage.removeItem('safehaven_user_last_location');
+  } catch (e) {}
+};
+
+// Default fallback coordinates
 const getInitialLocation = () => {
   try {
     const saved = localStorage.getItem('safehaven_user_last_location');
     if (saved) {
       const parsed = JSON.parse(saved);
-      if (parsed && parsed.latitude && parsed.longitude) {
+      // Only restore if user manually pinned or had real GPS (not generic IP fallback)
+      if (parsed && parsed.latitude && parsed.longitude && (!isGenericDhaka(parsed.latitude, parsed.longitude) || parsed.source === 'MANUAL')) {
         return {
           latitude: parsed.latitude,
           longitude: parsed.longitude,
           accuracy: parsed.accuracy || 20,
-          address: parsed.address || `Lat: ${parsed.latitude.toFixed(4)}°, Lng: ${parsed.longitude.toFixed(4)}° (Saved)`,
+          address: parsed.address || `Lat: ${parsed.latitude.toFixed(4)}°, Lng: ${parsed.longitude.toFixed(4)}°`,
           loading: false,
           error: null,
-          source: 'SAVED'
+          source: parsed.source || 'SAVED',
+          isApproximate: parsed.accuracy > 500,
+          permissionDenied: false
         };
       }
     }
@@ -25,15 +40,18 @@ const getInitialLocation = () => {
     latitude: 23.8103,
     longitude: 90.4125,
     accuracy: null,
-    address: 'Detecting live location...',
+    address: 'লাইভ অবস্থান নির্ণয় করা হচ্ছে...',
     loading: true,
     error: null,
-    source: 'INITIAL'
+    source: 'INITIAL',
+    isApproximate: true,
+    permissionDenied: false
   };
 };
 
 export const useGeolocation = (enableWatch = false) => {
   const [location, setLocation] = useState(getInitialLocation);
+  const isManuallySet = useRef(false);
 
   // Attempt reverse geocoding for a friendly locality name
   const fetchReadableAddress = useCallback(async (lat, lng) => {
@@ -54,14 +72,18 @@ export const useGeolocation = (enableWatch = false) => {
     return null;
   }, []);
 
-  // Save confirmed location to cache
-  const saveLocationToCache = (lat, lng, accuracy, address) => {
+  // Save confirmed location to cache (never save generic IP coordinates)
+  const saveLocationToCache = (lat, lng, accuracy, address, source) => {
+    if (source === 'IP' || (isGenericDhaka(lat, lng) && source !== 'MANUAL')) {
+      return;
+    }
     try {
       localStorage.setItem('safehaven_user_last_location', JSON.stringify({
         latitude: lat,
         longitude: lng,
         accuracy,
-        address
+        address,
+        source
       }));
     } catch (e) {}
   };
@@ -76,17 +98,21 @@ export const useGeolocation = (enableWatch = false) => {
       if (data && data.latitude && data.longitude) {
         const lat = parseFloat(data.latitude);
         const lng = parseFloat(data.longitude);
-        const addr = `${data.city || 'Dhaka'}, ${data.region || 'Dhaka Division'}, Bangladesh`;
-        setLocation({
-          latitude: lat,
-          longitude: lng,
-          accuracy: 1500,
-          address: addr,
-          loading: false,
-          error: 'GPS hardware signal unavailable. Location approximated via Network/IP.',
-          source: 'IP'
+        const addr = `${data.city || 'Dhaka'}, ${data.region || 'Dhaka Division'}, Bangladesh (আইপি ভিত্তিক আনুমানিক)`;
+        setLocation(prev => {
+          if (isManuallySet.current) return prev;
+          return {
+            latitude: lat,
+            longitude: lng,
+            accuracy: 2000,
+            address: addr,
+            loading: false,
+            error: 'GPS hardware signal unavailable. Location approximated via Network/IP.',
+            source: 'IP',
+            isApproximate: true,
+            permissionDenied: prev.permissionDenied
+          };
         });
-        saveLocationToCache(lat, lng, 1500, addr);
         return true;
       }
     } catch (err) {
@@ -96,17 +122,21 @@ export const useGeolocation = (enableWatch = false) => {
         if (altData && altData.latitude && altData.longitude) {
           const lat = parseFloat(altData.latitude);
           const lng = parseFloat(altData.longitude);
-          const addr = `${altData.locality || altData.city || 'Dhaka'}, ${altData.principalSubdivision || ''}`;
-          setLocation({
-            latitude: lat,
-            longitude: lng,
-            accuracy: 2000,
-            address: addr,
-            loading: false,
-            error: 'GPS unavailable. Location resolved via Network IP.',
-            source: 'IP'
+          const addr = `${altData.locality || altData.city || 'Dhaka'}, Bangladesh (আইপি ভিত্তিক আনুমানিক)`;
+          setLocation(prev => {
+            if (isManuallySet.current) return prev;
+            return {
+              latitude: lat,
+              longitude: lng,
+              accuracy: 2500,
+              address: addr,
+              loading: false,
+              error: 'GPS unavailable. Location resolved via Network IP.',
+              source: 'IP',
+              isApproximate: true,
+              permissionDenied: prev.permissionDenied
+            };
           });
-          saveLocationToCache(lat, lng, 2000, addr);
           return true;
         }
       } catch (err2) {
@@ -121,7 +151,8 @@ export const useGeolocation = (enableWatch = false) => {
       setLocation(prev => ({
         ...prev,
         loading: false,
-        error: 'Geolocation is not supported by your browser.'
+        error: 'Geolocation is not supported by your browser.',
+        permissionDenied: true
       }));
       return;
     }
@@ -129,6 +160,7 @@ export const useGeolocation = (enableWatch = false) => {
     setLocation(prev => ({ ...prev, loading: true, error: null }));
 
     const handleSuccess = async (pos, source = 'GPS') => {
+      isManuallySet.current = false;
       const { latitude, longitude, accuracy } = pos.coords;
       let address = `Lat: ${latitude.toFixed(4)}°, Lng: ${longitude.toFixed(4)}°`;
       
@@ -139,21 +171,40 @@ export const useGeolocation = (enableWatch = false) => {
             ...prev,
             address: namedAddr
           }));
-          saveLocationToCache(latitude, longitude, accuracy, namedAddr);
+          saveLocationToCache(latitude, longitude, accuracy, namedAddr, source);
         }
       });
 
       setLocation({
         latitude,
         longitude,
-        accuracy,
+        accuracy: Math.round(accuracy),
         address,
         loading: false,
         error: null,
-        source
+        source,
+        isApproximate: accuracy > 500,
+        permissionDenied: false
       });
-      saveLocationToCache(latitude, longitude, accuracy, address);
+      saveLocationToCache(latitude, longitude, accuracy, address, source);
     };
+
+    // Check permission status if API is available
+    if (navigator.permissions && navigator.permissions.query) {
+      navigator.permissions.query({ name: 'geolocation' }).then(result => {
+        if (result.state === 'denied') {
+          setLocation(prev => ({
+            ...prev,
+            loading: false,
+            permissionDenied: true,
+            isApproximate: true,
+            error: 'ব্রাউজারে লোকেশন পারমিশন ব্লক করা আছে। সঠিক জিপিএস পেতে অ্যাড্রেস বারের লক (🔒) আইকনে ক্লিক করে Location চালু করুন।'
+          }));
+          fetchIpGeolocation();
+          return;
+        }
+      }).catch(() => {});
+    }
 
     // Tier 1: High-Accuracy Hardware GPS
     navigator.geolocation.getCurrentPosition(
@@ -166,21 +217,22 @@ export const useGeolocation = (enableWatch = false) => {
           (pos) => handleSuccess(pos, 'NETWORK'),
           async (err2) => {
             console.warn('Browser geolocation failed or denied:', err2.message);
+            const isDenied = err2.code === 1;
             const ipSuccess = await fetchIpGeolocation();
-            if (!ipSuccess) {
-              setLocation(prev => ({
-                ...prev,
-                loading: false,
-                error: err2.code === 1 
-                  ? 'Location permission denied. Click the lock icon in your browser URL bar to allow location access.' 
-                  : 'Unable to retrieve location coordinates.'
-              }));
-            }
+            setLocation(prev => ({
+              ...prev,
+              loading: false,
+              permissionDenied: isDenied,
+              isApproximate: true,
+              error: isDenied 
+                ? 'ব্রাউজারে লোকেশন পারমিশন ব্লক করা আছে। অ্যাড্রেস বারের লক (🔒) আইকনে ক্লিক করে Location Allow করুন।' 
+                : 'ডিভাইস থেকে জিপিএস সংকেত পাওয়া যায়নি। নেটওয়ার্কের মাধ্যমে আনুমানিক অবস্থান নির্ধারণ করা হয়েছে।'
+            }));
           },
           { enableHighAccuracy: false, timeout: 10000, maximumAge: 30000 }
         );
       },
-      { enableHighAccuracy: true, timeout: 9000, maximumAge: 5000 }
+      { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 }
     );
   }, [fetchIpGeolocation, fetchReadableAddress]);
 
@@ -191,16 +243,20 @@ export const useGeolocation = (enableWatch = false) => {
     if (enableWatch && navigator.geolocation) {
       watchId = navigator.geolocation.watchPosition(
         (pos) => {
+          // Do not overwrite if user explicitly pinned a manual place
+          if (isManuallySet.current) return;
           const { latitude, longitude, accuracy } = pos.coords;
           setLocation(prev => ({
             ...prev,
             latitude,
             longitude,
-            accuracy,
+            accuracy: Math.round(accuracy),
             address: `Lat: ${latitude.toFixed(4)}°, Lng: ${longitude.toFixed(4)}°`,
             loading: false,
             error: null,
-            source: 'GPS_WATCH'
+            source: 'GPS_WATCH',
+            isApproximate: accuracy > 500,
+            permissionDenied: false
           }));
         },
         () => {},
@@ -213,9 +269,10 @@ export const useGeolocation = (enableWatch = false) => {
     };
   }, [enableWatch, requestLocation]);
 
-  // Function to manually adjust location on map
+  // Function to manually adjust location on map or via search
   const setManualLocation = useCallback((latitude, longitude, customAddress) => {
-    const address = customAddress || `Lat: ${latitude.toFixed(4)}°, Lng: ${longitude.toFixed(4)}° (Pinned)`;
+    isManuallySet.current = true;
+    const address = customAddress || `Lat: ${latitude.toFixed(4)}°, Lng: ${longitude.toFixed(4)}° (বাছাইকৃত স্থান)`;
     setLocation({
       latitude,
       longitude,
@@ -223,14 +280,17 @@ export const useGeolocation = (enableWatch = false) => {
       address,
       loading: false,
       error: null,
-      source: 'MANUAL'
+      source: 'MANUAL',
+      isApproximate: false,
+      permissionDenied: false
     });
-    saveLocationToCache(latitude, longitude, 10, address);
+    saveLocationToCache(latitude, longitude, 10, address, 'MANUAL');
   }, []);
 
   return {
     ...location,
     refreshLocation: requestLocation,
-    setManualLocation
+    setManualLocation,
+    clearLocationCache
   };
 };

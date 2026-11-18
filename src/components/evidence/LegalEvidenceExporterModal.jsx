@@ -2,11 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { FiShield, FiFileText, FiDownload, FiPrinter, FiX, FiCheckCircle, FiLock, FiMapPin, FiClock, FiUser, FiHash } from 'react-icons/fi';
 import { useAuth } from '../../context/AuthContext';
 import { useSOS } from '../../context/SOSContext';
+import { useLanguage } from '../../context/LanguageContext';
 import toast from 'react-hot-toast';
 
 const LegalEvidenceExporterModal = ({ isOpen, onClose, item }) => {
   const { user } = useAuth();
   const { savedContacts = [] } = useSOS();
+  const { language } = useLanguage();
+  const isBn = language === 'bn';
+
   const [sha256Hash, setSha256Hash] = useState('Computing SHA-256...');
   const [documentId, setDocumentId] = useState('');
 
@@ -42,7 +46,7 @@ const LegalEvidenceExporterModal = ({ isOpen, onClose, item }) => {
       <!DOCTYPE html>
       <html>
         <head>
-          <title>Legal Evidence Docket - ${documentId}</title>
+          <title>${isBn ? 'আইনি প্রমাণাদি ডকেট' : 'Legal Evidence Docket'} - ${documentId}</title>
           <style>
             body { font-family: 'Helvetica Neue', Arial, sans-serif; padding: 40px; color: #111; line-height: 1.5; }
             .header { border-bottom: 3px solid #e11d48; padding-bottom: 20px; margin-bottom: 20px; display: flex; justify-content: space-between; }
@@ -69,7 +73,6 @@ const LegalEvidenceExporterModal = ({ isOpen, onClose, item }) => {
   };
 
   const handleDownloadZIPPackage = () => {
-    // Generate JSON metadata package download
     const metadata = {
       documentControlId: documentId,
       sha256Digest: sha256Hash,
@@ -95,7 +98,7 @@ const LegalEvidenceExporterModal = ({ isOpen, onClose, item }) => {
     a.href = url;
     a.download = `SafeHaven_ChainOfCustody_${documentId}.json`;
     a.click();
-    toast.success('📦 Legal Evidence Metadata Package Downloaded!');
+    toast.success(isBn ? '📦 আইনি প্রমাণাদি মেটাডাটা প্যাকেজ ডাউনলোড সম্পন্ন!' : '📦 Legal Evidence Metadata Package Downloaded!');
   };
 
   return (
@@ -116,9 +119,9 @@ const LegalEvidenceExporterModal = ({ isOpen, onClose, item }) => {
             <FiShield />
           </div>
           <div>
-            <span className="mono-tag mono-tag-rose">CHAIN-OF-CUSTODY EXPORTER</span>
+            <span className="mono-tag mono-tag-rose">{isBn ? 'চেইন-অব-কাস্টডি এক্সপোর্টার' : 'CHAIN-OF-CUSTODY EXPORTER'}</span>
             <h2 className="text-xl font-bold font-heading text-zinc-900 dark:text-white mt-1">
-              Official Legal Evidence Docket
+              {isBn ? 'অফিসিয়াল আইনি প্রমাণাদি ডকেট' : 'Official Legal Evidence Docket'}
             </h2>
           </div>
         </div>
@@ -129,21 +132,21 @@ const LegalEvidenceExporterModal = ({ isOpen, onClose, item }) => {
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-zinc-200 dark:border-zinc-800 pb-3 gap-2">
             <div>
               <p className="text-xs font-mono font-bold text-rose-600 dark:text-rose-400 uppercase tracking-wider">
-                BANGLADESH POLICE & COURT EVIDENCE EXHIBIT
+                {isBn ? 'বাংলাদেশ পুলিশ ও আদালত প্রমাণাদি প্রদর্শনী' : 'BANGLADESH POLICE & COURT EVIDENCE EXHIBIT'}
               </p>
               <h3 className="text-lg font-bold text-zinc-900 dark:text-white">
-                Case Control Ref: {documentId}
+                {isBn ? 'কেস নিয়ন্ত্রণ নম্বর' : 'Case Control Ref'}: {documentId}
               </h3>
             </div>
             <span className="mono-tag mono-tag-emerald">
-              <FiCheckCircle /> UNTAMPERED RECORD
+              <FiCheckCircle /> {isBn ? 'অক্ষত ও অপরিবর্তিত রেকর্ড' : 'UNTAMPERED RECORD'}
             </span>
           </div>
 
           {/* Cryptographic SHA-256 Checksum */}
           <div className="p-3.5 rounded-xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 space-y-1">
             <div className="flex items-center gap-1.5 text-xs font-mono font-bold text-zinc-700 dark:text-zinc-300">
-              <FiHash className="text-rose-500" /> Cryptographic SHA-256 Hash Digest (Chain-of-Custody Proof):
+              <FiHash className="text-rose-500" /> {isBn ? 'ক্রিপ্টোগ্রাফিক SHA-256 হ্যাশ ডাইজেস্ট (অকাট্য প্রমাণ):' : 'Cryptographic SHA-256 Hash Digest (Chain-of-Custody Proof):'}
             </div>
             <p className="font-mono text-[11px] text-zinc-900 dark:text-zinc-100 bg-white dark:bg-zinc-950 p-2 rounded border border-zinc-300 dark:border-zinc-800 break-all select-all">
               {sha256Hash}
@@ -154,37 +157,45 @@ const LegalEvidenceExporterModal = ({ isOpen, onClose, item }) => {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             
             <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 space-y-1">
-              <span className="text-[10px] font-mono font-bold uppercase text-zinc-400 block">Victim / Reporter Profile</span>
-              <p className="text-xs font-bold text-zinc-900 dark:text-white">{user?.fullName || 'Protected User'}</p>
+              <span className="text-[10px] font-mono font-bold uppercase text-zinc-400 block">
+                {isBn ? 'ভিকটিম / আবেদনকারীর বিবরণ' : 'Victim / Reporter Profile'}
+              </span>
+              <p className="text-xs font-bold text-zinc-900 dark:text-white">{user?.fullName || (isBn ? 'সুরক্ষিত ব্যবহারকারী' : 'Protected User')}</p>
               <p className="text-[11px] text-zinc-500 font-mono">{user?.email || 'N/A'}</p>
-              <p className="text-[11px] text-zinc-500 font-mono">Phone: {user?.phone || 'N/A'}</p>
+              <p className="text-[11px] text-zinc-500 font-mono">{isBn ? 'ফোন:' : 'Phone:'} {user?.phone || 'N/A'}</p>
             </div>
 
             <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 space-y-1">
-              <span className="text-[10px] font-mono font-bold uppercase text-zinc-400 block">Incident Telemetry</span>
-              <p className="text-xs font-bold text-zinc-900 dark:text-white">Timestamp: {item.date || new Date().toLocaleString()}</p>
+              <span className="text-[10px] font-mono font-bold uppercase text-zinc-400 block">
+                {isBn ? 'ঘটনার টেলিমেট্রি রেকর্ড' : 'Incident Telemetry'}
+              </span>
+              <p className="text-xs font-bold text-zinc-900 dark:text-white">{isBn ? 'সময়:' : 'Timestamp:'} {item.date || new Date().toLocaleString()}</p>
               <p className="text-[11px] text-zinc-500 font-mono">GPS: {item.lat || '22.3347'}, {item.lng || '91.8106'}</p>
-              <p className="text-[11px] text-zinc-500 font-mono">Alerted Emergency Contacts: {savedContacts.length}</p>
+              <p className="text-[11px] text-zinc-500 font-mono">
+                {isBn ? `সতর্কীকৃত জরুরি পরিচিতি: ${savedContacts.length} জন` : `Alerted Emergency Contacts: ${savedContacts.length}`}
+              </p>
             </div>
 
           </div>
 
           {/* Media Preview Section */}
           <div className="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 space-y-2">
-            <span className="text-[10px] font-mono font-bold uppercase text-zinc-400 block">Captured Media Exhibit</span>
+            <span className="text-[10px] font-mono font-bold uppercase text-zinc-400 block">
+              {isBn ? 'সংগৃহীত মিডিয়া প্রমাণাদি' : 'Captured Media Exhibit'}
+            </span>
             
             {item.dataUrl && item.dataUrl.startsWith('data:audio') ? (
               <audio controls src={item.dataUrl} className="w-full h-10" />
             ) : item.dataUrl || item.url ? (
               <img src={item.dataUrl || item.url} alt="Evidence Exhibit" className="max-h-48 rounded-lg object-contain mx-auto border border-zinc-300 dark:border-zinc-700" />
             ) : (
-              <p className="text-xs text-zinc-500 font-mono">Voice / Camera Telemetry Log (ID: {item.id})</p>
+              <p className="text-xs text-zinc-500 font-mono">{isBn ? 'ভয়েস / ক্যামেরা টেলিমেট্রি লগ' : 'Voice / Camera Telemetry Log'} (ID: {item.id})</p>
             )}
           </div>
 
           {/* Verification Legal Stamp */}
           <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-center font-mono text-xs font-bold uppercase tracking-wider">
-            🔒 Legal Chain-of-Custody Verified • Official Court Exhibit Ready
+            {isBn ? '🔒 আইনি চেইন-অব-কাস্টডি পরীক্ষিত • আদালত উপযোগী অফিসিয়াল প্রদর্শনী' : '🔒 Legal Chain-of-Custody Verified • Official Court Exhibit Ready'}
           </div>
 
         </div>
@@ -195,14 +206,14 @@ const LegalEvidenceExporterModal = ({ isOpen, onClose, item }) => {
             onClick={handlePrintPDF}
             className="w-full sm:w-1/2 btn-danger py-3 font-mono text-xs uppercase font-bold flex items-center justify-center gap-2"
           >
-            <FiPrinter /> Print / Save PDF Docket
+            <FiPrinter /> {isBn ? 'ডকেট প্রিন্ট / PDF সংরক্ষণ' : 'Print / Save PDF Docket'}
           </button>
 
           <button
             onClick={handleDownloadZIPPackage}
             className="w-full sm:w-1/2 btn-solid py-3 font-mono text-xs uppercase font-bold flex items-center justify-center gap-2"
           >
-            <FiDownload /> Export Metadata Package (.JSON)
+            <FiDownload /> {isBn ? 'মেটাডাটা ফাইল রপ্তানি (.JSON)' : 'Export Metadata Package (.JSON)'}
           </button>
         </div>
 

@@ -146,6 +146,9 @@ const LiveLocationPage = () => {
             latitude={location.latitude} 
             longitude={location.longitude} 
             accuracy={location.accuracy} 
+            source={location.source}
+            isApproximate={location.isApproximate}
+            permissionDenied={location.permissionDenied}
             title={isBn ? 'আপনার লাইভ অবস্থান' : 'Your Live Coordinates'}
             onLocationChange={(lat, lng, acc, addr) => {
               location.setManualLocation(lat, lng, addr);

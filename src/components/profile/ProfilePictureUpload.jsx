@@ -2,9 +2,13 @@ import React, { useState, useRef, useEffect } from 'react';
 import { FiCamera, FiUser, FiLoader, FiAlertCircle, FiUploadCloud } from 'react-icons/fi';
 import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from 'firebase/storage';
 import { storage } from '../../firebase/config';
+import { useLanguage } from '../../context/LanguageContext';
 import toast from 'react-hot-toast';
 
 const ProfilePictureUpload = ({ currentUrl, onUploadSuccess, userId = 'guest' }) => {
+  const { language } = useLanguage();
+  const isBn = language === 'bn';
+
   const [previewUrl, setPreviewUrl] = useState(currentUrl || '');
   const [uploading, setUploading] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
@@ -18,12 +22,12 @@ const ProfilePictureUpload = ({ currentUrl, onUploadSuccess, userId = 'guest' })
   }, [currentUrl]);
 
   const validateFile = (file) => {
-    if (!file) return 'No file selected.';
+    if (!file) return isBn ? 'কোনো ফাইল নির্বাচন করা হয়নি।' : 'No file selected.';
     if (!file.type || !file.type.startsWith('image/')) {
-      return 'Invalid file type. Please select a valid image file (JPEG, PNG, WEBP, GIF).';
+      return isBn ? 'অসমর্থিত ফাইল ফরম্যাট। একটি ছবি (JPEG, PNG, WEBP, GIF) নির্বাচন করুন।' : 'Invalid file type. Please select a valid image file (JPEG, PNG, WEBP, GIF).';
     }
     if (file.size > 5 * 1024 * 1024) {
-      return 'File size exceeds 5MB limit. Please select a smaller photo.';
+      return isBn ? 'ছবির সাইজ ৫ মেগাবাইটের বেশি। ছোট সাইজের ছবি নির্বাচন করুন।' : 'File size exceeds 5MB limit. Please select a smaller photo.';
     }
     return null;
   };
@@ -49,7 +53,7 @@ const ProfilePictureUpload = ({ currentUrl, onUploadSuccess, userId = 'guest' })
         onUploadSuccess(dataUrl);
       }
       setUploading(false);
-      toast.success('Profile picture updated successfully!');
+      toast.success(isBn ? 'প্রোফাইল ছবি সফলভাবে আপডেট করা হয়েছে!' : 'Profile picture updated successfully!');
 
       // 2. Attempt background upload to Firebase Storage (if bucket is active)
       try {
@@ -118,15 +122,10 @@ const ProfilePictureUpload = ({ currentUrl, onUploadSuccess, userId = 'guest' })
     e.preventDefault();
     e.stopPropagation();
     setIsDragging(false);
-
-    const file = e.dataTransfer.files?.[0];
-    if (file) {
-      processAndUploadFile(file);
-    }
   };
 
   return (
-    <div className="flex flex-col items-center gap-3">
+    <div className="flex flex-col items-center gap-3 font-sans">
       {/* Hidden File Input for Native Camera / Gallery Picker */}
       <input
         type="file"
@@ -159,7 +158,9 @@ const ProfilePictureUpload = ({ currentUrl, onUploadSuccess, userId = 'guest' })
         ) : (
           <div className="flex flex-col items-center justify-center text-zinc-400 dark:text-zinc-500 space-y-1">
             <FiUser className="w-10 h-10" />
-            <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-rose-500">Add Photo</span>
+            <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-rose-500">
+              {isBn ? 'ছবি যোগ করুন' : 'Add Photo'}
+            </span>
           </div>
         )}
 
@@ -170,13 +171,15 @@ const ProfilePictureUpload = ({ currentUrl, onUploadSuccess, userId = 'guest' })
           {isDragging ? (
             <>
               <FiUploadCloud className="w-8 h-8 text-rose-400 animate-bounce" />
-              <span className="text-[10px] font-mono font-bold uppercase tracking-wider mt-1 text-rose-300">Drop Image Here</span>
+              <span className="text-[10px] font-mono font-bold uppercase tracking-wider mt-1 text-rose-300">
+                {isBn ? 'এখানে ছবি ড্রপ করুন' : 'Drop Image Here'}
+              </span>
             </>
           ) : (
             <>
               <FiCamera className="w-7 h-7 text-white mb-1" />
               <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-zinc-200">
-                {previewUrl ? 'Change Photo' : 'Upload Photo'}
+                {previewUrl ? (isBn ? 'ছবি পরিবর্তন' : 'Change Photo') : (isBn ? 'ছবি আপলোড' : 'Upload Photo')}
               </span>
             </>
           )}
@@ -186,7 +189,9 @@ const ProfilePictureUpload = ({ currentUrl, onUploadSuccess, userId = 'guest' })
         {uploading && (
           <div className="absolute inset-0 bg-zinc-950/70 flex flex-col items-center justify-center text-white z-10 space-y-1">
             <FiLoader className="w-8 h-8 text-rose-500 animate-spin" />
-            <span className="text-[10px] font-mono font-bold text-rose-400">Processing...</span>
+            <span className="text-[10px] font-mono font-bold text-rose-400">
+              {isBn ? 'প্রসেসিং হচ্ছে...' : 'Processing...'}
+            </span>
           </div>
         )}
       </div>
@@ -199,7 +204,7 @@ const ProfilePictureUpload = ({ currentUrl, onUploadSuccess, userId = 'guest' })
           </p>
         ) : (
           <p className="text-[11px] text-zinc-500 dark:text-zinc-400 font-mono">
-            Click, tap, or drag & drop to upload (Max 5MB: JPG, PNG, WEBP)
+            {isBn ? 'ছবি আপলোড করতে ট্যাপ করুন বা ড্রপ করুন (সর্বোচ্চ ৫MB: JPG, PNG, WEBP)' : 'Click, tap, or drag & drop to upload (Max 5MB: JPG, PNG, WEBP)'}
           </p>
         )}
       </div>

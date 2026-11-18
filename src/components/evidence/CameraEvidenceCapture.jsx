@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { FiCamera, FiVideo, FiSquare, FiDownload, FiTrash2, FiEye, FiX, FiCheck, FiFileText } from 'react-icons/fi';
 import LegalEvidenceExporterModal from './LegalEvidenceExporterModal';
+import { useLanguage } from '../../context/LanguageContext';
 import toast from 'react-hot-toast';
 
 const CameraEvidenceCapture = () => {
@@ -9,6 +10,8 @@ const CameraEvidenceCapture = () => {
   const [previewImage, setPreviewImage] = useState(null);
   const [selectedExportItem, setSelectedExportItem] = useState(null);
   const [exporterOpen, setExporterOpen] = useState(false);
+  const { language } = useLanguage();
+  const isBn = language === 'bn';
 
   const [evidenceList, setEvidenceList] = useState(() => {
     try {
@@ -32,10 +35,10 @@ const CameraEvidenceCapture = () => {
         videoRef.current.srcObject = stream;
       }
       setCameraActive(true);
-      toast.success('📷 Camera Feed Activated!');
+      toast.success(isBn ? '📷 ক্যামেরা ফিড চালু হয়েছে!' : '📷 Camera Feed Activated!');
     } catch (err) {
       console.warn('Camera Access Error:', err.message);
-      toast.error('Camera permission required to capture evidence');
+      toast.error(isBn ? 'প্রমাণ ধারণের জন্য ক্যামেরা পারমিশন প্রয়োজন' : 'Camera permission required to capture evidence');
     }
   };
 
@@ -74,7 +77,7 @@ const CameraEvidenceCapture = () => {
     const updated = [newEvidence, ...evidenceList];
     setEvidenceList(updated);
     localStorage.setItem('safehaven_camera_evidence', JSON.stringify(updated));
-    toast.success('📸 Photo Evidence Captured & Saved!');
+    toast.success(isBn ? '📸 ছবির প্রমাণ সংরক্ষিত হয়েছে!' : '📸 Photo Evidence Captured & Saved!');
   };
 
   const startVideoRecording = () => {
@@ -103,15 +106,15 @@ const CameraEvidenceCapture = () => {
           const updated = [newEvidence, ...evidenceList];
           setEvidenceList(updated);
           localStorage.setItem('safehaven_camera_evidence', JSON.stringify(updated));
-          toast.success('🎥 Emergency Video Recording Saved!');
+          toast.success(isBn ? '🎥 জরুরি ভিডিও রেকর্ডিং সংরক্ষিত হয়েছে!' : '🎥 Emergency Video Recording Saved!');
         };
       };
 
       mediaRecorderRef.current.start();
       setIsVideoRecording(true);
-      toast.error('🎥 Emergency Video Recording Started!');
+      toast.error(isBn ? '🎥 জরুরি ভিডিও রেকর্ডিং শুরু হয়েছে!' : '🎥 Emergency Video Recording Started!');
     } catch (e) {
-      toast.error('Video recording failed');
+      toast.error(isBn ? 'ভিডিও রেকর্ডিং ব্যর্থ হয়েছে' : 'Video recording failed');
     }
   };
 
@@ -126,7 +129,7 @@ const CameraEvidenceCapture = () => {
     const updated = evidenceList.filter((item) => item.id !== id);
     setEvidenceList(updated);
     localStorage.setItem('safehaven_camera_evidence', JSON.stringify(updated));
-    toast.success('Evidence removed');
+    toast.success(isBn ? 'প্রমাণ মুছে ফেলা হয়েছে' : 'Evidence removed');
   };
 
   const handleOpenExporter = (item) => {
@@ -135,21 +138,23 @@ const CameraEvidenceCapture = () => {
   };
 
   return (
-    <div className="product-card p-6 space-y-6">
+    <div className="product-card p-6 space-y-6 font-sans">
       <div className="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 pb-3">
         <div className="flex items-center gap-2">
           <FiCamera className="text-rose-600 dark:text-rose-400 text-lg" />
           <div>
             <h3 className="text-sm font-bold uppercase tracking-wider text-zinc-900 dark:text-white font-heading">
-              Camera Evidence Capture
+              {isBn ? 'ক্যামেরা প্রমাণাদি ক্যাপচার' : 'Camera Evidence Capture'}
             </h3>
-            <p className="text-xs text-zinc-500">Record video clips & snapshot evidence during emergencies</p>
+            <p className="text-xs text-zinc-500">
+              {isBn ? 'বিপদকালীন পরিস্থিতিতে তাৎক্ষণিক ছবি ও ভিডিও ক্লিপ ধারণ করুন' : 'Record video clips & snapshot evidence during emergencies'}
+            </p>
           </div>
         </div>
         {cameraActive ? (
-          <span className="mono-tag mono-tag-rose">Camera Feed Live</span>
+          <span className="mono-tag mono-tag-rose">{isBn ? 'ক্যামেরা চালু' : 'Camera Feed Live'}</span>
         ) : (
-          <span className="mono-tag mono-tag-zinc">Camera Off</span>
+          <span className="mono-tag mono-tag-zinc">{isBn ? 'ক্যামেরা বন্ধ' : 'Camera Off'}</span>
         )}
       </div>
 
@@ -162,24 +167,24 @@ const CameraEvidenceCapture = () => {
           <div className="absolute bottom-4 left-4 right-4 flex items-center justify-center gap-3 bg-zinc-950/80 backdrop-blur-sm p-3 rounded-xl">
             <button
               onClick={capturePhoto}
-              className="btn-solid !py-2 !px-4 text-xs font-mono"
+              className="btn-solid !py-2 !px-4 text-xs font-mono font-bold"
             >
-              <FiCamera /> TAKE PHOTO
+              <FiCamera /> {isBn ? 'ছবি তুলুন' : 'TAKE PHOTO'}
             </button>
 
             {isVideoRecording ? (
               <button
                 onClick={stopVideoRecording}
-                className="btn-danger !py-2 !px-4 text-xs font-mono animate-pulse"
+                className="btn-danger !py-2 !px-4 text-xs font-mono font-bold animate-pulse"
               >
-                <FiSquare /> STOP VIDEO
+                <FiSquare /> {isBn ? 'ভিডিও থামান' : 'STOP VIDEO'}
               </button>
             ) : (
               <button
                 onClick={startVideoRecording}
-                className="btn-danger !py-2 !px-4 text-xs font-mono"
+                className="btn-danger !py-2 !px-4 text-xs font-mono font-bold"
               >
-                <FiVideo /> RECORD VIDEO
+                <FiVideo /> {isBn ? 'ভিডিও রেকর্ড' : 'RECORD VIDEO'}
               </button>
             )}
 
@@ -187,7 +192,7 @@ const CameraEvidenceCapture = () => {
               onClick={stopCamera}
               className="btn-outline !py-2 !px-3 text-xs"
             >
-              <FiX /> Close Camera
+              <FiX /> {isBn ? 'বন্ধ করুন' : 'Close Camera'}
             </button>
           </div>
         </div>
@@ -198,10 +203,10 @@ const CameraEvidenceCapture = () => {
         >
           <FiCamera className="w-8 h-8 mx-auto text-rose-500" />
           <span className="block font-bold text-xs text-zinc-800 dark:text-zinc-200">
-            Click to Launch Live Camera Feed
+            {isBn ? 'লাইভ ক্যামেরা ফিড চালু করতে ক্লিক করুন' : 'Click to Launch Live Camera Feed'}
           </span>
           <span className="block text-[11px] text-zinc-500 font-mono">
-            Captures timestamped photo snapshots & video evidence
+            {isBn ? 'টাইমস্ট্যাম্পযুক্ত ছবি ও ভিডিও প্রমাণাদি জমা রাখে' : 'Captures timestamped photo snapshots & video evidence'}
           </span>
         </button>
       )}
@@ -209,11 +214,13 @@ const CameraEvidenceCapture = () => {
       {/* Camera Evidence Vault List */}
       <div className="space-y-3 pt-2">
         <h4 className="text-xs font-mono font-bold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">
-          Saved Media Vault ({evidenceList.length})
+          {isBn ? `সংরক্ষিত মিডিয়া ভল্ট (${evidenceList.length})` : `Saved Media Vault (${evidenceList.length})`}
         </h4>
 
         {evidenceList.length === 0 ? (
-          <p className="text-xs text-zinc-400 italic py-2">No photo or video evidence stored yet.</p>
+          <p className="text-xs text-zinc-400 italic py-2">
+            {isBn ? 'কোনো ছবি বা ভিডিও প্রমাণ এখনো জমা নেই।' : 'No photo or video evidence stored yet.'}
+          </p>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             {evidenceList.map((item) => (
@@ -229,14 +236,14 @@ const CameraEvidenceCapture = () => {
                     <button
                       onClick={() => handleOpenExporter(item)}
                       className="p-1 rounded bg-rose-600 hover:bg-rose-700 text-xs text-white"
-                      title="Export Chain-of-Custody PDF Docket"
+                      title={isBn ? 'আইনি প্রমাণপত্র ডাউনলোড' : 'Export Chain-of-Custody PDF Docket'}
                     >
                       <FiFileText />
                     </button>
                     <button
                       onClick={() => setPreviewImage(item.dataUrl)}
                       className="p-1 rounded bg-zinc-800 hover:bg-zinc-700 text-xs"
-                      title="View Full"
+                      title={isBn ? 'বড় করে দেখুন' : 'View Full'}
                     >
                       <FiEye />
                     </button>
@@ -244,14 +251,14 @@ const CameraEvidenceCapture = () => {
                       href={item.dataUrl}
                       download={`Evidence_${item.id}.${item.type === 'photo' ? 'jpg' : 'webm'}`}
                       className="p-1 rounded bg-zinc-800 hover:bg-zinc-700 text-xs"
-                      title="Download"
+                      title={isBn ? 'ডাউনলোড' : 'Download'}
                     >
                       <FiDownload />
                     </a>
                     <button
                       onClick={() => deleteEvidence(item.id)}
                       className="p-1 rounded bg-rose-600/50 hover:bg-rose-700 text-xs text-white"
-                      title="Delete"
+                      title={isBn ? 'মুছুন' : 'Delete'}
                     >
                       <FiTrash2 />
                     </button>
@@ -270,6 +277,7 @@ const CameraEvidenceCapture = () => {
             <button
               onClick={() => setPreviewImage(null)}
               className="absolute top-2 right-2 p-2 rounded-lg bg-zinc-800 text-white"
+              title={isBn ? 'বন্ধ করুন' : 'Close'}
             >
               <FiX />
             </button>

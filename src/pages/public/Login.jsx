@@ -12,7 +12,8 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [authError, setAuthError] = useState('');
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const isBn = language === 'bn';
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -56,28 +57,30 @@ const Login = () => {
 
           <div className="relative z-10 space-y-4">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs font-mono font-bold uppercase tracking-wider">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> SafeHaven Security Network
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> {isBn ? 'সেফহ্যাভেন সুরক্ষা নেটওয়ার্ক' : 'SafeHaven Security Network'}
             </div>
             <h3 className="text-2xl font-extrabold font-heading leading-tight tracking-tight">
-              Instant Geolocation Distress Telemetry & Emergency Help
+              {isBn ? 'তাৎক্ষণিক লাইভ জিপিএস বিপদ সংকেত ও জরুরি সহায়তা' : 'Instant Geolocation Distress Telemetry & Emergency Help'}
             </h3>
             <p className="text-xs text-zinc-400 leading-relaxed font-sans">
-              Sign in to manage your 5 priority emergency contacts, monitor real-time SOS broadcasts, and access your encrypted evidence locker.
+              {isBn
+                ? 'আপনার ৫ জন জরুরি পরিচিতি পরিচালনা করতে, রিয়েল-টাইম এসওএস ট্র্যাক করতে ও এনক্রিপ্টেড এভিডেন্স লকারে ঢুকতে সাইন ইন করুন।'
+                : 'Sign in to manage your 5 priority emergency contacts, monitor real-time SOS broadcasts, and access your encrypted evidence locker.'}
             </p>
           </div>
 
           <div className="relative z-10 space-y-3 pt-6 border-t border-zinc-800">
             <div className="flex items-center gap-2.5 text-xs text-zinc-300 font-medium">
               <FiCheckCircle className="text-emerald-400 text-sm flex-shrink-0" />
-              <span>Response Latency: &lt; 3 Seconds</span>
+              <span>{isBn ? 'প্রতিক্রিয়ার সময়: < ৩ সেকেন্ড' : 'Response Latency: < 3 Seconds'}</span>
             </div>
             <div className="flex items-center gap-2.5 text-xs text-zinc-300 font-medium">
               <FiCheckCircle className="text-emerald-400 text-sm flex-shrink-0" />
-              <span>AES-256 Encrypted Telemetry Logs</span>
+              <span>{isBn ? 'AES-256 এনক্রিপ্টেড অডিট রেকর্ড' : 'AES-256 Encrypted Telemetry Logs'}</span>
             </div>
             <div className="flex items-center gap-2.5 text-xs text-zinc-300 font-medium">
               <FiCheckCircle className="text-emerald-400 text-sm flex-shrink-0" />
-              <span>National Dispatch 999 Integration</span>
+              <span>{isBn ? 'জাতীয় জরুরি সেবা ৯৯৯ সরাসরি সংযোগ' : 'National Dispatch 999 Integration'}</span>
             </div>
           </div>
         </div>

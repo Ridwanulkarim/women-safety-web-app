@@ -12,7 +12,8 @@ const Navbar = () => {
   const { user, logoutUser, isAdmin } = useAuth();
   const { unreadCount } = useNotifications();
   const { openSOSModal } = useSOS();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const isBn = language === 'bn';
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
 
   const navigate = useNavigate();
@@ -84,10 +85,10 @@ const Navbar = () => {
                   <Link
                     to="/admin"
                     className="px-3 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-mono text-xs font-bold flex items-center gap-1.5 shadow-md shadow-purple-600/25 transition active:scale-95"
-                    title="Admin Command Center"
+                    title={isBn ? 'অ্যাডমিন কমান্ড সেন্টার' : 'Admin Command Center'}
                   >
                     <FiShield className="w-3.5 h-3.5" />
-                    <span className="hidden sm:inline">Admin Panel</span>
+                    <span className="hidden sm:inline">{isBn ? 'অ্যাডমিন প্যানেল' : 'Admin Panel'}</span>
                   </Link>
                 )}
 
@@ -95,7 +96,7 @@ const Navbar = () => {
                 <Link
                   to="/dashboard/notifications"
                   className="relative p-2 rounded-xl bg-zinc-100/90 dark:bg-zinc-800/80 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition border border-zinc-200/80 dark:border-zinc-700/80 min-h-[38px] min-w-[38px] flex items-center justify-center shadow-xs"
-                  title="Notifications"
+                  title={isBn ? 'নোটিফিকেশন' : 'Notifications'}
                 >
                   <FiBell className="w-4 h-4 text-zinc-800 dark:text-zinc-200" />
                   {unreadCount > 0 && (
@@ -134,7 +135,7 @@ const Navbar = () => {
                         <p className="text-[11px] text-zinc-500 truncate font-mono">{user.email}</p>
                         {isAdmin && (
                           <span className="inline-block mt-1 px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-600 dark:text-purple-400 font-mono text-[9px] font-bold uppercase">
-                            Administrator
+                            {isBn ? 'অ্যাডমিনিস্ট্রেটর' : 'Administrator'}
                           </span>
                         )}
                       </div>
@@ -145,7 +146,7 @@ const Navbar = () => {
                           onClick={() => setProfileDropdownOpen(false)}
                           className="flex items-center gap-2 px-3 py-2 text-xs font-bold rounded-lg bg-purple-500/10 text-purple-600 dark:text-purple-400 hover:bg-purple-500/20 transition"
                         >
-                          <FiShield /> Admin Command Center
+                          <FiShield /> {isBn ? 'অ্যাডমিন কমান্ড সেন্টার' : 'Admin Command Center'}
                         </Link>
                       )}
 
