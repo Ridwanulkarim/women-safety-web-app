@@ -4,6 +4,93 @@ import api from '../../services/api';
 import { TIP_CATEGORIES } from '../../utils/constants';
 import { useLanguage } from '../../context/LanguageContext';
 
+const KNOWN_TIPS_TRANSLATIONS = {
+  'Commuting at Night': {
+    title_bn: 'রাতের যাত্রা ও যাতায়াতের নিরাপত্তা',
+    content_bn: 'সবসময় আলোযুক্ত রাস্তায় চলুন, বিশ্বস্ত পরিচিতদের সাথে লাইভ ট্রিপ লোকেশন শেয়ার করুন এবং রাতে একা চলার সময় দুই কানে হেডফোন গুঁজে রাখবেন না।'
+  },
+  'Ride-Sharing Security Checklist': {
+    title_bn: 'রাইডশেয়ারিং নিরাপত্তা চেকলিস্ট',
+    content_bn: 'গাড়িতে ওঠার আগে চালকের ছবি ও গাড়ির নম্বর প্লেট অ্যাপের সাথে মিলিয়ে নিন এবং পেছনের সিটে বসুন।'
+  },
+  'Home Entrance Vigilance': {
+    title_bn: 'বাসার প্রবেশদ্বারে সতর্কতা',
+    content_bn: 'দরজার সামনে আসার আগেই চাবি হাতে রাখুন। ভেতরে প্রবেশের আগে আশেপাশের পরিবেশ দেখে নিন এবং দ্রুত ছিটকিনি লাগিয়ে দিন।'
+  },
+  'Night Travel & Rideshare Security Checklist': {
+    title_bn: 'রাতের যাত্রা ও রাইডশেয়ারিং নিরাপত্তা চেকলিস্ট',
+    content_bn: 'গাড়িতে ওঠার আগে অবশ্যই ড্রাইভারের ছবি, নাম ও গাড়ির নম্বর প্লেট অ্যাপের তথ্যের সাথে মিলিয়ে নিন। সবসময় পেছনের সিটে বসুন এবং পরিবারের সাথে লাইভ ট্রিপ শেয়ার করুন।'
+  },
+  'Physical Self-Defense Stance & Vulnerable Targets': {
+    title_bn: 'শারীরিক আত্মরক্ষার সঠিক ভঙ্গি ও সংবেদনশীল পয়েন্ট',
+    content_bn: 'দুই পা কিছুটা ফাঁকা করে ভারসাম্য বজায় রাখুন এবং হাত বুকের কাছে প্রস্তুত রাখুন। আক্রান্ত হলে হাতের তালুর আঘাত বা কনুই দিয়ে আক্রমণকারীর চোখ, নাক, গলা বা সংবেদনশীল পয়েন্টে আঘাত করুন।'
+  },
+  'De-escalation & Spatial Boundary Defense': {
+    title_bn: 'পরিস্থিতি শান্ত করা ও নিরাপদ দূরত্ব বজায় রাখা',
+    content_bn: 'অপরিচিত ব্যক্তির থেকে কমপক্ষে ৬ ফুট দূরত্ব বজায় রাখুন। আক্রমণাত্মক আচরণ দেখলে স্পষ্ট ও বলিষ্ঠ কণ্ঠে চিৎকার করে "দূরে থাকুন" বলুন যাতে আশেপাশের মানুষের দৃষ্টি আকর্ষণ হয়।'
+  },
+  'Utilizing Improvised Defense Items': {
+    title_bn: 'দৈনন্দিন জিনিসপত্র দিয়ে আত্মরক্ষা',
+    content_bn: 'আঙুলের ফাঁকে শক্ত করে রাখা চাবি, উচ্চ শব্দের অ্যালার্ম, ছাতা বা ভারী ব্যাগ যেকোনো জরুরি পরিস্থিতিতে আত্মরক্ষার কার্যকর হাতিয়ার হিসেবে ব্যবহার করতে পারেন।'
+  },
+  'App Location Privacy & Geolocation Audit': {
+    title_bn: 'অ্যাপের লোকেশন প্রাইভেসী ও ট্র্যাকিং অডিট',
+    content_bn: 'ফোনের অ্যাপ পারমিশন নিয়মিত পরীক্ষা করুন। সামাজিক যোগাযোগ মাধ্যম বা অপ্রয়োজনীয় অ্যাপের ব্যাকগ্রাউন্ড লোকেশন বন্ধ রাখুন যাতে কেউ আপনাকে ট্র্যাক করতে না পারে।'
+  },
+  'Two-Factor Authentication (2FA) Security': {
+    title_bn: 'টু-ফ্যাক্টর অথেনটিকেশন (২এফএ) নিরাপত্তা',
+    content_bn: 'ইমেইল, ফেসবুক, হোয়াটসঅ্যাপ ও ব্যাংকিং অ্যাকাউন্টে টু-ফ্যাক্টর অথেনটিকেশন চালু রাখুন যাতে পাসওয়ার্ড জানা থাকলেও কেউ আপনার অ্যাকাউন্টে ঢুকতে না পারে।'
+  },
+  'Real-Time Posting & Check-In Safety': {
+    title_bn: 'রিয়েল-টাইম লোকেশন চেক-ইন সতর্কবার্তা',
+    content_bn: 'সোশ্যাল মিডিয়ায় কোনো জায়গায় থাকাকালীন সাথে সাথে লাইভ চেক-ইন বা ছবি পোস্ট করবেন না। স্থানটি ত্যাগ করার পর পোস্ট করা অনেক বেশি নিরাপদ।'
+  },
+  'Public Transit & Commute Awareness': {
+    title_bn: 'গণপরিবহন ও রাস্তায় চলার সতর্কতা',
+    content_bn: 'আলোযুক্ত স্থানে অপেক্ষা করুন। একা হাঁটার সময় দুই কানেই নয়েজ-ক্যানসেলিং হেডফোন পরে গান শুনবেন না, যাতে আশেপাশের গতিবিধি ও আওয়াজ টের পাওয়া যায়।'
+  },
+  'Hotel & Temporary Lodging Security': {
+    title_bn: 'হোটেল ও অস্থায়ী আবাসন নিরাপত্তা',
+    content_bn: 'হোটেল রুমের দরজায় সেফটি লক বা ডোর স্টপার ব্যবহার করুন। দরজার ওপাশে কোনো হোটেল কর্মী পরিচয় দিলে নিশ্চিত না হয়ে দরজা খুলবেন না।'
+  },
+  'Late-Night Overtime Safety Protocol': {
+    title_bn: 'দেরিতে অফিস শেষে ফেরার সতর্কতা',
+    content_bn: 'দেরি করে অফিস শেষ হলে অফিসের সিকিউরিটি টিমকে জানিয়ে রাখুন এবং নিরাপদ কোনো বাহন না আসা পর্যন্ত অফিস ভবনের ভেতরে অপেক্ষা করুন।'
+  },
+  'Documenting Workplace Harassment': {
+    title_bn: 'কর্মক্ষেত্রে হয়রানির প্রমাণাদি সংরক্ষণ',
+    content_bn: 'কর্মক্ষেত্রে কোনো অনাকাঙ্ক্ষিত আচরণ বা হেনস্তার শিকার হলে তারিখ, সময়, কথোপকথন এবং স্ক্রিনশট নিরাপদ ক্লাউড বা ভল্টে সংরক্ষণ করে রাখুন।'
+  },
+  'Emergency Building Evacuation Routes': {
+    title_bn: 'অফিস ভবনের জরুরি প্রস্থান পথ',
+    content_bn: 'আপনার অফিসের জরুরি সিঁড়ি, ফায়ার এক্সিট এবং জরুরি অ্যালার্ম বাটন কোথায় রয়েছে তা আগেই চিনে রাখুন।'
+  },
+  'Home Entrance & Doorway Vigilance': {
+    title_bn: 'বাসার প্রবেশদ্বার ও সতর্ক দরজা খোলা',
+    content_bn: 'দরজার সামনে আসার আগেই চাবি হাতে প্রস্তুত রাখুন। দরজা খোলার আগে আশেপাশের পরিবেশ একনজর দেখে নিন এবং দ্রুত ভেতরে ঢুকে ছিটকিনি লাগিয়ে দিন।'
+  },
+  'Deadbolts & Secondary Window Locks': {
+    title_bn: 'দরজা-জানালায় মজবুত লক ও সিকিউরিটি ডোর',
+    content_bn: 'বাসার মূল দরজায় শক্ত ডেডবোল্ট ও ম্যাজিক আই (Peephole) রাখুন। নিচতলা বা ব্যালকনির জানালায় মজবুত গ্রিল নিশ্চিত করুন।'
+  },
+  'Trusted Neighbor Emergency Network': {
+    title_bn: 'বিশ্বস্ত প্রতিবেশীর সাথে জরুরি যোগাযোগ',
+    content_bn: 'বিপদের সময় সাহায্যের জন্য পাশের বাসার বিশ্বস্ত প্রতিবেশীর সাথে যোগাযোগ রাখুন এবং ৯৯৯, ১০৯ ও অন্যান্য জরুরি নম্বর দরজার পাশে ঝুলিয়ে রাখুন।'
+  },
+  'Legal Protection Under Nari O Shishu Nirjatan Daman Ain': {
+    title_bn: 'নারী ও শিশু নির্যাতন দমন আইনের আওতায় আইনি সুরক্ষা',
+    content_bn: 'বাংলাদেশ আইনে যৌন হয়রানি, উত্ত্যক্ত করা ও পারিবারিক সহিংসতা জামিন অযোগ্য ও কঠোর শাস্তিযোগ্য অপরাধ। ভুক্তভোগীর তাৎক্ষণিক আইনি সহায়তা পাওয়ার পূর্ণ অধিকার রয়েছে।'
+  },
+  'Filing a General Diary (GD) or FIR at Police Stations': {
+    title_bn: 'থানায় সাধারণ ডায়েরি (জিডি) বা এফআইআর দায়ের করার নিয়ম',
+    content_bn: 'যেকোনো হুমকি বা বিপদে থানায় জিডি বা মামলা নেওয়ার জন্য পুলিশ আইনত বাধ্য। জিডি দায়ের করার পর অবশ্যই সিল ও স্বাক্ষরসহ অনুলিপি সংগ্রহ করুন।'
+  },
+  'Access to Government Free Legal Aid (16430)': {
+    title_bn: 'সরকারি বিনামূল্যে আইনি সহায়তা সেবা (১৬৪৩০)',
+    content_bn: 'বাংলাদেশ সরকারের জাতীয় আইনগত সহায়তা প্রদান সংস্থার টোল-ফ্রি নম্বর ১৬৪৩০-এ কল করে বিনা খরচে আইনি পরামর্শ ও আইনজীবী সেবা পাওয়া যায়।'
+  }
+};
+
 const DEFAULT_SAFETY_TIPS = [
   // Self Defense
   {
@@ -205,10 +292,25 @@ const SafetyTips = () => {
     fetchTips();
   }, []);
 
+  const getTipTitle = (tip) => {
+    if (!isBn) return tip.title;
+    return tip.title_bn || KNOWN_TIPS_TRANSLATIONS[tip.title]?.title_bn || tip.title;
+  };
+
+  const getTipContent = (tip) => {
+    if (!isBn) return tip.content;
+    return tip.content_bn || KNOWN_TIPS_TRANSLATIONS[tip.title]?.content_bn || tip.content;
+  };
+
+  const getTipCategory = (tipCat) => {
+    if (!isBn) return tipCat;
+    return categoryTranslations[tipCat] || tipCat;
+  };
+
   const filteredTips = tips.filter(t => {
     const matchesCat = category === 'All' || t.category === category;
-    const titleToSearch = isBn ? (t.title_bn || t.title || '') : (t.title || '');
-    const contentToSearch = isBn ? (t.content_bn || t.content || '') : (t.content || '');
+    const titleToSearch = getTipTitle(t);
+    const contentToSearch = getTipContent(t);
     const matchesSearch =
       titleToSearch.toLowerCase().includes(search.toLowerCase()) ||
       contentToSearch.toLowerCase().includes(search.toLowerCase());
@@ -284,15 +386,15 @@ const SafetyTips = () => {
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="mono-tag mono-tag-rose">
-                    <FiTag /> {isBn ? (categoryTranslations[tip.category] || tip.category) : tip.category}
+                    <FiTag /> {getTipCategory(tip.category)}
                   </span>
                   <FiBookOpen className="text-zinc-400" />
                 </div>
                 <h3 className="text-base font-extrabold font-heading text-zinc-900 dark:text-white leading-snug">
-                  {isBn ? (tip.title_bn || tip.title) : tip.title}
+                  {getTipTitle(tip)}
                 </h3>
                 <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed font-normal">
-                  {isBn ? (tip.content_bn || tip.content) : tip.content}
+                  {getTipContent(tip)}
                 </p>
               </div>
             </div>

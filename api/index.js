@@ -45,28 +45,62 @@ const dbData = {
     ['blog-1', {
       id: 'blog-1',
       title: 'Essential Self-Defense Strategies Every Woman Should Know',
+      title_bn: 'প্রত্যেক নারীর জন্য আবশ্যকীয় আত্মরক্ষা ও নিরাপত্তা কৌশল',
       summary: 'Learn practical physical awareness and tactical self-defense maneuvers.',
+      summary_bn: 'পাবলিক প্লেসে সচেতনতা, শারীরিক কৌশল এবং তাৎক্ষণিক আত্মরক্ষার প্রয়োজনীয় নির্দেশিকা।',
       content: 'Personal safety begins with situational awareness. Stay alert in low-light environments, trust your instincts, and keep emergency hotlines on speed dial...',
+      content_bn: 'ব্যক্তিগত নিরাপত্তা শুরু হয় পরিস্থিতি সম্পর্কে সচেতনতার মাধ্যমে। কম আলো বা নির্জন স্থানে সতর্ক থাকুন, নিজের অনুভূতির উপর আস্থা রাখুন এবং জরুরি হটলাইনগুলো প্রস্তুত রাখুন...',
       author: 'SafeHaven Security Team',
+      author_bn: 'সেফহ্যাভেন নিরাপত্তা টিম',
       category: 'Self Defense',
+      category_bn: 'আত্মরক্ষা',
       imageUrl: 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=800&q=80',
       createdAt: new Date().toISOString()
     }],
     ['blog-2', {
       id: 'blog-2',
       title: 'Digital Safety: Protecting Your Location & Online Privacy',
+      title_bn: 'ডিজিটাল নিরাপত্তা: লাইভ লোকেশন ও অনলাইন তথ্যের গোপনীয়তা রক্ষা',
       summary: 'How to prevent cyber-stalking, secure mobile permissions, and manage location sharing.',
+      summary_bn: 'সাইবার স্টকিং রোধ, মোবাইল অ্যাপ পারমিশন নিয়ন্ত্রণ এবং রিয়েল-টাইম গোপনীয়তা সুরক্ষার উপায়।',
       content: 'Your digital footprint can reveal your real-world routines. Review application permissions frequently, use multi-factor authentication, and avoid posting live check-ins...',
+      content_bn: 'আধুনিক ডিজিটাল যুগে মোবাইল তথ্যের গোপনীয়তা ব্যক্তিগত নিরাপত্তার একটি অবিচ্ছেদ্য অংশ। অধিকাংশ ক্ষেত্রে সামাজিক যোগাযোগ মাধ্যমে সরাসরি চেক-ইন বা মোবাইল অ্যাপের অনিয়ন্ত্রিত পারমিশন থেকে ট্র্যাকিংয়ের ঘটনা ঘটে...',
       author: 'Cyber Safety Expert',
+      author_bn: 'সাইবার সুরক্ষা বিশেষজ্ঞ',
       category: 'Digital Safety',
+      category_bn: 'ডিজিটাল নিরাপত্তা',
       imageUrl: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&w=800&q=80',
       createdAt: new Date().toISOString()
     }]
   ]),
   safetyTips: new Map([
-    ['tip-1', { id: 'tip-1', title: 'Commuting at Night', category: 'Travel Safety', content: 'Stay in well-lit areas, share your live trip details with a trusted contact, and avoid wearing noise-canceling headphones.' }],
-    ['tip-2', { id: 'tip-2', title: 'Ride-Sharing Security Checklist', category: 'Travel Safety', content: 'Verify driver identity, match license plate numbers before entering, and sit in the rear seat.' }],
-    ['tip-3', { id: 'tip-3', title: 'Home Entrance Vigilance', category: 'Home Safety', content: 'Have your keys ready before reaching your front door. Look around before stepping inside.' }]
+    ['tip-1', { 
+      id: 'tip-1', 
+      title: 'Commuting at Night', 
+      title_bn: 'রাতের যাত্রা ও যাতায়াতের নিরাপত্তা',
+      category: 'Travel Safety', 
+      category_bn: 'ভ্রমণ নিরাপত্তা',
+      content: 'Stay in well-lit areas, share your live trip details with a trusted contact, and avoid wearing noise-canceling headphones.',
+      content_bn: 'সবসময় আলোযুক্ত রাস্তায় চলুন, বিশ্বস্ত পরিচিতদের সাথে লাইভ ট্রিপ লোকেশন শেয়ার করুন এবং রাতে একা চলার সময় দুই কানে হেডফোন গুঁজে রাখবেন না।'
+    }],
+    ['tip-2', { 
+      id: 'tip-2', 
+      title: 'Ride-Sharing Security Checklist', 
+      title_bn: 'রাইডশেয়ারিং নিরাপত্তা চেকলিস্ট',
+      category: 'Travel Safety', 
+      category_bn: 'ভ্রমণ নিরাপত্তা',
+      content: 'Verify driver identity, match license plate numbers before entering, and sit in the rear seat.',
+      content_bn: 'গাড়িতে ওঠার আগে চালকের ছবি ও গাড়ির নম্বর প্লেট অ্যাপের সাথে মিলিয়ে নিন এবং পেছনের সিটে বসুন।'
+    }],
+    ['tip-3', { 
+      id: 'tip-3', 
+      title: 'Home Entrance Vigilance', 
+      title_bn: 'বাসার প্রবেশদ্বারে সতর্কতা',
+      category: 'Home Safety', 
+      category_bn: 'বাসার নিরাপত্তা',
+      content: 'Have your keys ready before reaching your front door. Look around before stepping inside.',
+      content_bn: 'দরজার সামনে আসার আগেই চাবি হাতে রাখুন। ভেতরে প্রবেশের আগে আশেপাশের পরিবেশ দেখে নিন এবং দ্রুত ছিটকিনি লাগিয়ে দিন।'
+    }]
   ])
 };
 

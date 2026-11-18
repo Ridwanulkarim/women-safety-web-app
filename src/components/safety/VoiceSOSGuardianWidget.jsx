@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { FiMic, FiMicOff, FiShield, FiAlertTriangle, FiVolume2, FiRadio, FiCheckCircle, FiPlayCircle, FiGlobe } from 'react-icons/fi';
 import { useVoiceSOS } from '../../context/VoiceSOSContext';
+import { useLanguage } from '../../context/LanguageContext';
 
 const VoiceSOSGuardianWidget = () => {
   const {
@@ -16,6 +17,9 @@ const VoiceSOSGuardianWidget = () => {
     triggerDistressSequence
   } = useVoiceSOS();
 
+  const { language } = useLanguage();
+  const isBn = language === 'bn';
+
   const supportedKeywords = [
     { text: 'বাঁচাও', lang: 'bn' },
     { text: 'Help', lang: 'en' },
@@ -27,7 +31,7 @@ const VoiceSOSGuardianWidget = () => {
   ];
 
   return (
-    <div className={`glass-card-xl p-6 sm:p-7 rounded-3xl space-y-5 transition-all duration-300 relative overflow-hidden ${
+    <div className={`glass-card-xl p-6 sm:p-7 rounded-3xl space-y-5 transition-all duration-300 relative overflow-hidden font-sans ${
       isGuardianActive
         ? 'border-emerald-500/40 bg-emerald-50/20 dark:bg-emerald-950/10 shadow-xl shadow-emerald-900/10'
         : 'border-zinc-200/80 dark:border-zinc-800/80'
@@ -50,16 +54,18 @@ const VoiceSOSGuardianWidget = () => {
           <div>
             <div className="flex items-center gap-2">
               <h3 className="text-base font-extrabold font-heading text-zinc-900 dark:text-white tracking-tight">
-                AI Voice-Activated Hands-Free SOS
+                {isBn ? 'এআই ভয়েস-অ্যাক্টিভেটেড হ্যান্ডস-ফ্রি এসওএস' : 'AI Voice-Activated Hands-Free SOS'}
               </h3>
               <span className={`mono-tag text-[9px] ${
                 isGuardianActive ? 'mono-tag-emerald' : 'mono-tag-zinc'
               }`}>
-                {isGuardianActive ? 'GUARDIAN ACTIVE' : 'STANDBY'}
+                {isGuardianActive ? (isBn ? 'গার্ডিয়ান সক্রিয়' : 'GUARDIAN ACTIVE') : (isBn ? 'স্ট্যান্ডবাই' : 'STANDBY')}
               </span>
             </div>
             <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-0.5">
-              রাস্তায় চলার সময় বা বিপদে পড়লে ফোন আনলক না করেই মুখে <strong>"Help"</strong> বা <strong>"বাঁচাও"</strong> বললেই স্বয়ংক্রিয় SOS ব্রডকাস্ট হবে।
+              {isBn
+                ? <>রাস্তায় চলার সময় বা বিপদে পড়লে ফোন আনলক না করেই মুখে <strong>"Help"</strong> বা <strong>"বাঁচাও"</strong> বললেই স্বয়ংক্রিয় SOS ব্রডকাস্ট হবে।</>
+                : <>Hands-free voice recognition: Simply say <strong>"Help"</strong> or <strong>"বাঁচাও"</strong> to automatically trigger siren and send emergency SOS with live GPS.</>}
             </p>
           </div>
         </div>
@@ -68,12 +74,12 @@ const VoiceSOSGuardianWidget = () => {
         <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
           <div className="text-right sm:block hidden">
             <span className="block text-[10px] font-mono font-bold uppercase text-zinc-400">
-              হ্যান্ডস-ফ্রি গার্ডিয়ান
+              {isBn ? 'হ্যান্ডস-ফ্রি গার্ডিয়ান' : 'Hands-Free Guardian'}
             </span>
             <span className={`text-xs font-bold font-mono ${
               isGuardianActive ? 'text-emerald-600 dark:text-emerald-400' : 'text-zinc-500'
             }`}>
-              {isGuardianActive ? '🟢 অন রয়েছে' : '⚪ বন্ধ রয়েছে'}
+              {isGuardianActive ? (isBn ? '🟢 চালু রয়েছে' : '🟢 ENABLED') : (isBn ? '⚪ বন্ধ রয়েছে' : '⚪ DISABLED')}
             </span>
           </div>
 
@@ -97,7 +103,9 @@ const VoiceSOSGuardianWidget = () => {
       {/* Unsupported Browser Alert (if non-Chromium) */}
       {!isSpeechSupported && (
         <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 text-xs font-medium">
-          ⚠️ আপনার বর্তমান ব্রাউজারে Web Speech Recognition API সাপোর্ট করে না। সর্বোত্তম অভিজ্ঞতার জন্য <strong>Google Chrome, Microsoft Edge অথবা Safari</strong> ব্যবহার করুন। নিচের "টেস্ট সিমুলেশন" বাটনে ক্লিক করে আপনি যে কোনো ব্রাউজারে এটি পরীক্ষা করতে পারেন।
+          {isBn
+            ? <>⚠️ আপনার বর্তমান ব্রাউজারে Web Speech Recognition API সাপোর্ট করে না। সর্বোত্তম অভিজ্ঞতার জন্য <strong>Google Chrome, Microsoft Edge অথবা Safari</strong> ব্যবহার করুন।</>
+            : <>⚠️ Web Speech Recognition API is not supported in this browser. Please use <strong>Google Chrome, Microsoft Edge or Safari</strong> for hands-free listening.</>}
         </div>
       )}
 
@@ -107,7 +115,9 @@ const VoiceSOSGuardianWidget = () => {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
             <div className="flex items-center gap-2 text-xs font-mono text-emerald-600 dark:text-emerald-400">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
-              <span className="font-bold">মাইক্রোফোন সক্রিয়: কথা শুনছে... (Continuous Ambient Listening)</span>
+              <span className="font-bold">
+                {isBn ? 'মাইক্রোফোন সক্রিয়: কথা শুনছে... (Continuous Ambient Listening)' : 'Microphone Active: Continuous Ambient Listening...'}
+              </span>
             </div>
 
             {/* Language Switcher */}
@@ -156,9 +166,11 @@ const VoiceSOSGuardianWidget = () => {
 
           {/* Live Transcript Stream */}
           <div className="flex items-center justify-between text-xs text-zinc-600 dark:text-zinc-400 pt-1 font-mono">
-            <span className="text-[11px] text-zinc-500">সর্বশেষ শোনা অডিও:</span>
+            <span className="text-[11px] text-zinc-500">
+              {isBn ? 'সর্বশেষ শোনা অডিও:' : 'Last heard transcript:'}
+            </span>
             <span className="font-semibold text-zinc-800 dark:text-zinc-200 truncate max-w-xs">
-              {liveTranscript ? `"${liveTranscript}"` : 'কোনো শব্দ শোনা যায়নি...'}
+              {liveTranscript ? `"${liveTranscript}"` : (isBn ? 'কোনো শব্দ শোনা যায়নি...' : 'Awaiting speech input...')}
             </span>
           </div>
         </div>
@@ -167,7 +179,7 @@ const VoiceSOSGuardianWidget = () => {
       {/* Trigger Keywords Chips */}
       <div className="space-y-2 relative z-10">
         <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-zinc-500 block">
-          শনাক্তযোগ্য বিপদ শব্দসমূহ (Distress Trigger Keywords):
+          {isBn ? 'শনাক্তযোগ্য বিপদ শব্দসমূহ (Distress Trigger Keywords):' : 'Supported Distress Trigger Keywords:'}
         </span>
         <div className="flex flex-wrap gap-2">
           {supportedKeywords.map((item, idx) => (
@@ -186,7 +198,7 @@ const VoiceSOSGuardianWidget = () => {
       <div className="pt-2 border-t border-zinc-200/80 dark:border-zinc-800/80 flex flex-wrap items-center justify-between gap-3 relative z-10">
         <div className="text-[11px] text-zinc-500 font-mono flex items-center gap-1.5">
           <FiShield className="text-emerald-500" />
-          <span>৫ সেকেন্ডের ফলস-অ্যালার্ম ক্যান্সেল বাফার সহ সুরক্ষিত</span>
+          <span>{isBn ? '৫ সেকেন্ডের ফলস-অ্যালার্ম বাতিল বাফার সহ সুরক্ষিত' : 'Protected with 5-second false-alarm cancel buffer'}</span>
         </div>
 
         <div className="flex items-center gap-2 w-full sm:w-auto">
@@ -196,7 +208,7 @@ const VoiceSOSGuardianWidget = () => {
             className="flex-1 sm:flex-initial px-3.5 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-500/20 text-xs font-bold font-mono transition flex items-center justify-center gap-1.5 shadow-xs cursor-pointer active:scale-95"
             title="Simulate speaking 'বাঁচাও' (Bengali Trigger)"
           >
-            <FiPlayCircle className="text-sm" /> টেস্ট: "বাঁচাও"
+            <FiPlayCircle className="text-sm" /> {isBn ? 'টেস্ট: "বাঁচাও"' : 'Test: "বাঁচাও"'}
           </button>
 
           <button
