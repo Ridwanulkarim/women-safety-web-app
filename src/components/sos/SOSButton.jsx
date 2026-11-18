@@ -2,10 +2,15 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { FiAlertCircle } from 'react-icons/fi';
 import { useSOS } from '../../context/SOSContext';
+import { useLanguage } from '../../context/LanguageContext';
 
-const SOSButton = ({ size = 'large', label = 'EMERGENCY SOS' }) => {
+const SOSButton = ({ size = 'large', label }) => {
   const { openSOSModal, isSOSActive } = useSOS();
+  const { language } = useLanguage();
+  const isBn = language === 'bn';
 
+  const defaultLabel = isBn ? 'জরুরি এসওএস' : 'EMERGENCY SOS';
+  const displayLabel = label || defaultLabel;
   const isLg = size === 'large';
 
   return (
@@ -24,8 +29,12 @@ const SOSButton = ({ size = 'large', label = 'EMERGENCY SOS' }) => {
       >
         <span className="absolute inset-0 rounded-full bg-white/20 opacity-0 group-hover:opacity-100 transition" />
         <FiAlertCircle className={`${isLg ? 'w-16 h-16 sm:w-20 sm:h-20' : 'w-8 h-8'} mb-1 animate-bounce`} />
-        <span className="tracking-widest uppercase font-heading">{label}</span>
-        {isLg && <span className="text-[10px] opacity-80 mt-1 font-sans">TAP FOR QUICK DISTRESS</span>}
+        <span className="tracking-widest uppercase font-heading">{displayLabel}</span>
+        {isLg && (
+          <span className="text-[10px] opacity-80 mt-1 font-sans">
+            {isBn ? 'সাহায্যের জন্য ট্যাপ করুন' : 'TAP FOR QUICK DISTRESS'}
+          </span>
+        )}
       </motion.button>
     </div>
   );

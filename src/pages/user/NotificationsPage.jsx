@@ -1,10 +1,13 @@
 import React from 'react';
 import { FiBell, FiCheck, FiTrash2, FiInfo, FiAlertTriangle } from 'react-icons/fi';
 import { useNotifications } from '../../context/NotificationContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { formatDate } from '../../utils/helpers';
 
 const NotificationsPage = () => {
   const { notifications, markAsRead, deleteNotification } = useNotifications();
+  const { language } = useLanguage();
+  const isBn = language === 'bn';
 
   return (
     <div className="max-w-4xl mx-auto space-y-8 font-sans relative overflow-hidden">
@@ -18,10 +21,16 @@ const NotificationsPage = () => {
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-xl sm:text-2xl font-extrabold font-heading text-zinc-900 dark:text-white">Notifications</h1>
-              <span className="mono-tag mono-tag-rose text-[10px]">REAL-TIME TELEMETRY</span>
+              <h1 className="text-xl sm:text-2xl font-extrabold font-heading text-zinc-900 dark:text-white">
+                {isBn ? 'নোটিফিকেশন ও বার্তা' : 'Notifications'}
+              </h1>
+              <span className="mono-tag mono-tag-rose text-[10px]">
+                {isBn ? 'রিয়েল-টাইম টেলিমেট্রি' : 'REAL-TIME TELEMETRY'}
+              </span>
             </div>
-            <p className="text-xs text-zinc-500 dark:text-zinc-400">Emergency alerts, safety updates, and system announcements.</p>
+            <p className="text-xs text-zinc-500 dark:text-zinc-400">
+              {isBn ? 'জরুরি অ্যালার্ট, নিরাপত্তা আপডেট এবং সিস্টেম ঘোষণাসমূহ।' : 'Emergency alerts, safety updates, and system announcements.'}
+            </p>
           </div>
         </div>
       </div>
@@ -30,8 +39,12 @@ const NotificationsPage = () => {
         {notifications.length === 0 ? (
           <div className="glass-card-xl p-12 rounded-3xl text-center space-y-3 text-zinc-400">
             <FiBell className="w-12 h-12 mx-auto opacity-30 text-rose-500" />
-            <p className="text-sm font-bold text-zinc-700 dark:text-zinc-300">No Notifications Found</p>
-            <p className="text-xs text-zinc-500">You're completely up to date with all safety advisories.</p>
+            <p className="text-sm font-bold text-zinc-700 dark:text-zinc-300">
+              {isBn ? 'কোনো নোটিফিকেশন নেই' : 'No Notifications Found'}
+            </p>
+            <p className="text-xs text-zinc-500">
+              {isBn ? 'আপনি সকল নিরাপত্তা তথ্যের সাথে আপ-টু-ডেট আছেন।' : "You're completely up to date with all safety advisories."}
+            </p>
           </div>
         ) : (
           notifications.map((item) => (
@@ -53,29 +66,31 @@ const NotificationsPage = () => {
                     <h4 className="font-bold text-sm text-zinc-900 dark:text-white">{item.title}</h4>
                     {!item.isRead && (
                       <span className="text-[9px] font-mono font-bold uppercase px-2 py-0.5 rounded-full bg-rose-600 text-white">
-                        New
+                        {isBn ? 'নতুন' : 'New'}
                       </span>
                     )}
                   </div>
                   <p className="text-xs text-zinc-600 dark:text-zinc-300 leading-relaxed">{item.message}</p>
-                  <span className="text-[10px] text-zinc-400 font-mono block">{formatDate(item.createdAt)}</span>
+                  <span className="text-[10px] text-zinc-400 flex items-center gap-1 font-mono pt-1">
+                    {formatDate(item.createdAt || item.timestamp)}
+                  </span>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 flex-shrink-0">
+              <div className="flex items-center gap-2">
                 {!item.isRead && (
                   <button
                     onClick={() => markAsRead(item.id)}
-                    className="p-2 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200 hover:text-rose-600 text-xs transition"
-                    title="Mark Read"
+                    className="p-2 rounded-xl text-zinc-400 hover:text-emerald-500 hover:bg-emerald-500/10 transition"
+                    title={isBn ? 'পঠিত হিসেবে চিহ্নিত করুন' : 'Mark as Read'}
                   >
                     <FiCheck />
                   </button>
                 )}
                 <button
                   onClick={() => deleteNotification(item.id)}
-                  className="p-2 rounded-xl bg-rose-500/10 text-rose-600 hover:bg-rose-500/20 text-xs transition"
-                  title="Delete Notification"
+                  className="p-2 rounded-xl text-zinc-400 hover:text-rose-500 hover:bg-rose-500/10 transition"
+                  title={isBn ? 'মুছে ফেলুন' : 'Delete'}
                 >
                   <FiTrash2 />
                 </button>

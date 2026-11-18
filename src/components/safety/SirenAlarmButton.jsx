@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { FiVolume2, FiVolumeX, FiAlertTriangle } from 'react-icons/fi';
+import { useLanguage } from '../../context/LanguageContext';
 import toast from 'react-hot-toast';
 
 const SirenAlarmButton = () => {
@@ -7,12 +8,14 @@ const SirenAlarmButton = () => {
   const audioCtxRef = useRef(null);
   const oscRef = useRef(null);
   const gainRef = useRef(null);
+  const { language } = useLanguage();
+  const isBn = language === 'bn';
 
   const startSiren = () => {
     try {
       const AudioContext = window.AudioContext || window.webkitAudioContext;
       if (!AudioContext) {
-        toast.error('Web Audio API not supported in this browser');
+        toast.error(isBn ? 'আপনার ব্রাউজারে অডিও এপিআই সমর্থিত নয়' : 'Web Audio API not supported in this browser');
         return;
       }
 
@@ -53,10 +56,10 @@ const SirenAlarmButton = () => {
 
       oscRef.current.start();
       setIsPlaying(true);
-      toast.error('🚨 Loud Emergency Siren Alarm Activated!');
+      toast.error(isBn ? '🚨 তীব্র বিপদকালীন সাইরেন অ্যালার্ম চালু হয়েছে!' : '🚨 Loud Emergency Siren Alarm Activated!');
     } catch (e) {
       console.warn('Audio Siren Error:', e.message);
-      toast.error('Could not activate siren');
+      toast.error(isBn ? 'সাইরেন বাজানো সম্ভব হয়নি' : 'Could not activate siren');
     }
   };
 
@@ -73,7 +76,7 @@ const SirenAlarmButton = () => {
       } catch (e) {}
     }
     setIsPlaying(false);
-    toast.success('Emergency siren deactivated');
+    toast.success(isBn ? 'সাইরেন বন্ধ করা হয়েছে' : 'Emergency siren deactivated');
   };
 
   const toggleSiren = () => {
@@ -94,7 +97,11 @@ const SirenAlarmButton = () => {
       }`}
     >
       {isPlaying ? <FiVolumeX className="w-4 h-4" /> : <FiVolume2 className="w-4 h-4" />}
-      <span>{isPlaying ? 'STOP SIREN (100dB)' : 'LOUD SIREN ALARM'}</span>
+      <span>
+        {isPlaying 
+          ? (isBn ? 'সাইরেন বন্ধ করুন' : 'STOP SIREN (100dB)') 
+          : (isBn ? 'জরুরি সাইরেন অ্যালার্ম' : 'LOUD SIREN ALARM')}
+      </span>
     </button>
   );
 };

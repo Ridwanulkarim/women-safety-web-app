@@ -6,10 +6,13 @@ import SOSButton from '../../components/sos/SOSButton';
 import LiveMap from '../../components/map/LiveMap';
 import { EMERGENCY_NUMBERS } from '../../utils/constants';
 import { useLanguage } from '../../context/LanguageContext';
+import { useGeolocation } from '../../hooks/useGeolocation';
 import LanguageToggle from '../../components/common/LanguageToggle';
 
 const Home = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const isBn = language === 'bn';
+  const location = useGeolocation(true);
 
   return (
     <div className="space-y-12 pb-24 relative overflow-hidden">
@@ -55,10 +58,10 @@ const Home = () => {
             <div className="space-y-4 relative z-10">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="mono-tag mono-tag-zinc">
-                  <FiCpu className="w-3.5 h-3.5 text-zinc-500" /> Platform v2.4
+                  <FiCpu className="w-3.5 h-3.5 text-zinc-500" /> {isBn ? 'প্ল্যাটফর্ম সংস্করণ ২.৪' : 'Platform v2.4'}
                 </span>
                 <span className="mono-tag mono-tag-emerald">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 telemetry-dot"></span> 24/7 Protection Shield
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 telemetry-dot"></span> {isBn ? '২৪/৭ সার্বক্ষণিক সুরক্ষা কবচ' : '24/7 Protection Shield'}
                 </span>
               </div>
 
@@ -124,7 +127,9 @@ const Home = () => {
               <span className="flex items-center gap-1.5 text-rose-600 dark:text-rose-400 font-bold">
                 <FiMapPin /> {t('home.gpsTelemetry')}
               </span>
-              <span className="text-zinc-800 dark:text-zinc-300 font-semibold">23.8103° N, 90.4125° E</span>
+              <span className="text-zinc-800 dark:text-zinc-300 font-semibold">
+                {location.latitude ? `${location.latitude.toFixed(4)}° ${isBn ? 'উত্তর' : 'N'}, ${location.longitude.toFixed(4)}° ${isBn ? 'পূর্ব' : 'E'}` : 'Detecting GPS...'}
+              </span>
             </div>
           </motion.div>
 
@@ -176,12 +181,20 @@ const Home = () => {
             <h2 className="text-lg font-extrabold text-zinc-900 dark:text-white font-heading">{t('home.monitoringRadar')}</h2>
           </div>
           <span className="mono-tag mono-tag-zinc hidden sm:inline-flex">
-            Leaflet / OpenStreetMap Dual Engine
+            {isBn ? 'লিফলেট / ওপেনস্ট্রিটম্যাপ ডুয়াল ইঞ্জিন' : 'Leaflet / OpenStreetMap Dual Engine'}
           </span>
         </div>
 
         <div className="rounded-3xl overflow-hidden border border-zinc-200/80 dark:border-zinc-800/80 shadow-xl">
-          <LiveMap title="SafeHaven Geolocation Radar" />
+          <LiveMap 
+            latitude={location.latitude}
+            longitude={location.longitude}
+            accuracy={location.accuracy}
+            title={isBn ? 'সেফহ্যাভেন লাইভ লোকেশন রাডার' : 'SafeHaven Geolocation Radar'}
+            onLocationChange={(lat, lng, acc, addr) => {
+              location.setManualLocation(lat, lng, addr);
+            }}
+          />
         </div>
       </section>
 

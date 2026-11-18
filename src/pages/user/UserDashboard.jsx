@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { FiAlertCircle, FiPhoneCall, FiMapPin, FiCheckCircle, FiShield, FiUser, FiActivity, FiVolume2, FiPlusCircle } from 'react-icons/fi';
 import { useAuth } from '../../context/AuthContext';
 import { useSOS } from '../../context/SOSContext';
+import { useLanguage } from '../../context/LanguageContext';
 import SOSButton from '../../components/sos/SOSButton';
 import SOSHistoryList from '../../components/sos/SOSHistoryList';
 import ContactCard from '../../components/contacts/ContactCard';
@@ -14,6 +15,9 @@ import VoiceSOSGuardianWidget from '../../components/safety/VoiceSOSGuardianWidg
 const UserDashboard = () => {
   const { user } = useAuth();
   const { sosHistory, openSOSModal, savedContacts = [] } = useSOS();
+  const { language } = useLanguage();
+  const isBn = language === 'bn';
+
   const [fakeCallOpen, setFakeCallOpen] = useState(false);
   const [medicalIdOpen, setMedicalIdOpen] = useState(false);
 
@@ -28,17 +32,21 @@ const UserDashboard = () => {
         <div className="space-y-2 relative z-10">
           <div className="flex flex-wrap items-center gap-2">
             <span className="mono-tag mono-tag-emerald">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 telemetry-dot"></span> Active Protection Shield
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 telemetry-dot"></span> {isBn ? 'সক্রিয় সুরক্ষা কবচ' : 'Active Protection Shield'}
             </span>
             <span className="mono-tag mono-tag-zinc">
-              Telemetry: ONLINE
+              {isBn ? 'টেলিমেট্রি: অনলাইন' : 'Telemetry: ONLINE'}
             </span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold font-heading text-zinc-900 dark:text-white tracking-tight">
-            Welcome, <span className="gradient-text-rose">{user?.fullName || 'User'}</span> 👋
+            {isBn ? 'স্বাগতম, ' : 'Welcome, '}<span className="gradient-text-rose">{user?.fullName || (isBn ? 'ব্যবহারকারী' : 'User')}</span> 👋
           </h1>
           <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400">
-            Emergency telemetry online. <span className="font-bold text-zinc-900 dark:text-white">{savedContacts.length} of 5</span> priority emergency contact(s) linked to your SOS beacon.
+            {isBn ? (
+              <>জরুরি টেলিমেট্রি সক্রিয়। আপনার এসওএস বিকনের সাথে ৫টির মধ্যে <span className="font-bold text-zinc-900 dark:text-white">{savedContacts.length}টি</span> জরুরি পরিচিতি যুক্ত রয়েছে।</>
+            ) : (
+              <>Emergency telemetry online. <span className="font-bold text-zinc-900 dark:text-white">{savedContacts.length} of 5</span> priority emergency contact(s) linked to your SOS beacon.</>
+            )}
           </p>
         </div>
 
@@ -50,14 +58,14 @@ const UserDashboard = () => {
             onClick={() => setFakeCallOpen(true)}
             className="btn-solid text-xs !py-2.5 !px-4 font-mono font-bold shadow-sm"
           >
-            <FiPhoneCall /> FAKE CALL
+            <FiPhoneCall /> {isBn ? 'ফেক কল' : 'FAKE CALL'}
           </button>
 
           <button
             onClick={() => setMedicalIdOpen(true)}
             className="btn-outline text-xs !py-2.5 !px-4 font-mono font-bold"
           >
-            <FiActivity /> MEDICAL ID
+            <FiActivity /> {isBn ? 'মেডিকেল আইডি' : 'MEDICAL ID'}
           </button>
         </div>
       </div>
@@ -72,9 +80,11 @@ const UserDashboard = () => {
         <div className="glass-card-xl p-6 sm:p-8 text-center space-y-6 flex flex-col items-center justify-center relative overflow-hidden">
           <div className="space-y-1">
             <span className="mono-tag mono-tag-rose text-[10px]">
-              <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse"></span> DISTRESS BEACON
+              <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse"></span> {isBn ? 'বিপদকালীন বিকন' : 'DISTRESS BEACON'}
             </span>
-            <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-widest font-mono">1-Tap Emergency Trigger</h3>
+            <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-widest font-mono">
+              {isBn ? '১-ট্যাপ জরুরি ট্রিগার' : '1-Tap Emergency Trigger'}
+            </h3>
           </div>
 
           <div className="relative flex items-center justify-center py-2">
@@ -83,7 +93,7 @@ const UserDashboard = () => {
           </div>
 
           <p className="text-xs text-zinc-500 dark:text-zinc-400 max-w-xs">
-            Press and hold for 3 seconds to broadcast live GPS telemetry to linked contacts.
+            {isBn ? 'সংযুক্ত পরিচিতিদের কাছে লাইভ জিপিএস লোকেশন পাঠাতে ৩ সেকেন্ড চাপ দিয়ে ধরে রাখুন।' : 'Press and hold for 3 seconds to broadcast live GPS telemetry to linked contacts.'}
           </p>
         </div>
 
@@ -96,26 +106,28 @@ const UserDashboard = () => {
               </div>
               <div>
                 <h3 className="text-sm font-extrabold uppercase tracking-wider text-zinc-900 dark:text-white font-heading">
-                  Priority Emergency Contacts
+                  {isBn ? 'অগ্রাধিকার জরুরি পরিচিতি' : 'Priority Emergency Contacts'}
                 </h3>
-                <p className="text-[11px] text-zinc-500">Speed-dial contacts receiving your SOS SMS alert</p>
+                <p className="text-[11px] text-zinc-500">
+                  {isBn ? 'জরুরি এসওএস সতর্কবার্তা পাঠানো হবে এমন স্পিড-ডায়াল পরিচিতি' : 'Speed-dial contacts receiving your SOS SMS alert'}
+                </p>
               </div>
             </div>
             <Link to="/dashboard/contacts" className="text-xs font-mono font-bold text-rose-600 dark:text-rose-400 hover:underline">
-              Manage ({savedContacts.length}/5) →
+              {isBn ? `ব্যবস্থাপনা (${savedContacts.length}/৫) →` : `Manage (${savedContacts.length}/5) →`}
             </Link>
           </div>
 
           {savedContacts.length === 0 ? (
             <div className="p-8 text-center space-y-3 rounded-2xl bg-zinc-50/80 dark:bg-zinc-900/60 border border-dashed border-zinc-300 dark:border-zinc-800">
               <p className="text-xs text-zinc-500 dark:text-zinc-400 font-medium">
-                No priority emergency contacts saved yet. Add at least 1 contact to enable automated dispatch alerts.
+                {isBn ? 'এখনও কোনো জরুরি পরিচিতি সংরক্ষিত নেই। স্বয়ংক্রিয় সতর্কবার্তা পাঠাতে অন্তত ১ জন পরিচিতি যোগ করুন।' : 'No priority emergency contacts saved yet. Add at least 1 contact to enable automated dispatch alerts.'}
               </p>
               <Link
                 to="/dashboard/contacts"
                 className="btn-danger text-xs !py-2 !px-4 font-mono inline-flex items-center gap-1.5 shadow-md shadow-rose-600/25"
               >
-                <FiPlusCircle /> Add Emergency Contacts
+                <FiPlusCircle /> {isBn ? 'জরুরি পরিচিতি যোগ করুন' : 'Add Emergency Contacts'}
               </Link>
             </div>
           ) : (
@@ -134,12 +146,14 @@ const UserDashboard = () => {
         <div className="flex items-center justify-between border-b border-zinc-200/80 dark:border-zinc-800/80 pb-4">
           <div className="space-y-0.5">
             <h3 className="text-sm font-extrabold uppercase tracking-wider text-zinc-900 dark:text-white font-heading">
-              Recent SOS Telemetry Logs
+              {isBn ? 'সাম্প্রতিক এসওএস টেলিমেট্রি লগ' : 'Recent SOS Telemetry Logs'}
             </h3>
-            <p className="text-[11px] text-zinc-500">Immutable audit log of historical emergency activations</p>
+            <p className="text-[11px] text-zinc-500">
+              {isBn ? 'বিগত সকল জরুরি এসওএস সক্রিয়করণের অপরিবর্তনীয় অডিট লগ' : 'Immutable audit log of historical emergency activations'}
+            </p>
           </div>
           <Link to="/dashboard/sos-history" className="text-xs font-mono font-bold text-rose-600 dark:text-rose-400 hover:underline">
-            Full History Log →
+            {isBn ? 'সম্পূর্ণ ইতিহাস লগ →' : 'Full History Log →'}
           </Link>
         </div>
 

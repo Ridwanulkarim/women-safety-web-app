@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { FiPhoneCall, FiPhoneOff, FiX, FiClock, FiUser, FiVolume2 } from 'react-icons/fi';
+import { useLanguage } from '../../context/LanguageContext';
 
 const FakeCallModal = ({ isOpen, onClose }) => {
-  const [callerName, setCallerName] = useState('Mom');
+  const { language } = useLanguage();
+  const isBn = language === 'bn';
+
+  const [callerName, setCallerName] = useState(isBn ? 'আম্মু (Mom)' : 'Mom');
   const [callerNumber, setCallerNumber] = useState('+880 1711-000000');
   const [delaySeconds, setDelaySeconds] = useState(5);
   const [callState, setCallState] = useState('IDLE'); // IDLE, COUNTDOWN, RINGING, CONNECTED
@@ -58,7 +62,7 @@ const FakeCallModal = ({ isOpen, onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/80 backdrop-blur-md">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/80 backdrop-blur-md font-sans">
       
       {/* 1. CONFIGURATION STAGE */}
       {callState === 'IDLE' && (
@@ -66,23 +70,26 @@ const FakeCallModal = ({ isOpen, onClose }) => {
           <button
             onClick={onClose}
             className="absolute top-4 right-4 p-1.5 text-zinc-400 hover:text-zinc-200 rounded-lg bg-zinc-100 dark:bg-zinc-800"
+            title={isBn ? 'বন্ধ করুন' : 'Close'}
           >
             <FiX className="w-4 h-4" />
           </button>
 
           <div className="space-y-1">
-            <span className="mono-tag mono-tag-rose">Tactile Safety Tool</span>
+            <span className="mono-tag mono-tag-rose">
+              {isBn ? 'কৌশলী সুরক্ষা টুল' : 'Tactile Safety Tool'}
+            </span>
             <h3 className="text-xl font-extrabold text-zinc-900 dark:text-white font-heading">
-              Fake Call Generator
+              {isBn ? 'ফেক কল জেনারেটর' : 'Fake Call Generator'}
             </h3>
             <p className="text-xs text-zinc-500">
-              Simulate a realistic incoming phone call to safely excuse yourself from uncomfortable situations.
+              {isBn ? 'অস্বস্তিকর বা ঝুঁকিপূর্ণ পরিস্থিতি থেকে নিরাপদে বের হয়ে আসতে একটি ভুয়া ইনকামিং কলের অনুকরণ করুন।' : 'Simulate a realistic incoming phone call to safely excuse yourself from uncomfortable situations.'}
             </p>
           </div>
 
           <div className="space-y-4">
             <div>
-              <label className="human-label">Caller Name</label>
+              <label className="human-label">{isBn ? 'কলদাতার নাম' : 'Caller Name'}</label>
               <div className="relative">
                 <FiUser className="absolute left-3.5 top-3 text-zinc-400" />
                 <input
@@ -90,24 +97,24 @@ const FakeCallModal = ({ isOpen, onClose }) => {
                   value={callerName}
                   onChange={(e) => setCallerName(e.target.value)}
                   className="human-input human-input-has-icon"
-                  placeholder="e.g. Mom, Officer Rahman, Boss"
+                  placeholder={isBn ? 'যেমন: আম্মু, ভাইয়া, স্যার' : 'e.g. Mom, Officer Rahman, Boss'}
                 />
               </div>
             </div>
 
             <div>
-              <label className="human-label">Phone Number Display</label>
+              <label className="human-label">{isBn ? 'ফোন নম্বর প্রদর্শন' : 'Phone Number Display'}</label>
               <input
                 type="text"
                 value={callerNumber}
                 onChange={(e) => setCallerNumber(e.target.value)}
-                className="human-input"
+                className="human-input font-mono"
                 placeholder="+880 17xx-xxxxxx"
               />
             </div>
 
             <div>
-              <label className="human-label">Call Delay (Seconds)</label>
+              <label className="human-label">{isBn ? 'কল শুরু হওয়ার সময় (সেকেন্ড)' : 'Call Delay (Seconds)'}</label>
               <div className="grid grid-cols-3 gap-2">
                 {[5, 10, 30].map((s) => (
                   <button
@@ -120,7 +127,7 @@ const FakeCallModal = ({ isOpen, onClose }) => {
                         : 'bg-zinc-100 dark:bg-zinc-800/60 text-zinc-700 dark:text-zinc-300 border-zinc-200 dark:border-zinc-700'
                     }`}
                   >
-                    {s} Secs
+                    {s} {isBn ? 'সেকেন্ড' : 'Secs'}
                   </button>
                 ))}
               </div>
@@ -128,9 +135,9 @@ const FakeCallModal = ({ isOpen, onClose }) => {
 
             <button
               onClick={startFakeCall}
-              className="w-full btn-solid py-3 text-xs uppercase font-mono tracking-wider"
+              className="w-full btn-solid py-3 text-xs uppercase font-mono tracking-wider font-bold"
             >
-              <FiPhoneCall /> Schedule Fake Call ({delaySeconds}s)
+              <FiPhoneCall /> {isBn ? `ফেক কল শুরু করুন (${delaySeconds} সেকেন্ড)` : `Schedule Fake Call (${delaySeconds}s)`}
             </button>
           </div>
         </div>
@@ -143,14 +150,18 @@ const FakeCallModal = ({ isOpen, onClose }) => {
             {countdown}s
           </div>
           <div>
-            <h3 className="text-lg font-bold text-zinc-900 dark:text-white font-heading">Incoming Call Scheduled</h3>
-            <p className="text-xs text-zinc-500">Lock your phone screen or keep it facing up. Incoming call will ring in {countdown} seconds.</p>
+            <h3 className="text-lg font-bold text-zinc-900 dark:text-white font-heading">
+              {isBn ? 'ইনকামিং কল শুরু হচ্ছে' : 'Incoming Call Scheduled'}
+            </h3>
+            <p className="text-xs text-zinc-500">
+              {isBn ? `ফোনটি স্বাভাবিকভাবে প্রস্তুত রাখুন। ঠিক ${countdown} সেকেন্ডের মধ্যে ইনকামিং কল আসবে।` : `Lock your phone screen or keep it facing up. Incoming call will ring in ${countdown} seconds.`}
+            </p>
           </div>
           <button
             onClick={() => setCallState('IDLE')}
             className="w-full btn-outline text-xs"
           >
-            Cancel Call
+            {isBn ? 'কল বাতিল করুন' : 'Cancel Call'}
           </button>
         </div>
       )}
@@ -165,7 +176,7 @@ const FakeCallModal = ({ isOpen, onClose }) => {
             <h2 className="text-3xl font-extrabold font-heading text-white">{callerName}</h2>
             <p className="text-sm font-mono text-zinc-400">{callerNumber}</p>
             <span className="inline-block px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 font-mono text-xs animate-pulse">
-              Incoming Call...
+              {isBn ? 'ইনকামিং কল আসছে...' : 'Incoming Call...'}
             </span>
           </div>
 
@@ -178,7 +189,9 @@ const FakeCallModal = ({ isOpen, onClose }) => {
               >
                 <FiPhoneOff />
               </button>
-              <span className="block text-xs font-mono text-zinc-400">Decline</span>
+              <span className="block text-xs font-mono text-zinc-400">
+                {isBn ? 'কেটে দিন' : 'Decline'}
+              </span>
             </div>
 
             <div className="text-center space-y-2">
@@ -188,7 +201,9 @@ const FakeCallModal = ({ isOpen, onClose }) => {
               >
                 <FiPhoneCall />
               </button>
-              <span className="block text-xs font-mono text-zinc-400">Answer</span>
+              <span className="block text-xs font-mono text-zinc-400">
+                {isBn ? 'রিসিভ করুন' : 'Answer'}
+              </span>
             </div>
           </div>
         </div>
@@ -203,13 +218,19 @@ const FakeCallModal = ({ isOpen, onClose }) => {
             </div>
             <h2 className="text-3xl font-extrabold font-heading text-white">{callerName}</h2>
             <p className="text-sm font-mono text-emerald-400 font-bold">{formatTime(callDuration)}</p>
-            <p className="text-xs text-zinc-400">Call Connected • Audio Active</p>
+            <p className="text-xs text-zinc-400">
+              {isBn ? 'কল চলছে • অডিও সক্রিয়' : 'Call Connected • Audio Active'}
+            </p>
           </div>
 
           <div className="max-w-xs mx-auto p-4 rounded-xl bg-zinc-900 border border-zinc-800 text-center space-y-1">
             <FiVolume2 className="w-5 h-5 mx-auto text-emerald-400" />
-            <p className="text-xs text-zinc-300">Simulated Conversation Active</p>
-            <p className="text-[11px] text-zinc-500">"Hey, where are you right now? I am waiting outside..."</p>
+            <p className="text-xs text-zinc-300">
+              {isBn ? 'ভয়েস কথোপকথন সক্রিয়' : 'Simulated Conversation Active'}
+            </p>
+            <p className="text-[11px] text-zinc-500 italic">
+              {isBn ? '"হ্যালো, তুমি এখন কোথায়? আমি বাইরে দাঁড়িয়ে আছি, তাড়াতাড়ি চলে আসো..."' : '"Hey, where are you right now? I am waiting outside..."'}
+            </p>
           </div>
 
           <div className="flex justify-center pb-12">

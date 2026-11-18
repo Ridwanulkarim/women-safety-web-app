@@ -8,7 +8,8 @@ import { useLanguage } from '../../context/LanguageContext';
 const MobileBottomBar = () => {
   const { user } = useAuth();
   const { openSOSModal } = useSOS();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const isBn = language === 'bn';
   const location = useLocation();
 
   const hiddenPaths = ['/login', '/register', '/signin', '/signup'];
@@ -42,7 +43,7 @@ const MobileBottomBar = () => {
           }`}
         >
           <FiPhoneCall className="w-5 h-5 mb-0.5" />
-          <span>999 Dial</span>
+          <span>{isBn ? '৯৯৯ ডায়াল' : '999 Dial'}</span>
           {isActive('/emergency-help') && <span className="w-1 h-1 rounded-full bg-rose-600 dark:bg-rose-400 mt-0.5"></span>}
         </Link>
 

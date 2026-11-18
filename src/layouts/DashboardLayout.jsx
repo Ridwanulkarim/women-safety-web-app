@@ -12,6 +12,7 @@ import LanguageToggle from '../components/common/LanguageToggle';
 import SOSModal from '../components/sos/SOSModal';
 import VoiceSOSAlarmModal from '../components/safety/VoiceSOSAlarmModal';
 import { useVoiceSOS } from '../context/VoiceSOSContext';
+import { useLanguage } from '../context/LanguageContext';
 import { FiMic } from 'react-icons/fi';
 import ScrollToTop from '../components/common/ScrollToTop';
 import MobileBottomBar from '../components/common/MobileBottomBar';
@@ -21,26 +22,29 @@ const DashboardLayout = () => {
   const { unreadCount } = useNotifications();
   const { openSOSModal } = useSOS();
   const { isGuardianActive } = useVoiceSOS();
+  const { language, t } = useLanguage();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const location = useLocation();
   const navigate = useNavigate();
 
+  const isBn = language === 'bn';
+
   const baseMenuItems = [
-    { name: 'Dashboard', path: '/dashboard', icon: FiLayout },
-    { name: 'Evidence Vault', path: '/dashboard/evidence', icon: FiCamera },
-    { name: 'Profile', path: '/dashboard/profile', icon: FiUser },
-    { name: 'Emergency Contacts', path: '/dashboard/contacts', icon: FiPhoneCall },
-    { name: 'SOS History', path: '/dashboard/sos-history', icon: FiClock },
-    { name: 'Live Location', path: '/dashboard/live-location', icon: FiMapPin },
-    { name: 'Notifications', path: '/dashboard/notifications', icon: FiBell, badge: unreadCount },
-    { name: 'Settings', path: '/dashboard/settings', icon: FiSettings }
+    { name: isBn ? 'ড্যাশবোর্ড' : 'Dashboard', path: '/dashboard', icon: FiLayout },
+    { name: isBn ? 'প্রমাণ সংরক্ষণাগার' : 'Evidence Vault', path: '/dashboard/evidence', icon: FiCamera },
+    { name: isBn ? 'প্রোফাইল' : 'Profile', path: '/dashboard/profile', icon: FiUser },
+    { name: isBn ? 'জরুরি পরিচিতি' : 'Emergency Contacts', path: '/dashboard/contacts', icon: FiPhoneCall },
+    { name: isBn ? 'এসওএস ইতিহাস' : 'SOS History', path: '/dashboard/sos-history', icon: FiClock },
+    { name: isBn ? 'লাইভ লোকেশন' : 'Live Location', path: '/dashboard/live-location', icon: FiMapPin },
+    { name: isBn ? 'নোটিফিকেশন' : 'Notifications', path: '/dashboard/notifications', icon: FiBell, badge: unreadCount },
+    { name: isBn ? 'সেটিংস' : 'Settings', path: '/dashboard/settings', icon: FiSettings }
   ];
 
   const menuItems = isAdmin
     ? [
-        { name: 'Dashboard', path: '/dashboard', icon: FiLayout },
-        { name: 'Admin Command', path: '/admin', icon: FiShield, isAdminPill: true },
+        { name: isBn ? 'ড্যাশবোর্ড' : 'Dashboard', path: '/dashboard', icon: FiLayout },
+        { name: isBn ? 'অ্যাডমিন কমান্ড' : 'Admin Command', path: '/admin', icon: FiShield, isAdminPill: true },
         ...baseMenuItems.slice(1)
       ]
     : baseMenuItems;
@@ -62,7 +66,7 @@ const DashboardLayout = () => {
               SafeHaven
             </span>
             <span className="text-[10px] font-mono font-bold text-emerald-500 uppercase flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 telemetry-dot"></span> Shield Active
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 telemetry-dot"></span> {isBn ? 'সুরক্ষা সক্রিয়' : 'Shield Active'}
             </span>
           </div>
         </Link>
@@ -72,7 +76,7 @@ const DashboardLayout = () => {
           onClick={openSOSModal}
           className="w-full btn-danger mb-6 font-mono text-xs shadow-lg shadow-rose-600/30"
         >
-          <FiAlertCircle className="w-4 h-4 animate-pulse" /> SOS DISPATCH
+          <FiAlertCircle className="w-4 h-4 animate-pulse" /> {isBn ? 'জরুরি এসওএস পাঠান' : 'SOS DISPATCH'}
         </button>
 
         {/* Nav Links */}
@@ -156,12 +160,12 @@ const DashboardLayout = () => {
               {sidebarOpen ? <FiX className="w-4 h-4" /> : <FiMenu className="w-4 h-4" />}
             </button>
             <h1 className="text-xs sm:text-sm font-bold font-heading text-zinc-900 dark:text-white truncate max-w-[130px] sm:max-w-none">
-              User Control Panel
+              {isBn ? 'ইউজার কন্ট্রোল প্যানেল' : 'User Control Panel'}
             </h1>
             {isGuardianActive && (
               <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-[10px] font-mono font-bold animate-pulse">
                 <FiMic className="animate-bounce text-xs" />
-                <span>Voice Guardian: LISTENING ("বাঁচাও" / "Help")</span>
+                <span>{isBn ? 'ভয়েস গার্ডিয়ান: কথা শুনছে ("বাঁচাও" / "Help")' : 'Voice Guardian: LISTENING ("বাঁচাও" / "Help")'}</span>
               </div>
             )}
           </div>
@@ -171,10 +175,10 @@ const DashboardLayout = () => {
               <Link
                 to="/admin"
                 className="px-2.5 sm:px-3 py-1.5 rounded-lg bg-purple-600 hover:bg-purple-700 text-white font-mono text-xs font-bold flex items-center gap-1.5 shadow-sm transition active:scale-95"
-                title="Access Admin Command Center"
+                title={isBn ? 'অ্যাডমিন কমান্ড সেন্টারে যান' : 'Access Admin Command Center'}
               >
                 <FiShield className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Admin Panel</span>
+                <span className="hidden sm:inline">{isBn ? 'অ্যাডমিন প্যানেল' : 'Admin Panel'}</span>
               </Link>
             )}
 
@@ -185,7 +189,7 @@ const DashboardLayout = () => {
             <Link
               to="/dashboard/notifications"
               className="relative p-1.5 sm:p-2 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700 min-h-[36px] sm:min-h-[38px] min-w-[36px] flex items-center justify-center"
-              title="Notifications"
+              title={isBn ? 'নোটিফিকেশন' : 'Notifications'}
             >
               <FiBell className="w-4 h-4 text-zinc-800 dark:text-zinc-200" />
               {unreadCount > 0 && (
@@ -202,10 +206,10 @@ const DashboardLayout = () => {
                 navigate('/login');
               }}
               className="p-1.5 sm:p-2 rounded-lg bg-rose-500/10 text-rose-600 border border-rose-500/20 hover:bg-rose-500/20 transition min-h-[36px] flex items-center justify-center font-mono text-xs font-bold gap-1"
-              title="Logout"
+              title={isBn ? 'লগআউট' : 'Logout'}
             >
               <FiLogOut className="w-4 h-4" />
-              <span className="hidden sm:inline">Logout</span>
+              <span className="hidden sm:inline">{isBn ? 'লগআউট' : 'Logout'}</span>
             </button>
           </div>
         </header>
@@ -236,7 +240,7 @@ const DashboardLayout = () => {
               }}
               className="w-full flex items-center justify-between px-4 py-2.5 rounded-lg text-xs font-bold text-rose-600 bg-rose-500/10 hover:bg-rose-500/20 transition mt-2"
             >
-              <span className="flex items-center gap-2"><FiLogOut /> Logout of Account</span>
+              <span className="flex items-center gap-2"><FiLogOut /> {isBn ? 'অ্যাকাউন্ট থেকে লগআউট' : 'Logout of Account'}</span>
             </button>
           </div>
         )}
