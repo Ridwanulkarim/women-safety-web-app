@@ -25,7 +25,7 @@ const PublicLayout = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#fafafa] dark:bg-[#09090b] text-zinc-900 dark:text-zinc-100 selection:bg-rose-500/20 selection:text-rose-500 transition-colors duration-200 pb-16 lg:pb-0">
+    <div className="min-h-screen flex flex-col bg-[#fafafa] dark:bg-[#09090b] text-zinc-900 dark:text-zinc-100 selection:bg-rose-500/20 selection:text-rose-500 transition-colors duration-200">
       <ScrollToTop />
       <Navbar />
       <main className="flex-grow">
@@ -33,7 +33,6 @@ const PublicLayout = () => {
       </main>
       <Footer />
       <SOSModal />
-      <MobileBottomBar />
     </div>
   );
 };

@@ -52,7 +52,7 @@ const DashboardLayout = () => {
   const isActive = (path) => location.pathname === path;
 
   return (
-    <div className="min-h-screen flex bg-[#f8fafc] dark:bg-[#09090d] text-zinc-900 dark:text-zinc-100 transition-colors duration-200 pb-16 lg:pb-0">
+    <div className="min-h-screen flex bg-[#f8fafc] dark:bg-[#09090d] text-zinc-900 dark:text-zinc-100 transition-colors duration-200">
       <ScrollToTop />
 
       {/* Sidebar Desktop */}
@@ -253,7 +253,6 @@ const DashboardLayout = () => {
 
       <SOSModal />
       <VoiceSOSAlarmModal />
-      <MobileBottomBar />
     </div>
   );
 };
