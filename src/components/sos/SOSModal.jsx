@@ -5,6 +5,7 @@ import { useSOS } from '../../context/SOSContext';
 import { useNotifications } from '../../context/NotificationContext';
 import { useGeolocation } from '../../hooks/useGeolocation';
 import { useLanguage } from '../../context/LanguageContext';
+import { toBengaliDigits, localizeNum } from '../../utils/helpers';
 import { useNavigate } from 'react-router-dom';
 
 const SOSModal = () => {
@@ -105,14 +106,14 @@ const SOSModal = () => {
                 </div>
                 <p className="text-zinc-800 dark:text-zinc-200">{location.address || (isBn ? 'ঢাকা, বাংলাদেশ' : 'Dhaka, Bangladesh')}</p>
                 <p className="text-[10px] text-zinc-400 font-mono">
-                  {isBn ? `অক্ষাংশ: ${location.latitude.toFixed(4)}, দ্রাঘিমাংশ: ${location.longitude.toFixed(4)}` : `Lat: ${location.latitude.toFixed(4)}, Lng: ${location.longitude.toFixed(4)}`}
+                  {isBn ? `অক্ষাংশ: ${toBengaliDigits(location.latitude.toFixed(4))}, দ্রাঘিমাংশ: ${toBengaliDigits(location.longitude.toFixed(4))}` : `Lat: ${location.latitude.toFixed(4)}, Lng: ${location.longitude.toFixed(4)}`}
                 </p>
               </div>
 
               {/* Direct Emergency Contacts Alerted Status Box */}
               <div className="p-4 rounded-xl bg-slate-100 dark:bg-slate-900 text-left space-y-2 border border-slate-200 dark:border-slate-800">
                 <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
-                  <FiSend /> {isBn ? `সতর্কবার্তা পাঠানো পরিচিতি (${savedContacts.length} জন)` : `Alerted Emergency Contacts (${savedContacts.length})`}
+                  <FiSend /> {isBn ? `সতর্কবার্তা পাঠানো পরিচিতি (${toBengaliDigits(savedContacts.length)} জন)` : `Alerted Emergency Contacts (${savedContacts.length})`}
                 </span>
 
                 {savedContacts.length === 0 ? (
@@ -182,15 +183,15 @@ const SOSModal = () => {
             /* Countdown Confirmation State */
             <div className="space-y-6">
               <div className="w-20 h-20 mx-auto rounded-full bg-rose-600 text-white flex items-center justify-center text-4xl font-black font-mono animate-bounce">
-                {countdown}
+                {localizeNum(countdown, isBn)}
               </div>
               <div className="space-y-1">
                 <h3 className="text-xl font-bold text-zinc-900 dark:text-white font-heading">
-                  {isBn ? `${countdown} সেকেন্ডে এসওএস পাঠানো হচ্ছে...` : `Broadcasting SOS in ${countdown}s`}
+                  {isBn ? `${toBengaliDigits(countdown)} সেকেন্ডে এসওএস পাঠানো হচ্ছে...` : `Broadcasting SOS in ${countdown}s`}
                 </h3>
                 <p className="text-xs text-zinc-500">
                   {isBn
-                    ? `আপনার সংরক্ষিত ${savedContacts.length} জন জরুরি পরিচিতির কাছে এসএমএস ও ইমেইল বিপদবার্তা পাঠানো হচ্ছে।`
+                    ? `আপনার সংরক্ষিত ${toBengaliDigits(savedContacts.length)} জন জরুরি পরিচিতির কাছে এসএমএস ও ইমেইল বিপদবার্তা পাঠানো হচ্ছে।`
                     : `Sending SMS & Email distress alerts to ${savedContacts.length} saved emergency contact(s).`}
                 </p>
               </div>
@@ -223,7 +224,7 @@ const SOSModal = () => {
               <div className="p-4 rounded-xl bg-slate-100 dark:bg-slate-900 text-left space-y-2 border border-slate-200 dark:border-slate-800">
                 <div className="flex items-center justify-between">
                   <span className="text-[11px] font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400 flex items-center gap-1.5">
-                    <FiSend /> {isBn ? `এসওএস প্রাপক (${savedContacts.length} জন সংরক্ষিত পরিচিতি)` : `SOS Dispatch Target (${savedContacts.length} Saved Contacts)`}
+                    <FiSend /> {isBn ? `এসওএস প্রাপক (${toBengaliDigits(savedContacts.length)} জন সংরক্ষিত পরিচিতি)` : `SOS Dispatch Target (${savedContacts.length} Saved Contacts)`}
                   </span>
                   <button
                     onClick={() => {

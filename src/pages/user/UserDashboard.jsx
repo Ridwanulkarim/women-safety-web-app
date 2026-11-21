@@ -4,6 +4,7 @@ import { FiAlertCircle, FiPhoneCall, FiMapPin, FiCheckCircle, FiShield, FiUser, 
 import { useAuth } from '../../context/AuthContext';
 import { useSOS } from '../../context/SOSContext';
 import { useLanguage } from '../../context/LanguageContext';
+import { toBengaliDigits } from '../../utils/helpers';
 import SOSButton from '../../components/sos/SOSButton';
 import SOSHistoryList from '../../components/sos/SOSHistoryList';
 import ContactCard from '../../components/contacts/ContactCard';
@@ -43,7 +44,7 @@ const UserDashboard = () => {
           </h1>
           <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400">
             {isBn ? (
-              <>জরুরি টেলিমেট্রি সক্রিয়। আপনার এসওএস বিকনের সাথে ৫টির মধ্যে <span className="font-bold text-zinc-900 dark:text-white">{savedContacts.length}টি</span> জরুরি পরিচিতি যুক্ত রয়েছে।</>
+              <>জরুরি টেলিমেট্রি সক্রিয়। আপনার এসওএস বিকনের সাথে ৫টির মধ্যে <span className="font-bold text-zinc-900 dark:text-white">{toBengaliDigits(savedContacts.length)}টি</span> জরুরি পরিচিতি যুক্ত রয়েছে।</>
             ) : (
               <>Emergency telemetry online. <span className="font-bold text-zinc-900 dark:text-white">{savedContacts.length} of 5</span> priority emergency contact(s) linked to your SOS beacon.</>
             )}
@@ -114,7 +115,7 @@ const UserDashboard = () => {
               </div>
             </div>
             <Link to="/dashboard/contacts" className="text-xs font-mono font-bold text-rose-600 dark:text-rose-400 hover:underline">
-              {isBn ? `ব্যবস্থাপনা (${savedContacts.length}/৫) →` : `Manage (${savedContacts.length}/5) →`}
+              {isBn ? `ব্যবস্থাপনা (${toBengaliDigits(savedContacts.length)}/৫) →` : `Manage (${savedContacts.length}/5) →`}
             </Link>
           </div>
 

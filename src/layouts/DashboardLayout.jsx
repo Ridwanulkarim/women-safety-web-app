@@ -13,6 +13,7 @@ import SOSModal from '../components/sos/SOSModal';
 import VoiceSOSAlarmModal from '../components/safety/VoiceSOSAlarmModal';
 import { useVoiceSOS } from '../context/VoiceSOSContext';
 import { useLanguage } from '../context/LanguageContext';
+import { localizeNum } from '../utils/helpers';
 import { FiMic } from 'react-icons/fi';
 import ScrollToTop from '../components/common/ScrollToTop';
 import MobileBottomBar from '../components/common/MobileBottomBar';
@@ -107,7 +108,7 @@ const DashboardLayout = () => {
                   <span className={`px-2 py-0.5 rounded-full text-[10px] font-mono font-bold ${
                     active ? 'bg-white text-rose-600' : 'bg-rose-600 text-white'
                   }`}>
-                    {item.badge}
+                    {localizeNum(item.badge, isBn)}
                   </span>
                 )}
               </Link>
@@ -194,7 +195,7 @@ const DashboardLayout = () => {
               <FiBell className="w-4 h-4 text-zinc-800 dark:text-zinc-200" />
               {unreadCount > 0 && (
                 <span className="absolute -top-1 -right-1 w-4 h-4 bg-rose-600 text-white text-[9px] font-bold rounded-full flex items-center justify-center font-mono">
-                  {unreadCount}
+                  {localizeNum(unreadCount, isBn)}
                 </span>
               )}
             </Link>

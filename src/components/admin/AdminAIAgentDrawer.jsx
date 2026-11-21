@@ -5,6 +5,7 @@ import {
   FiLayers, FiX, FiCornerDownLeft, FiZap, FiFileText, FiPieChart, FiGlobe 
 } from 'react-icons/fi';
 import { getGlobalSOSAlerts, getRegisteredUsers } from '../../utils/adminDataRegistry';
+import { toBengaliDigits } from '../../utils/helpers';
 import toast from 'react-hot-toast';
 
 /**
@@ -342,13 +343,13 @@ const AdminAIAgentDrawer = ({ defaultMode = 'SOS_REPORTS', isOpen, onClose }) =>
       setActiveStepTrace([
         'Node: TOOL_EXECUTION',
         'Invoking Tool: compute_analytics_metrics()',
-        isBengali ? `${alerts.length}টি এসওএস লগ ও ${users.length}টি প্রোফাইল স্ক্যান করা হচ্ছে...` : `Scanning ${alerts.length} SOS logs...`
+        isBengali ? `${toBengaliDigits(alerts.length)}টি এসওএস লগ ও ${toBengaliDigits(users.length)}টি প্রোফাইল স্ক্যান করা হচ্ছে...` : `Scanning ${alerts.length} SOS logs...`
       ]);
     } else {
       setActiveStepTrace([
         'Node: TOOL_EXECUTION',
         'Invoking Tool: query_sos_incident_database()',
-        isBengali ? `${alerts.length}টি লাইভ বিপদ সংকেত ডাটাবেজ থেকে রিট্রিভ করা হয়েছে।` : `Retrieved ${alerts.length} real distress records.`
+        isBengali ? `${toBengaliDigits(alerts.length)}টি লাইভ বিপদ সংকেত ডাটাবেজ থেকে রিট্রিভ করা হয়েছে।` : `Retrieved ${alerts.length} real distress records.`
       ]);
     }
 
@@ -380,14 +381,14 @@ const AdminAIAgentDrawer = ({ defaultMode = 'SOS_REPORTS', isOpen, onClose }) =>
       if (isBengali) {
         spokenPhrase = `সেফহ্যাভেন সিস্টেমে মোট ${analyticsEngine.total}টি রিপোর্ট এসেছে। বর্তমানে ${analyticsEngine.active}টি সক্রিয় এবং ${analyticsEngine.resolved}টি সমাধান করা হয়েছে। স্টকিং এবং রাস্তায় হয়রানি প্রধান সমস্যা হিসেবে পাওয়া গেছে।`;
         botResponse = `**📋 জরুরি এসওএস ইনসিডেন্ট সারাংশ:**\n\n` +
-          `• **মোট রিপোর্ট সংখ্যা:** ${analyticsEngine.total} টি নথিভুক্ত ঘটনা।\n` +
-          `• **বর্তমানে সক্রিয় অ্যালার্ট:** ${analyticsEngine.active} টি পেন্ডিং।\n` +
-          `• **সফলভাবে সমাধানকৃত:** ${analyticsEngine.resolved} টি (সমাধানের হার **${analyticsEngine.rate}%**)।\n\n` +
+          `• **মোট রিপোর্ট সংখ্যা:** ${toBengaliDigits(analyticsEngine.total)} টি নথিভুক্ত ঘটনা।\n` +
+          `• **বর্তমানে সক্রিয় অ্যালার্ট:** ${toBengaliDigits(analyticsEngine.active)} টি পেন্ডিং।\n` +
+          `• **সফলভাবে সমাধানকৃত:** ${toBengaliDigits(analyticsEngine.resolved)} টি (সমাধানের হার **${toBengaliDigits(analyticsEngine.rate)}%**)।\n\n` +
           `**🔍 শনাক্তকৃত প্রধান সমস্যা ও কারণসমূহ:**\n` +
-          `• পিছু নেওয়া বা স্টকিং: **${analyticsEngine.issueCategories.Stalking}** টি\n` +
-          `• রাস্তায় হয়রানি ও হুমকি: **${analyticsEngine.issueCategories.Harassment}** টি\n` +
-          `• প্রত্যক্ষ আক্রমণ ও শারীরিক আঘাত: **${analyticsEngine.issueCategories.PhysicalAssault}** টি\n` +
-          `• মেডিকেল ও জরুরি সহায়তা: **${analyticsEngine.issueCategories.MedicalEmergency}** টি\n\n` +
+          `• পিছু নেওয়া বা স্টকিং: **${toBengaliDigits(analyticsEngine.issueCategories.Stalking)}** টি\n` +
+          `• রাস্তায় হয়রানি ও হুমকি: **${toBengaliDigits(analyticsEngine.issueCategories.Harassment)}** টি\n` +
+          `• প্রত্যক্ষ আক্রমণ ও শারীরিক আঘাত: **${toBengaliDigits(analyticsEngine.issueCategories.PhysicalAssault)}** টি\n` +
+          `• মেডিকেল ও জরুরি সহায়তা: **${toBengaliDigits(analyticsEngine.issueCategories.MedicalEmergency)}** টি\n\n` +
           `**সর্বোচ্চ ঝুঁকির এলাকা:** ${Object.keys(analyticsEngine.locationCounts).slice(0, 3).join(', ') || 'প্রধান ট্রানজিট রুটসমূহ'}।`;
       } else {
         spokenPhrase = `Total ${analyticsEngine.total} reports recorded with ${analyticsEngine.resolved} resolved and ${analyticsEngine.active} currently active.`;
@@ -428,11 +429,11 @@ const AdminAIAgentDrawer = ({ defaultMode = 'SOS_REPORTS', isOpen, onClose }) =>
       if (isBengali) {
         spokenPhrase = `এখন পর্যন্ত মোট ${analyticsEngine.total}টি ইনসিডেন্ট হয়েছে। ইনসিডেন্ট সমাধানের হার ${analyticsEngine.rate} শতাংশ।`;
         botResponse = `**📊 লাইভ অ্যানালিটিক্স ও সিস্টেম মেট্রিক্স:**\n\n` +
-          `• **মোট নথিভুক্ত ঘটনা:** ${analyticsEngine.total} টি\n` +
-          `• **বর্তমানে সক্রিয় অ্যালার্ট:** ${analyticsEngine.active} টি\n` +
-          `• **সফল সমাধান সংখ্যা:** ${analyticsEngine.resolved} টি\n` +
-          `• **সমাধানের হার (Resolution Rate):** **${analyticsEngine.rate}%**\n` +
-          `• **মোট সুরক্ষিত অ্যাকাউন্ট:** ${analyticsEngine.totalUsers} জন\n` +
+          `• **মোট নথিভুক্ত ঘটনা:** ${toBengaliDigits(analyticsEngine.total)} টি\n` +
+          `• **বর্তমানে সক্রিয় অ্যালার্ট:** ${toBengaliDigits(analyticsEngine.active)} টি\n` +
+          `• **সফল সমাধান সংখ্যা:** ${toBengaliDigits(analyticsEngine.resolved)} টি\n` +
+          `• **সমাধানের হার (Resolution Rate):** **${toBengaliDigits(analyticsEngine.rate)}%**\n` +
+          `• **মোট সুরক্ষিত অ্যাকাউন্ট:** ${toBengaliDigits(analyticsEngine.totalUsers)} জন\n` +
           `• **সর্বোচ্চ বিপদের সময়কাল:** ${analyticsEngine.peakHour}`;
       } else {
         spokenPhrase = `Total ${analyticsEngine.total} incidents recorded with an overall resolution rate of ${analyticsEngine.rate} percent.`;
@@ -495,7 +496,7 @@ const AdminAIAgentDrawer = ({ defaultMode = 'SOS_REPORTS', isOpen, onClose }) =>
         spokenPhrase = `সেফহ্যাভেনে বর্তমানে ${analyticsEngine.total}টি রিপোর্ট সংরক্ষিত আছে। আপনি সামারি বা মেট্রিক্স জানতে চাইতে পারেন।`;
         botResponse = `**💡 সেফহ্যাভেন এআই বিশ্লেষণ:**\n\n` +
           `আপনার প্রশ্ন "${userPrompt}" সম্পর্কে:\n` +
-          `সেফহ্যাভেন সিস্টেমে বর্তমানে **${analyticsEngine.total}টি রিপোর্ট** এবং **${analyticsEngine.totalUsers} জন নিবন্ধিত ব্যবহারকারী** সুরক্ষিত রয়েছেন।\n\n` +
+          `সেফহ্যাভেন সিস্টেমে বর্তমানে **${toBengaliDigits(analyticsEngine.total)}টি রিপোর্ট** এবং **${toBengaliDigits(analyticsEngine.totalUsers)} জন নিবন্ধিত ব্যবহারকারী** সুরক্ষিত রয়েছেন।\n\n` +
           `আপনি আমাকে বলতে পারেন: **সব রিপোর্ট সামারি করো**, **কী কী সমস্যা হয়েছিল**, **কয়টি ইনসিডেন্ট হয়েছে** অথবা **সর্বশেষ ঘটনার বিবরণ দাও**।`;
       } else {
         spokenPhrase = `SafeHaven is monitoring ${analyticsEngine.total} total incident logs.`;

@@ -3,6 +3,7 @@ import { FiShield, FiFileText, FiDownload, FiPrinter, FiX, FiCheckCircle, FiLock
 import { useAuth } from '../../context/AuthContext';
 import { useSOS } from '../../context/SOSContext';
 import { useLanguage } from '../../context/LanguageContext';
+import { toBengaliDigits } from '../../utils/helpers';
 import toast from 'react-hot-toast';
 
 const LegalEvidenceExporterModal = ({ isOpen, onClose, item }) => {
@@ -172,7 +173,7 @@ const LegalEvidenceExporterModal = ({ isOpen, onClose, item }) => {
               <p className="text-xs font-bold text-zinc-900 dark:text-white">{isBn ? 'সময়:' : 'Timestamp:'} {item.date || new Date().toLocaleString()}</p>
               <p className="text-[11px] text-zinc-500 font-mono">GPS: {item.lat || '22.3347'}, {item.lng || '91.8106'}</p>
               <p className="text-[11px] text-zinc-500 font-mono">
-                {isBn ? `সতর্কীকৃত জরুরি পরিচিতি: ${savedContacts.length} জন` : `Alerted Emergency Contacts: ${savedContacts.length}`}
+                {isBn ? `সতর্কীকৃত জরুরি পরিচিতি: ${toBengaliDigits(savedContacts.length)} জন` : `Alerted Emergency Contacts: ${savedContacts.length}`}
               </p>
             </div>
 

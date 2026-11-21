@@ -72,7 +72,7 @@ const NotificationsPage = () => {
                   </div>
                   <p className="text-xs text-zinc-600 dark:text-zinc-300 leading-relaxed">{item.message}</p>
                   <span className="text-[10px] text-zinc-400 flex items-center gap-1 font-mono pt-1">
-                    {formatDate(item.createdAt || item.timestamp)}
+                    {formatDate(item.createdAt || item.timestamp, isBn)}
                   </span>
                 </div>
               </div>

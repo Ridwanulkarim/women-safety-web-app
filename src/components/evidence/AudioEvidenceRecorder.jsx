@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { FiMic, FiSquare, FiPlay, FiPause, FiDownload, FiTrash2, FiRadio, FiFileText } from 'react-icons/fi';
 import LegalEvidenceExporterModal from './LegalEvidenceExporterModal';
 import { useLanguage } from '../../context/LanguageContext';
+import { toBengaliDigits } from '../../utils/helpers';
 import toast from 'react-hot-toast';
 
 const AudioEvidenceRecorder = ({ autoStart = false }) => {
@@ -120,7 +121,7 @@ const AudioEvidenceRecorder = ({ autoStart = false }) => {
         </div>
         {isRecording ? (
           <span className="mono-tag mono-tag-rose animate-pulse">
-            <span className="w-2 h-2 rounded-full bg-rose-600 telemetry-dot"></span> {isBn ? `রেকর্ডিং চলছে (${formatTime(recordingTime)})` : `RECORDING (${formatTime(recordingTime)})`}
+            <span className="w-2 h-2 rounded-full bg-rose-600 telemetry-dot"></span> {isBn ? `রেকর্ডিং চলছে (${toBengaliDigits(formatTime(recordingTime))})` : `RECORDING (${formatTime(recordingTime)})`}
           </span>
         ) : (
           <span className="mono-tag mono-tag-emerald">{isBn ? 'প্রস্তুত' : 'Ready'}</span>
@@ -134,7 +135,7 @@ const AudioEvidenceRecorder = ({ autoStart = false }) => {
             onClick={stopRecording}
             className="w-full btn-danger py-3 text-xs font-mono font-bold uppercase tracking-wider flex items-center justify-center gap-2 animate-pulse"
           >
-            <FiSquare /> {isBn ? `রেকর্ড বন্ধ করুন (${formatTime(recordingTime)})` : `STOP RECORDING (${formatTime(recordingTime)})`}
+            <FiSquare /> {isBn ? `রেকর্ড বন্ধ করুন (${toBengaliDigits(formatTime(recordingTime))})` : `STOP RECORDING (${formatTime(recordingTime)})`}
           </button>
         ) : (
           <button
@@ -149,7 +150,7 @@ const AudioEvidenceRecorder = ({ autoStart = false }) => {
       {/* Audio Evidence Locker List */}
       <div className="space-y-3 pt-2">
         <h4 className="text-xs font-mono font-bold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">
-          {isBn ? `সংরক্ষিত অডিও ভল্ট (${recordings.length})` : `Saved Audio Vault (${recordings.length})`}
+          {isBn ? `সংরক্ষিত অডিও ভল্ট (${toBengaliDigits(recordings.length)})` : `Saved Audio Vault (${recordings.length})`}
         </h4>
 
         {recordings.length === 0 ? (

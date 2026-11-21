@@ -14,7 +14,7 @@ const NotFound = () => {
           <FiAlertOctagon />
         </div>
         <div className="space-y-2">
-          <h1 className="text-4xl font-extrabold font-heading text-rose-600">404</h1>
+          <h1 className="text-4xl font-extrabold font-heading text-rose-600">{isBn ? '৪০৪' : '404'}</h1>
           <h2 className="text-xl font-bold font-heading text-zinc-900 dark:text-white">
             {isBn ? 'পৃষ্ঠাটি খুঁজে পাওয়া যায়নি' : 'Page Not Found'}
           </h2>

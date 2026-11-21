@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FiPhoneCall, FiPhoneOff, FiX, FiClock, FiUser, FiVolume2 } from 'react-icons/fi';
 import { useLanguage } from '../../context/LanguageContext';
+import { toBengaliDigits, localizeNum } from '../../utils/helpers';
 
 const FakeCallModal = ({ isOpen, onClose }) => {
   const { language } = useLanguage();
@@ -127,7 +128,7 @@ const FakeCallModal = ({ isOpen, onClose }) => {
                         : 'bg-zinc-100 dark:bg-zinc-800/60 text-zinc-700 dark:text-zinc-300 border-zinc-200 dark:border-zinc-700'
                     }`}
                   >
-                    {s} {isBn ? 'সেকেন্ড' : 'Secs'}
+                    {localizeNum(s, isBn)} {isBn ? 'সেকেন্ড' : 'Secs'}
                   </button>
                 ))}
               </div>
@@ -137,7 +138,7 @@ const FakeCallModal = ({ isOpen, onClose }) => {
               onClick={startFakeCall}
               className="w-full btn-solid py-3 text-xs uppercase font-mono tracking-wider font-bold"
             >
-              <FiPhoneCall /> {isBn ? `ফেক কল শুরু করুন (${delaySeconds} সেকেন্ড)` : `Schedule Fake Call (${delaySeconds}s)`}
+              <FiPhoneCall /> {isBn ? `ফেক কল শুরু করুন (${toBengaliDigits(delaySeconds)} সেকেন্ড)` : `Schedule Fake Call (${delaySeconds}s)`}
             </button>
           </div>
         </div>
@@ -147,14 +148,14 @@ const FakeCallModal = ({ isOpen, onClose }) => {
       {callState === 'COUNTDOWN' && (
         <div className="max-w-sm w-full product-card p-8 text-center space-y-6">
           <div className="w-16 h-16 mx-auto rounded-full bg-rose-500/10 text-rose-500 flex items-center justify-center text-2xl font-bold font-mono animate-pulse">
-            {countdown}s
+            {isBn ? `${toBengaliDigits(countdown)} সে.` : `${countdown}s`}
           </div>
           <div>
             <h3 className="text-lg font-bold text-zinc-900 dark:text-white font-heading">
               {isBn ? 'ইনকামিং কল শুরু হচ্ছে' : 'Incoming Call Scheduled'}
             </h3>
             <p className="text-xs text-zinc-500">
-              {isBn ? `ফোনটি স্বাভাবিকভাবে প্রস্তুত রাখুন। ঠিক ${countdown} সেকেন্ডের মধ্যে ইনকামিং কল আসবে।` : `Lock your phone screen or keep it facing up. Incoming call will ring in ${countdown} seconds.`}
+              {isBn ? `ফোনটি স্বাভাবিকভাবে প্রস্তুত রাখুন। ঠিক ${toBengaliDigits(countdown)} সেকেন্ডের মধ্যে ইনকামিং কল আসবে।` : `Lock your phone screen or keep it facing up. Incoming call will ring in ${countdown} seconds.`}
             </p>
           </div>
           <button
@@ -217,7 +218,7 @@ const FakeCallModal = ({ isOpen, onClose }) => {
               {callerName.charAt(0)}
             </div>
             <h2 className="text-3xl font-extrabold font-heading text-white">{callerName}</h2>
-            <p className="text-sm font-mono text-emerald-400 font-bold">{formatTime(callDuration)}</p>
+            <p className="text-sm font-mono text-emerald-400 font-bold">{localizeNum(formatTime(callDuration), isBn)}</p>
             <p className="text-xs text-zinc-400">
               {isBn ? 'কল চলছে • অডিও সক্রিয়' : 'Call Connected • Audio Active'}
             </p>

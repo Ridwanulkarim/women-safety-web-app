@@ -4,6 +4,7 @@ import ContactCard from '../../components/contacts/ContactCard';
 import ContactModal from '../../components/contacts/ContactModal';
 import { useSOS } from '../../context/SOSContext';
 import { useLanguage } from '../../context/LanguageContext';
+import { toBengaliDigits } from '../../utils/helpers';
 
 const EmergencyContacts = () => {
   const [modalOpen, setModalOpen] = useState(false);
@@ -38,7 +39,7 @@ const EmergencyContacts = () => {
                 {isBn ? 'জরুরি পরিচিতি তালিকা' : 'Emergency Contacts'}
               </h1>
               <span className="mono-tag mono-tag-rose text-[10px]">
-                {isBn ? `${savedContacts.length}/৫ কোটা` : `${savedContacts.length}/5 QUOTA`}
+                {isBn ? `${toBengaliDigits(savedContacts.length)}/৫ কোটা` : `${savedContacts.length}/5 QUOTA`}
               </span>
             </div>
             <p className="text-xs text-zinc-500 dark:text-zinc-400">
@@ -54,7 +55,7 @@ const EmergencyContacts = () => {
           disabled={savedContacts.length >= 5}
           className="btn-danger py-3 px-5 text-xs font-mono font-bold uppercase tracking-wider shadow-lg shadow-rose-600/25"
         >
-          <FiPlusCircle className="text-base" /> {isBn ? `পরিচিতি যোগ করুন (${savedContacts.length}/৫)` : `Add Contact (${savedContacts.length}/5)`}
+          <FiPlusCircle className="text-base" /> {isBn ? `পরিচিতি যোগ করুন (${toBengaliDigits(savedContacts.length)}/৫)` : `Add Contact (${savedContacts.length}/5)`}
         </button>
       </div>
 

@@ -4,6 +4,7 @@ import { useGeolocation } from '../../hooks/useGeolocation';
 import LiveMap from '../../components/map/LiveMap';
 import toast from 'react-hot-toast';
 import { useLanguage } from '../../context/LanguageContext';
+import { toBengaliDigits, localizeNum } from '../../utils/helpers';
 
 const LiveLocationPage = () => {
   const location = useGeolocation(true);
@@ -13,7 +14,7 @@ const LiveLocationPage = () => {
   const handleShareLocation = async () => {
     const mapsUrl = `https://maps.google.com/?q=${location.latitude},${location.longitude}`;
     const shareText = isBn
-      ? `🚨 সেফহ্যাভেন জরুরি লোকেশন চেক:\nআমি বর্তমানে অবস্থান করছি: অক্ষাংশ ${location.latitude.toFixed(4)}, দ্রাঘিমাংশ ${location.longitude.toFixed(4)}।\nগুগল ম্যাপসে লাইভ লোকেশন দেখুন: ${mapsUrl}`
+      ? `🚨 সেফহ্যাভেন জরুরি লোকেশন চেক:\nআমি বর্তমানে অবস্থান করছি: অক্ষাংশ ${toBengaliDigits(location.latitude.toFixed(4))}, দ্রাঘিমাংশ ${toBengaliDigits(location.longitude.toFixed(4))}।\nগুগল ম্যাপসে লাইভ লোকেশন দেখুন: ${mapsUrl}`
       : `🚨 SafeHaven Emergency Location Check:\nI am at Lat ${location.latitude.toFixed(4)}, Lng ${location.longitude.toFixed(4)}.\nView Live Map on Google Maps: ${mapsUrl}`;
 
     // Native Mobile Web Share API
@@ -152,7 +153,7 @@ const LiveLocationPage = () => {
             title={isBn ? 'আপনার লাইভ অবস্থান' : 'Your Live Coordinates'}
             onLocationChange={(lat, lng, acc, addr) => {
               location.setManualLocation(lat, lng, addr);
-              toast.success(isBn ? `অবস্থান আপডেট হয়েছে: অক্ষাংশ ${lat.toFixed(4)}, দ্রাঘিমাংশ ${lng.toFixed(4)}!` : `Location updated to Lat ${lat.toFixed(4)}, Lng ${lng.toFixed(4)}!`);
+              toast.success(isBn ? `অবস্থান আপডেট হয়েছে: অক্ষাংশ ${toBengaliDigits(lat.toFixed(4))}, দ্রাঘিমাংশ ${toBengaliDigits(lng.toFixed(4))}!` : `Location updated to Lat ${lat.toFixed(4)}, Lng ${lng.toFixed(4)}!`);
             }}
           />
         </div>
@@ -160,16 +161,16 @@ const LiveLocationPage = () => {
         <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 pt-2 text-xs">
           <div className="p-4 rounded-2xl bg-zinc-50/80 dark:bg-zinc-900/80 border border-zinc-200/60 dark:border-zinc-800/60">
             <span className="text-[10px] text-zinc-400 font-bold uppercase font-mono">{isBn ? 'অক্ষাংশ (Latitude)' : 'Latitude'}</span>
-            <p className="font-extrabold text-rose-600 dark:text-rose-400 text-sm mt-0.5 font-mono">{location.latitude.toFixed(6)}° {isBn ? 'উত্তর' : 'N'}</p>
+            <p className="font-extrabold text-rose-600 dark:text-rose-400 text-sm mt-0.5 font-mono">{localizeNum(location.latitude.toFixed(6), isBn)}° {isBn ? 'উত্তর' : 'N'}</p>
           </div>
           <div className="p-4 rounded-2xl bg-zinc-50/80 dark:bg-zinc-900/80 border border-zinc-200/60 dark:border-zinc-800/60">
             <span className="text-[10px] text-zinc-400 font-bold uppercase font-mono">{isBn ? 'দ্রাঘিমাংশ (Longitude)' : 'Longitude'}</span>
-            <p className="font-extrabold text-purple-600 dark:text-purple-400 text-sm mt-0.5 font-mono">{location.longitude.toFixed(6)}° {isBn ? 'পূর্ব' : 'E'}</p>
+            <p className="font-extrabold text-purple-600 dark:text-purple-400 text-sm mt-0.5 font-mono">{localizeNum(location.longitude.toFixed(6), isBn)}° {isBn ? 'পূর্ব' : 'E'}</p>
           </div>
           <div className="p-4 rounded-2xl bg-zinc-50/80 dark:bg-zinc-900/80 border border-zinc-200/60 dark:border-zinc-800/60">
             <span className="text-[10px] text-zinc-400 font-bold uppercase font-mono">{isBn ? 'নির্ভুলতার সীমা' : 'Precision Radius'}</span>
             <p className="font-extrabold text-blue-500 text-sm mt-0.5 font-mono">
-              &plusmn;{location.accuracy ? Math.round(location.accuracy) : 25} {isBn ? 'মিটার' : 'meters'}
+              &plusmn;{localizeNum(location.accuracy ? Math.round(location.accuracy) : 25, isBn)} {isBn ? 'মিটার' : 'meters'}
             </p>
           </div>
           <div className="p-4 rounded-2xl bg-zinc-50/80 dark:bg-zinc-900/80 border border-zinc-200/60 dark:border-zinc-800/60">

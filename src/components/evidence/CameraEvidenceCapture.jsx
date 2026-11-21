@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import { FiCamera, FiVideo, FiSquare, FiDownload, FiTrash2, FiEye, FiX, FiCheck, FiFileText } from 'react-icons/fi';
 import LegalEvidenceExporterModal from './LegalEvidenceExporterModal';
 import { useLanguage } from '../../context/LanguageContext';
+import { toBengaliDigits } from '../../utils/helpers';
 import toast from 'react-hot-toast';
 
 const CameraEvidenceCapture = () => {
@@ -214,7 +215,7 @@ const CameraEvidenceCapture = () => {
       {/* Camera Evidence Vault List */}
       <div className="space-y-3 pt-2">
         <h4 className="text-xs font-mono font-bold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">
-          {isBn ? `সংরক্ষিত মিডিয়া ভল্ট (${evidenceList.length})` : `Saved Media Vault (${evidenceList.length})`}
+          {isBn ? `সংরক্ষিত মিডিয়া ভল্ট (${toBengaliDigits(evidenceList.length)})` : `Saved Media Vault (${evidenceList.length})`}
         </h4>
 
         {evidenceList.length === 0 ? (

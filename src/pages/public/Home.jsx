@@ -6,6 +6,7 @@ import SOSButton from '../../components/sos/SOSButton';
 import LiveMap from '../../components/map/LiveMap';
 import { EMERGENCY_NUMBERS } from '../../utils/constants';
 import { useLanguage } from '../../context/LanguageContext';
+import { toBengaliDigits } from '../../utils/helpers';
 import { useGeolocation } from '../../hooks/useGeolocation';
 import LanguageToggle from '../../components/common/LanguageToggle';
 
@@ -36,7 +37,7 @@ const Home = () => {
             <LanguageToggle />
             <span>{t('common.nationalDispatch')}</span>
             <span className="text-zinc-300 dark:text-zinc-700">|</span>
-            <span className="text-emerald-500 font-bold">LATENCY: &lt;15ms</span>
+            <span className="text-emerald-500 font-bold">{isBn ? 'ল্যাটেন্সি: <১৫ মি.সে.' : 'LATENCY: <15ms'}</span>
           </div>
         </div>
       </div>
@@ -128,7 +129,13 @@ const Home = () => {
                 <FiMapPin /> {t('home.gpsTelemetry')}
               </span>
               <span className="text-zinc-800 dark:text-zinc-300 font-semibold">
-                {location.latitude ? `${location.latitude.toFixed(4)}° ${isBn ? 'উত্তর' : 'N'}, ${location.longitude.toFixed(4)}° ${isBn ? 'পূর্ব' : 'E'}` : 'Detecting GPS...'}
+                {location.latitude
+                  ? isBn
+                    ? `${toBengaliDigits(location.latitude.toFixed(4))}° উত্তর, ${toBengaliDigits(location.longitude.toFixed(4))}° পূর্ব`
+                    : `${location.latitude.toFixed(4)}° N, ${location.longitude.toFixed(4)}° E`
+                  : isBn
+                    ? 'জিপিএস খোঁজা হচ্ছে...'
+                    : 'Detecting GPS...'}
               </span>
             </div>
           </motion.div>

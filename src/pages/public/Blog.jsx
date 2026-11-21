@@ -95,7 +95,7 @@ const Blog = () => {
                 <div className="space-y-2">
                   <div className="flex items-center gap-4 text-[11px] font-mono text-zinc-400">
                     <span className="flex items-center gap-1"><FiUser /> {displayAuthor}</span>
-                    <span className="flex items-center gap-1"><FiClock /> {formatDate(blog.createdAt)}</span>
+                    <span className="flex items-center gap-1"><FiClock /> {formatDate(blog.createdAt, isBn)}</span>
                   </div>
                   <h3 className="text-lg font-bold font-heading text-zinc-900 dark:text-white group-hover:text-rose-600 transition leading-snug">
                     {displayTitle}

@@ -67,7 +67,7 @@ const BlogDetail = () => {
         <div className="flex items-center justify-between text-xs font-mono text-zinc-500 border-b border-zinc-200 dark:border-zinc-800 pb-4">
           <div className="flex items-center gap-4">
             <span className="flex items-center gap-1"><FiUser /> {author}</span>
-            <span className="flex items-center gap-1"><FiClock /> {formatDate(blog.createdAt)}</span>
+            <span className="flex items-center gap-1"><FiClock /> {formatDate(blog.createdAt, isBn)}</span>
           </div>
           <button
             onClick={() => {

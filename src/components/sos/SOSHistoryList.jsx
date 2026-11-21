@@ -1,6 +1,6 @@
 import React from 'react';
 import { FiMapPin, FiClock, FiCheckCircle, FiAlertTriangle } from 'react-icons/fi';
-import { formatDate } from '../../utils/helpers';
+import { formatDate, localizeNum } from '../../utils/helpers';
 import { useLanguage } from '../../context/LanguageContext';
 
 const SOSHistoryList = ({ history = [] }) => {
@@ -40,14 +40,14 @@ const SOSHistoryList = ({ history = [] }) => {
                   {item.status === 'ACTIVE' ? (isBn ? 'সক্রিয়' : 'ACTIVE') : (isBn ? 'সমাধানকৃত' : 'RESOLVED')}
                 </span>
                 <span className="text-xs text-slate-400 flex items-center gap-1 font-mono">
-                  <FiClock /> {formatDate(item.timestamp)}
+                  <FiClock /> {formatDate(item.timestamp, isBn)}
                 </span>
               </div>
               <p className="text-sm font-semibold text-slate-200 flex items-center gap-1.5">
                 <FiMapPin className="text-pink-500 flex-shrink-0" /> {item.address}
               </p>
               <p className="text-[11px] text-slate-400 font-mono">
-                {isBn ? 'কোঅর্ডিনেটস:' : 'Coordinates:'} {item.latitude}, {item.longitude}
+                {isBn ? 'কোঅর্ডিনেটস:' : 'Coordinates:'} {localizeNum(item.latitude, isBn)}, {localizeNum(item.longitude, isBn)}
               </p>
             </div>
           </div>

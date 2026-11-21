@@ -4,6 +4,7 @@ import { FiAlertTriangle, FiVolume2, FiVolumeX, FiXCircle, FiSend, FiMapPin, FiS
 import { useVoiceSOS } from '../../context/VoiceSOSContext';
 import { useGeolocation } from '../../hooks/useGeolocation';
 import { useLanguage } from '../../context/LanguageContext';
+import { toBengaliDigits, localizeNum } from '../../utils/helpers';
 
 const VoiceSOSAlarmModal = () => {
   const {
@@ -74,7 +75,7 @@ const VoiceSOSAlarmModal = () => {
             {location && location.latitude && (
               <div className="flex items-center gap-1.5 text-[11px] text-zinc-400 font-mono pt-1 border-t border-zinc-800/80">
                 <FiMapPin className="text-rose-500 shrink-0" />
-                <span className="truncate">{location.address || `${location.latitude.toFixed(4)}° N, ${location.longitude.toFixed(4)}° E`}</span>
+                <span className="truncate">{location.address || (isBn ? `${toBengaliDigits(location.latitude.toFixed(4))}° উত্তর, ${toBengaliDigits(location.longitude.toFixed(4))}° পূর্ব` : `${location.latitude.toFixed(4)}° N, ${location.longitude.toFixed(4)}° E`)}</span>
               </div>
             )}
           </div>
@@ -85,13 +86,13 @@ const VoiceSOSAlarmModal = () => {
               <div className="relative flex items-center justify-center">
                 <div className="w-24 h-24 rounded-full border-4 border-rose-500/30 flex items-center justify-center">
                   <span className="text-5xl font-black font-heading text-rose-500 animate-pulse">
-                    {countdown}
+                    {localizeNum(countdown, isBn)}
                   </span>
                 </div>
               </div>
               <p className="text-xs text-zinc-400 font-mono">
                 {isBn
-                  ? <>স্বয়ংক্রিয়ভাবে জিপিএস ব্রডকাস্ট হতে <span className="text-rose-400 font-bold">{countdown} সেকেন্ড</span> বাকি</>
+                  ? <>স্বয়ংক্রিয়ভাবে জিপিএস ব্রডকাস্ট হতে <span className="text-rose-400 font-bold">{toBengaliDigits(countdown)} সেকেন্ড</span> বাকি</>
                   : <>Broadcasting live GPS SOS in <span className="text-rose-400 font-bold">{countdown} seconds</span></>}
               </p>
             </div>

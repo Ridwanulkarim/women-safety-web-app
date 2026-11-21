@@ -3,6 +3,7 @@ import { MapContainer, TileLayer, Marker, Popup, Circle, useMap, useMapEvents } 
 import L from 'leaflet';
 import { FiNavigation, FiSearch, FiMapPin, FiLoader, FiAlertTriangle, FiCheckCircle } from 'react-icons/fi';
 import { useLanguage } from '../../context/LanguageContext';
+import { toBengaliDigits } from '../../utils/helpers';
 import toast from 'react-hot-toast';
 
 /**
@@ -96,7 +97,7 @@ const LiveMap = ({
           onLocationChange(lat, lng, acc);
         }
         setIsLocating(false);
-        toast.success(isBn ? `সঠিক অবস্থান পাওয়া গেছে! (±${Math.round(acc)} মিটার নির্ভুল)` : `Exact location acquired! (±${Math.round(acc)}m precision)`, { id: 'gps-locating' });
+        toast.success(isBn ? `সঠিক অবস্থান পাওয়া গেছে! (±${toBengaliDigits(Math.round(acc))} মিটার নির্ভুল)` : `Exact location acquired! (±${Math.round(acc)}m precision)`, { id: 'gps-locating' });
       },
       (err) => {
         console.warn('High precision GPS failed:', err.message);
@@ -265,7 +266,7 @@ const LiveMap = ({
                 if (onLocationChange) {
                   const pos = e.target.getLatLng();
                   onLocationChange(pos.lat, pos.lng, 10);
-                  toast.success(isBn ? `অবস্থান আপডেট হয়েছে: ${pos.lat.toFixed(4)}, ${pos.lng.toFixed(4)}` : `Location updated: ${pos.lat.toFixed(4)}, ${pos.lng.toFixed(4)}`);
+                  toast.success(isBn ? `অবস্থান আপডেট হয়েছে: ${toBengaliDigits(pos.lat.toFixed(4))}, ${toBengaliDigits(pos.lng.toFixed(4))}` : `Location updated: ${pos.lat.toFixed(4)}, ${pos.lng.toFixed(4)}`);
                 }
               }
             }}
@@ -274,7 +275,7 @@ const LiveMap = ({
               <div className="p-1 text-center font-heading">
                 <strong className="text-pink-600 block text-xs uppercase">{isBn ? 'আপনার নির্বাচিত অবস্থান' : title}</strong>
                 <span className="text-[11px] text-slate-700 block font-mono">
-                  {isBn ? `অক্ষাংশ: ${latitude.toFixed(5)}, দ্রাঘিমাংশ: ${longitude.toFixed(5)}` : `Lat: ${latitude.toFixed(5)}, Lng: ${longitude.toFixed(5)}`}
+                  {isBn ? `অক্ষাংশ: ${toBengaliDigits(latitude.toFixed(5))}, দ্রাঘিমাংশ: ${toBengaliDigits(longitude.toFixed(5))}` : `Lat: ${latitude.toFixed(5)}, Lng: ${longitude.toFixed(5)}`}
                 </span>
                 {onLocationChange && allowManualAdjustment && (
                   <span className="text-[9px] text-zinc-500 italic mt-0.5 block">
