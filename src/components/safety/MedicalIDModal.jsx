@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FiX, FiActivity, FiUser, FiPhone, FiCheck, FiPlusCircle, FiEdit2 } from 'react-icons/fi';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { db } from '../../firebase/config';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
 import toast from 'react-hot-toast';
@@ -29,13 +31,42 @@ const MedicalIDModal = ({ isOpen, onClose }) => {
     contactPhone: savedData?.contactPhone || ''
   });
 
+  useEffect(() => {
+    if (!isOpen || !user?.uid) return;
+    getDoc(doc(db, 'users', user.uid))
+      .then((snap) => {
+        if (snap.exists() && snap.data()?.medicalId) {
+          const cloudMed = snap.data().medicalId;
+          setFormData((prev) => ({ ...prev, ...cloudMed }));
+          localStorage.setItem('safehaven_medical_id', JSON.stringify(cloudMed));
+          setIsEditing(false);
+        }
+      })
+      .catch(() => {});
+  }, [isOpen, user?.uid]);
+
   if (!isOpen) return null;
 
-  const handleSave = (e) => {
+  const handleSave = async (e) => {
     e.preventDefault();
     localStorage.setItem('safehaven_medical_id', JSON.stringify(formData));
+    if (user?.uid) {
+      try {
+        await setDoc(
+          doc(db, 'users', user.uid),
+          {
+            medicalId: formData,
+            bloodGroup: formData.bloodType,
+            updatedAt: new Date().toISOString()
+          },
+          { merge: true }
+        );
+      } catch (err) {
+        console.warn('Firestore medical ID sync notice:', err.message);
+      }
+    }
     setIsEditing(false);
-    toast.success(isBn ? 'জরুরি মেডিকেল আইডি সংরক্ষিত হয়েছে!' : 'Emergency Medical ID saved successfully!');
+    toast.success(isBn ? 'জরুরি মেডিকেল আইডি ক্লাউড ডাটাবেজে সংরক্ষিত হয়েছে!' : 'Emergency Medical ID saved to Cloud Database!');
   };
 
   return (

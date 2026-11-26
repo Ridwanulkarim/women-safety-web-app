@@ -6,6 +6,7 @@ import {
 } from 'react-icons/fi';
 import { getGlobalSOSAlerts, getRegisteredUsers } from '../../utils/adminDataRegistry';
 import { toBengaliDigits } from '../../utils/helpers';
+import api from '../../services/api';
 import toast from 'react-hot-toast';
 
 /**
@@ -319,14 +320,53 @@ const AdminAIAgentDrawer = ({ defaultMode = 'SOS_REPORTS', isOpen, onClose }) =>
     };
     setChatHistory(prev => [...prev, userMsg]);
 
-    // 2. Node: Intent Router
+    // 2. Node: Intent Router & Live Backend LangGraph Call
     setAgentState(AGENT_NODES.INTENT_ROUTING);
     setActiveStepTrace([
       'Node: INTENT_ROUTER', 
-      isBengali ? 'ইনটেন্ট ও প্রশ্নের উদ্দেশ্য বিশ্লেষণ করা হচ্ছে...' : 'Classifying user query intent...'
+      isBengali ? 'ব্যাকএন্ড LangChain + LangGraph সার্ভিসে প্রশ্ন পাঠানো হচ্ছে...' : 'Dispatching query to LangChain + LangGraph API...'
     ]);
 
-    await new Promise(r => setTimeout(r, 400));
+    try {
+      setAgentState(AGENT_NODES.TOOL_CALLING);
+      setActiveStepTrace([
+        'POST /api/ai/chat (LangGraph StateGraph)',
+        isBengali ? 'Firestore ডাটাবেজ টুল ও LangChain চেইন চালু হচ্ছে...' : 'Invoking Firestore tools & LangChain LCEL chain...'
+      ]);
+
+      const apiRes = await api.post(
+        '/ai/chat',
+        {
+          query: userPrompt,
+          mode,
+          language: isBengali ? 'bn' : 'en',
+          clientAlerts: alerts,
+          clientUsers: users
+        },
+        { timeout: 15000 }
+      );
+
+      const aiData = apiRes.data?.data;
+      if (aiData && aiData.answer) {
+        setAgentState(AGENT_NODES.RESPONSE_READY);
+        const botMsg = {
+          role: 'assistant',
+          text: aiData.answer,
+          spokenPhrase: aiData.spokenPhrase || aiData.answer,
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          trace: [...(aiData.executionTrace || []), `ENGINE: ${aiData.engineUsed || 'LangChain + LangGraph'}`]
+        };
+        setChatHistory(prev => [...prev, botMsg]);
+        setAgentState(AGENT_NODES.IDLE);
+        setActiveStepTrace([]);
+        speakText(aiData.answer, aiData.spokenPhrase);
+        return;
+      }
+    } catch (backendErr) {
+      console.warn('Backend LangGraph API fallback notice:', backendErr.message);
+    }
+
+    await new Promise(r => setTimeout(r, 300));
 
     const lower = userPrompt.toLowerCase();
     const isAnalyticsIntent = 

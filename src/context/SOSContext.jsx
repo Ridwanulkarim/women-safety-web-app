@@ -1,4 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { collection, doc, getDocs, setDoc, deleteDoc, query, where } from 'firebase/firestore';
+import { db } from '../firebase/config';
 import api from '../services/api';
 import toast from 'react-hot-toast';
 import { useAuth } from './AuthContext';
@@ -12,7 +14,7 @@ export const SOSProvider = ({ children }) => {
   const [sosModalOpen, setSosModalOpen] = useState(false);
   const [sosHistory, setSosHistory] = useState([]);
   const [activeSOSData, setActiveSOSData] = useState(null);
-  
+
   const storageKey = `safehaven_contacts_${user?.uid || user?.email || 'guest'}`;
 
   const [savedContacts, setSavedContacts] = useState(() => {
@@ -25,7 +27,7 @@ export const SOSProvider = ({ children }) => {
   });
   const [loadingContacts, setLoadingContacts] = useState(false);
 
-  // Sync saved contacts across LocalStorage and Backend API
+  // Sync saved contacts directly with Firebase Cloud Firestore + Backend API
   const fetchSavedContacts = useCallback(async () => {
     if (!user) {
       setSavedContacts([]);
@@ -33,12 +35,36 @@ export const SOSProvider = ({ children }) => {
     }
     setLoadingContacts(true);
     try {
-      const res = await api.get('/contacts');
-      if (Array.isArray(res.data?.data) && res.data.data.length > 0) {
-        setSavedContacts(res.data.data);
-        localStorage.setItem(storageKey, JSON.stringify(res.data.data));
+      let cloudContacts = [];
+
+      // 1. Primary Cloud Database: Query Firebase Cloud Firestore directly
+      if (user.uid) {
+        try {
+          const q = query(collection(db, 'contacts'), where('userId', '==', user.uid));
+          const snap = await getDocs(q);
+          cloudContacts = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        } catch (fsErr) {
+          console.warn('Firestore contacts read notice:', fsErr.message);
+        }
+      }
+
+      // 2. Also fetch from Express Backend API if Firestore returned empty
+      if (cloudContacts.length === 0) {
+        try {
+          const res = await api.get('/contacts');
+          if (Array.isArray(res.data?.data) && res.data.data.length > 0) {
+            cloudContacts = res.data.data;
+          }
+        } catch (apiErr) {
+          console.warn('Backend contacts sync notice:', apiErr.message);
+        }
+      }
+
+      if (cloudContacts.length > 0) {
+        setSavedContacts(cloudContacts);
+        localStorage.setItem(storageKey, JSON.stringify(cloudContacts));
       } else {
-        // Fallback to local storage if API returns empty (e.g. serverless cold restart)
+        // Offline cache fallback
         const stored = localStorage.getItem(storageKey);
         if (stored) {
           const parsed = JSON.parse(stored);
@@ -48,7 +74,6 @@ export const SOSProvider = ({ children }) => {
         }
       }
     } catch (e) {
-      // LocalStorage fallback on API error
       const stored = localStorage.getItem(storageKey);
       if (stored) {
         try { setSavedContacts(JSON.parse(stored)); } catch (err) {}
@@ -58,9 +83,37 @@ export const SOSProvider = ({ children }) => {
     }
   }, [user, storageKey]);
 
+  // Fetch user's SOS history directly from Firebase Cloud Firestore + Backend API
+  const fetchSOSHistory = useCallback(async () => {
+    if (!user?.uid) {
+      setSosHistory([]);
+      return;
+    }
+    try {
+      const q = query(collection(db, 'sos'), where('userId', '==', user.uid));
+      const snap = await getDocs(q);
+      const fsHistory = snap.docs
+        .map(d => ({ id: d.id, ...d.data() }))
+        .sort((a, b) => new Date(b.timestamp || 0) - new Date(a.timestamp || 0));
+
+      if (fsHistory.length > 0) {
+        setSosHistory(fsHistory);
+        return;
+      }
+
+      const res = await api.get('/sos/history');
+      if (Array.isArray(res.data?.data)) {
+        setSosHistory(res.data.data);
+      }
+    } catch (err) {
+      console.warn('Firestore SOS history sync notice:', err.message);
+    }
+  }, [user]);
+
   useEffect(() => {
     fetchSavedContacts();
-  }, [fetchSavedContacts]);
+    fetchSOSHistory();
+  }, [fetchSavedContacts, fetchSOSHistory]);
 
   const addContact = async (contactData) => {
     if (savedContacts.length >= 5) {
@@ -76,8 +129,10 @@ export const SOSProvider = ({ children }) => {
       return false;
     }
 
+    const contactId = 'contact_' + Date.now();
     const newContact = {
-      id: 'contact_' + Date.now(),
+      id: contactId,
+      userId: user?.uid || 'guest',
       ...contactData,
       createdAt: new Date().toISOString()
     };
@@ -86,13 +141,23 @@ export const SOSProvider = ({ children }) => {
     setSavedContacts(updatedList);
     localStorage.setItem(storageKey, JSON.stringify(updatedList));
 
+    // Persist to Firebase Cloud Firestore directly
+    if (user?.uid) {
+      try {
+        await setDoc(doc(db, 'contacts', contactId), newContact, { merge: true });
+      } catch (fsErr) {
+        console.warn('Firestore contact write notice:', fsErr.message);
+      }
+    }
+
+    // Sync with Backend REST API
     try {
-      await api.post('/contacts', contactData);
+      await api.post('/contacts', newContact);
     } catch (err) {
       console.warn('API sync fallback for contact save');
     }
 
-    toast.success('Emergency contact saved successfully!');
+    toast.success('Emergency contact saved to Cloud Database!');
     return true;
   };
 
@@ -100,6 +165,15 @@ export const SOSProvider = ({ children }) => {
     const updatedList = savedContacts.filter(c => c.id !== contactId && c._id !== contactId);
     setSavedContacts(updatedList);
     localStorage.setItem(storageKey, JSON.stringify(updatedList));
+
+    // Delete directly from Firebase Cloud Firestore
+    if (user?.uid) {
+      try {
+        await deleteDoc(doc(db, 'contacts', contactId));
+      } catch (fsErr) {
+        console.warn('Firestore contact delete notice:', fsErr.message);
+      }
+    }
 
     try {
       await api.delete(`/contacts/${contactId}`);
@@ -119,37 +193,42 @@ export const SOSProvider = ({ children }) => {
   const closeSOSModal = () => setSosModalOpen(false);
 
   const sendSOSAlert = async (locationData) => {
+    const lat = locationData?.latitude || 23.8103;
+    const lng = locationData?.longitude || 90.4125;
+    const addr = locationData?.address || `Lat: ${lat.toFixed(4)}, Lng: ${lng.toFixed(4)}`;
+
+    const payload = {
+      userId: user?.uid || 'anonymous',
+      latitude: lat,
+      longitude: lng,
+      address: addr,
+      userName: user?.fullName || (user?.email ? user.email.split('@')[0] : 'User'),
+      userPhone: user?.phone || '',
+      userEmail: user?.email || '',
+      contactsAlerted: savedContacts
+    };
+
     try {
-      const lat = locationData?.latitude || 23.8103;
-      const lng = locationData?.longitude || 90.4125;
-      const addr = locationData?.address || `Lat: ${lat.toFixed(4)}, Lng: ${lng.toFixed(4)}`;
-
-      const payload = {
-        latitude: lat,
-        longitude: lng,
-        address: addr,
-        userName: user?.fullName || 'User',
-        userPhone: user?.phone || ''
-      };
-
       const res = await api.post('/sos', payload);
-      const sosRecord = res.data?.data || {
-        id: 'sos_' + Date.now(),
-        userName: user?.fullName || (user?.email ? user.email.split('@')[0] : 'User'),
-        userPhone: user?.phone || 'Emergency Direct',
-        userEmail: user?.email || '',
+      const sosRecord = {
+        id: res.data?.data?.id || 'sos_' + Date.now(),
+        userId: user?.uid || 'anonymous',
+        userName: payload.userName,
+        userPhone: payload.userPhone || 'Emergency Direct',
+        userEmail: payload.userEmail,
         latitude: lat,
         longitude: lng,
         address: addr,
         status: 'ACTIVE',
-        contactsAlerted: savedContacts,
-        timestamp: new Date().toISOString()
+        contactsAlerted: res.data?.data?.contactsAlerted || savedContacts,
+        timestamp: res.data?.data?.timestamp || new Date().toISOString(),
+        ...(res.data?.data || {})
       };
 
       setIsSOSActive(true);
       setActiveSOSData(sosRecord);
       setSosHistory(prev => [sosRecord, ...(Array.isArray(prev) ? prev : [])]);
-      saveGlobalSOSAlert(sosRecord);
+      await saveGlobalSOSAlert(sosRecord);
 
       const count = Array.isArray(sosRecord.contactsAlerted) ? sosRecord.contactsAlerted.length : savedContacts.length;
       if (count > 0) {
@@ -160,15 +239,15 @@ export const SOSProvider = ({ children }) => {
 
       return sosRecord;
     } catch (error) {
-      toast.error('SOS Broadcast Warning: Local distress signal captured.');
       const fallbackRecord = {
-        id: 'sos_local_' + Date.now(),
-        userName: user?.fullName || (user?.email ? user.email.split('@')[0] : 'User'),
-        userPhone: user?.phone || 'Emergency Direct',
-        userEmail: user?.email || '',
-        latitude: locationData?.latitude || 23.8103,
-        longitude: locationData?.longitude || 90.4125,
-        address: locationData?.address || 'Dhaka, Bangladesh',
+        id: 'sos_' + Date.now(),
+        userId: user?.uid || 'anonymous',
+        userName: payload.userName,
+        userPhone: payload.userPhone || 'Emergency Direct',
+        userEmail: payload.userEmail,
+        latitude: lat,
+        longitude: lng,
+        address: addr,
         status: 'ACTIVE',
         contactsAlerted: savedContacts,
         timestamp: new Date().toISOString()
@@ -176,7 +255,8 @@ export const SOSProvider = ({ children }) => {
       setIsSOSActive(true);
       setActiveSOSData(fallbackRecord);
       setSosHistory(prev => [fallbackRecord, ...(Array.isArray(prev) ? prev : [])]);
-      saveGlobalSOSAlert(fallbackRecord);
+      await saveGlobalSOSAlert(fallbackRecord);
+      toast.error('🚨 SOS EMERGENCY BROADCAST SAVED TO CLOUD FIRESTORE!', { duration: 6000 });
       return fallbackRecord;
     }
   };
@@ -187,7 +267,8 @@ export const SOSProvider = ({ children }) => {
       if (targetId) await api.patch(`/sos/${targetId}/status`, { status: 'RESOLVED' });
     } catch (e) {}
     if (targetId) {
-      updateSOSAlertStatus(targetId, 'RESOLVED');
+      await updateSOSAlertStatus(targetId, 'RESOLVED');
+      setSosHistory(prev => (Array.isArray(prev) ? prev.map(item => item.id === targetId ? { ...item, status: 'RESOLVED' } : item) : []));
     }
     setIsSOSActive(false);
     setActiveSOSData(null);

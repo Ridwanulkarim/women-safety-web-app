@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import express from 'express';
 import dotenv from 'dotenv';
 import helmet from 'helmet';
@@ -13,6 +14,7 @@ import authRoutes from './src/routes/authRoutes.js';
 import userRoutes from './src/routes/userRoutes.js';
 import contactRoutes from './src/routes/contactRoutes.js';
 import sosRoutes from './src/routes/sosRoutes.js';
+import aiRoutes from './src/routes/aiRoutes.js';
 import {
   notificationRoutes,
   announcementRoutes,
@@ -60,6 +62,7 @@ const registerRoutes = (prefix = '') => {
   app.use(`${prefix}/blogs`, blogRoutes);
   app.use(`${prefix}/safety-tips`, tipRoutes);
   app.use(`${prefix}/analytics`, analyticsRoutes);
+  app.use(`${prefix}/ai`, aiRoutes);
 };
 
 registerRoutes('/api');

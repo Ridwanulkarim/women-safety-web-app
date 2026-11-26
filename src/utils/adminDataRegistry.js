@@ -1,6 +1,6 @@
 // src/utils/adminDataRegistry.js
 import { collection, doc, getDocs, setDoc, updateDoc, deleteDoc, onSnapshot } from 'firebase/firestore';
-import { db } from '../firebase/config';
+import { db, auth } from '../firebase/config';
 
 const USERS_STORAGE_KEY = 'safehaven_registered_users';
 const SOS_STORAGE_KEY = 'safehaven_global_sos_alerts';
@@ -236,9 +236,10 @@ export const saveGlobalSOSAlert = async (alertData) => {
     const list = getGlobalSOSAlerts();
     const alertEntry = {
       id: alertData.id || 'sos_' + Date.now(),
+      userId: alertData.userId || auth.currentUser?.uid || 'anonymous',
       userName: alertData.userName || 'Anonymous User',
       userPhone: alertData.userPhone || 'Emergency Direct',
-      userEmail: alertData.userEmail || '',
+      userEmail: alertData.userEmail || auth.currentUser?.email || '',
       latitude: alertData.latitude || 23.8103,
       longitude: alertData.longitude || 90.4125,
       address: alertData.address || 'Dhaka, Bangladesh',
@@ -330,6 +331,7 @@ export const saveAdminAnnouncement = (announcement) => {
     };
     const updated = [newAnn, ...list];
     localStorage.setItem(ANNOUNCEMENTS_STORAGE_KEY, JSON.stringify(updated));
+    setDoc(doc(db, 'announcements', newAnn.id), newAnn, { merge: true }).catch(() => {});
     return updated;
   } catch (e) {
     console.warn('Failed to save announcement:', e);
@@ -342,6 +344,7 @@ export const deleteAdminAnnouncement = (id) => {
     const list = getAdminAnnouncements();
     const updated = list.filter((a) => a.id !== id);
     localStorage.setItem(ANNOUNCEMENTS_STORAGE_KEY, JSON.stringify(updated));
+    deleteDoc(doc(db, 'announcements', id)).catch(() => {});
     return updated;
   } catch (e) {
     console.warn('Failed to delete announcement:', e);

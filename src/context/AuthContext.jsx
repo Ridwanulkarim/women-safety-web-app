@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
-import { auth } from '../firebase/config';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { auth, db } from '../firebase/config';
 import { firebaseLogin, firebaseRegister, firebaseGoogleLogin, firebaseLogout, firebaseResetPassword } from '../firebase/authService';
 import api from '../services/api';
 import toast from 'react-hot-toast';
@@ -75,6 +76,16 @@ export const AuthProvider = ({ children }) => {
         setUser(prev => prev || fastUser);
         await upsertRegisteredUser(fastUser);
         setLoading(false); // Unblock UI immediately!
+
+        // Load saved profile fields directly from Firebase Cloud Firestore
+        getDoc(doc(db, 'users', fbUser.uid))
+          .then((snap) => {
+            if (snap.exists()) {
+              const cloudData = snap.data();
+              setUser((prev) => ({ ...(prev || fastUser), ...cloudData, uid: fbUser.uid, role }));
+            }
+          })
+          .catch(() => {});
 
         // Background server sync
         (async () => {
@@ -282,8 +293,21 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const updateUserProfile = (updatedData) => {
+  const updateUserProfile = async (updatedData) => {
     setUser(prev => (prev ? { ...prev, ...updatedData } : updatedData));
+    const targetUid = updatedData?.uid || user?.uid || auth.currentUser?.uid;
+    if (targetUid) {
+      try {
+        const { role, status, ...safeFields } = updatedData || {};
+        await setDoc(
+          doc(db, 'users', targetUid),
+          { ...safeFields, updatedAt: new Date().toISOString() },
+          { merge: true }
+        );
+      } catch (err) {
+        console.warn('Firestore profile update notice:', err.message);
+      }
+    }
   };
 
   return (

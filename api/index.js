@@ -3,6 +3,7 @@ import cors from 'cors';
 import jwt from 'jsonwebtoken';
 import admin from 'firebase-admin';
 import nodemailer from 'nodemailer';
+import { runSafeHavenLangGraphAgent, getAgentMetadata } from '../backend/src/services/langgraphAgentService.js';
 
 const app = express();
 
@@ -12,7 +13,8 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 const JWT_SECRET = process.env.JWT_SECRET || 'safehaven_default_jwt_secret_key_2026';
 
-// Initialize Firebase Admin if credentials present
+// Initialize Firebase Admin SDK for Cloud Firestore persistence
+let firestoreDb = null;
 if (!admin.apps.length) {
   const projectId = process.env.FIREBASE_PROJECT_ID || 'women-safety-app-7c29e';
   const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
@@ -27,15 +29,22 @@ if (!admin.apps.length) {
       admin.initializeApp({
         credential: admin.credential.cert({ projectId, clientEmail, privateKey })
       });
+      firestoreDb = admin.firestore();
     } else {
       admin.initializeApp({ projectId });
     }
   } catch (e) {
     console.warn('Firebase Admin Init Notice:', e.message);
   }
+} else {
+  try {
+    if (process.env.FIREBASE_CLIENT_EMAIL && process.env.FIREBASE_PRIVATE_KEY) {
+      firestoreDb = admin.firestore();
+    }
+  } catch (e) {}
 }
 
-// In-Memory Mock Database
+// In-Memory Fallback Cache (used seamlessly when Firestore Admin credentials are absent)
 const dbData = {
   users: new Map(),
   contacts: new Map(),
@@ -74,29 +83,29 @@ const dbData = {
     }]
   ]),
   safetyTips: new Map([
-    ['tip-1', { 
-      id: 'tip-1', 
-      title: 'Commuting at Night', 
+    ['tip-1', {
+      id: 'tip-1',
+      title: 'Commuting at Night',
       title_bn: 'রাতের যাত্রা ও যাতায়াতের নিরাপত্তা',
-      category: 'Travel Safety', 
+      category: 'Travel Safety',
       category_bn: 'ভ্রমণ নিরাপত্তা',
       content: 'Stay in well-lit areas, share your live trip details with a trusted contact, and avoid wearing noise-canceling headphones.',
       content_bn: 'সবসময় আলোযুক্ত রাস্তায় চলুন, বিশ্বস্ত পরিচিতদের সাথে লাইভ ট্রিপ লোকেশন শেয়ার করুন এবং রাতে একা চলার সময় দুই কানে হেডফোন গুঁজে রাখবেন না।'
     }],
-    ['tip-2', { 
-      id: 'tip-2', 
-      title: 'Ride-Sharing Security Checklist', 
+    ['tip-2', {
+      id: 'tip-2',
+      title: 'Ride-Sharing Security Checklist',
       title_bn: 'রাইডশেয়ারিং নিরাপত্তা চেকলিস্ট',
-      category: 'Travel Safety', 
+      category: 'Travel Safety',
       category_bn: 'ভ্রমণ নিরাপত্তা',
       content: 'Verify driver identity, match license plate numbers before entering, and sit in the rear seat.',
       content_bn: 'গাড়িতে ওঠার আগে চালকের ছবি ও গাড়ির নম্বর প্লেট অ্যাপের সাথে মিলিয়ে নিন এবং পেছনের সিটে বসুন।'
     }],
-    ['tip-3', { 
-      id: 'tip-3', 
-      title: 'Home Entrance Vigilance', 
+    ['tip-3', {
+      id: 'tip-3',
+      title: 'Home Entrance Vigilance',
       title_bn: 'বাসার প্রবেশদ্বারে সতর্কতা',
-      category: 'Home Safety', 
+      category: 'Home Safety',
       category_bn: 'বাসার নিরাপত্তা',
       content: 'Have your keys ready before reaching your front door. Look around before stepping inside.',
       content_bn: 'দরজার সামনে আসার আগেই চাবি হাতে রাখুন। ভেতরে প্রবেশের আগে আশেপাশের পরিবেশ দেখে নিন এবং দ্রুত ছিটকিনি লাগিয়ে দিন।'
@@ -122,22 +131,32 @@ const authenticateToken = (req, res, next) => {
 
 // Health Check
 app.get(['/api/health', '/health'], (req, res) => {
-  res.status(200).json({ status: 'online', service: 'Women Safety Vercel API', timestamp: new Date().toISOString() });
+  res.status(200).json({
+    status: 'online',
+    service: 'Women Safety Vercel API',
+    database: firestoreDb ? 'Firebase Cloud Firestore (Admin SDK Connected)' : 'Firebase Cloud Firestore (Client SDK + Serverless Cache)',
+    aiService: getAgentMetadata(),
+    timestamp: new Date().toISOString()
+  });
 });
 
 // AUTH ROUTES
-app.post(['/api/auth/register', '/auth/register'], (req, res) => {
+app.post(['/api/auth/register', '/auth/register'], async (req, res) => {
   const { uid, email, fullName, phone, role } = req.body;
   const userId = uid || 'user_' + Date.now();
   const user = {
     uid: userId,
     email,
-    fullName: fullName || email.split('@')[0],
+    fullName: fullName || (email ? email.split('@')[0] : 'User'),
     phone: phone || '',
     role: role || 'user',
+    status: 'active',
     createdAt: new Date().toISOString()
   };
   dbData.users.set(userId, user);
+  if (firestoreDb) {
+    try { await firestoreDb.collection('users').doc(userId).set(user, { merge: true }); } catch (e) {}
+  }
   const token = generateToken({ uid: user.uid, email: user.email, role: user.role, fullName: user.fullName });
   return res.status(201).json({ success: true, message: 'User registered successfully', data: { user, token } });
 });
@@ -156,14 +175,7 @@ Your account was successfully logged in to SafeHaven Women Safety Web Applicatio
 • Date & Time: ${time}
 • Status: Authenticated
 
-Was this you?
-If you recently signed in, you can safely ignore this notification.
-If you did not initiate this login, please reset your password immediately:
-https://women-safety-web-app.vercel.app/forgot-password
-
-SafeHaven Women Emergency & Distress Network
-Dhaka, Bangladesh
-This is an automated mission-critical security alert sent to ${email}.`;
+SafeHaven Women Emergency & Distress Network`;
 
   const htmlContent = `
     <!DOCTYPE html>
@@ -196,43 +208,24 @@ This is an automated mission-critical security alert sent to ${email}.`;
         <p style="font-size: 14px; color: #d4d4d8; line-height: 1.6; margin: 0;">
           This is an automated confirmation that your account was successfully logged in to the <strong>SafeHaven Women Safety Web Application</strong>.
         </p>
-
         <div class="info-box">
-          <div class="info-row">
-            <span class="label">Account Email:</span>
-            <span class="val">${email}</span>
-          </div>
-          <div class="info-row">
-            <span class="label">Date & Time:</span>
-            <span class="val">${time}</span>
-          </div>
-          <div class="info-row">
-            <span class="label">Status:</span>
-            <span class="val" style="color: #34d399;">Authenticated</span>
-          </div>
+          <div class="info-row"><span class="label">Account Email:</span><span class="val">${email}</span></div>
+          <div class="info-row"><span class="label">Date & Time:</span><span class="val">${time}</span></div>
+          <div class="info-row"><span class="label">Status:</span><span class="val" style="color: #34d399;">Authenticated</span></div>
         </div>
-
         <div class="warning">
           <strong style="color: #f43f5e;">Was this you?</strong><br>
-          If you recently signed in, you can safely ignore this notification. If you did NOT sign in, someone else may have gained access to your credentials. Please secure your account immediately.
+          If you recently signed in, you can safely ignore this notification.
         </div>
-
-        <a href="https://women-safety-web-app.vercel.app/forgot-password" class="btn">
-          Change / Reset Password
-        </a>
-
-        <div class="footer">
-          SafeHaven Women Emergency & Distress Network • Dhaka, Bangladesh<br>
-          This is an automated mission-critical security alert sent to ${email}.
-        </div>
+        <a href="https://women-safety-web-app.vercel.app/forgot-password" class="btn">Change / Reset Password</a>
+        <div class="footer">SafeHaven Women Emergency & Distress Network • Dhaka, Bangladesh</div>
       </div>
     </body>
     </html>
   `;
 
-  // 1. Gmail SMTP (Direct 100% Inbox Delivery via Nodemailer)
-  const emailUser = process.env.EMAIL_USER || process.env.SMTP_USER || 'ridwanulk08@gmail.com';
-  const emailPass = process.env.EMAIL_PASS || process.env.SMTP_PASS || 'palhriailsrlllro';
+  const emailUser = process.env.EMAIL_USER || process.env.SMTP_USER;
+  const emailPass = process.env.EMAIL_PASS || process.env.SMTP_PASS;
   if (emailUser && emailPass) {
     try {
       const transporter = nodemailer.createTransport({
@@ -245,21 +238,14 @@ This is an automated mission-critical security alert sent to ${email}.`;
         to: email,
         subject,
         text: textContent,
-        html: htmlContent,
-        headers: {
-          'X-Priority': '3',
-          'X-Entity-Ref-ID': 'safehaven-login-alert',
-          'List-Unsubscribe': `<mailto:${emailUser}?subject=unsubscribe>`
-        }
+        html: htmlContent
       });
-      console.log(`[Gmail SMTP] Login alert successfully dispatched to ${email}`);
       return;
     } catch (e) {
       console.warn('Gmail SMTP notice:', e.message);
     }
   }
 
-  // 2. Resend API
   if (process.env.RESEND_API_KEY) {
     try {
       await fetch('https://api.resend.com/emails', {
@@ -275,23 +261,27 @@ This is an automated mission-critical security alert sent to ${email}.`;
           html: htmlContent
         })
       });
-      console.log(`[Resend] Login alert dispatched to ${email}`);
-      return;
     } catch (e) {
       console.warn('Resend dispatch notice:', e.message);
     }
   }
-
-  console.log(`[Simulated Login Alert Email] Dispatched to: ${email} | Subject: "${subject}"`);
 };
 
 app.post(['/api/auth/login', '/auth/login'], async (req, res) => {
   const { email, uid, isSessionRestore } = req.body;
   const cleanEmail = email ? email.toLowerCase().trim() : '';
-  let user = uid ? dbData.users.get(uid) : null;
-  if (!user) {
-    user = Array.from(dbData.users.values()).find(u => u.email === cleanEmail);
+  let user = null;
+
+  if (firestoreDb && uid) {
+    try {
+      const docSnap = await firestoreDb.collection('users').doc(uid).get();
+      if (docSnap.exists) user = { uid: docSnap.id, ...docSnap.data() };
+    } catch (e) {}
   }
+
+  if (!user && uid) user = dbData.users.get(uid);
+  if (!user) user = Array.from(dbData.users.values()).find(u => u.email === cleanEmail);
+
   const isAdmin = cleanEmail === 'ridwanulk08@gmail.com' || cleanEmail.startsWith('admin@') || cleanEmail.includes('admin');
   if (!user) {
     user = {
@@ -299,18 +289,18 @@ app.post(['/api/auth/login', '/auth/login'], async (req, res) => {
       email: cleanEmail,
       fullName: cleanEmail.split('@')[0],
       role: isAdmin ? 'admin' : 'user',
+      status: 'active',
       createdAt: new Date().toISOString()
     };
-    dbData.users.set(user.uid, user);
+  }
+  user.lastLogin = new Date().toISOString();
+  dbData.users.set(user.uid, user);
+  if (firestoreDb) {
+    try { await firestoreDb.collection('users').doc(user.uid).set(user, { merge: true }); } catch (e) {}
   }
 
-  // Dispatch automated security alert email only on REAL sign-in, NOT on page refresh / session restore!
   if (!isSessionRestore) {
-    try {
-      await dispatchLoginAlertEmail(user.email, user.fullName);
-    } catch (err) {
-      console.warn('Email dispatch notice:', err.message);
-    }
+    try { await dispatchLoginAlertEmail(user.email, user.fullName); } catch (err) {}
   }
 
   const token = generateToken({ uid: user.uid, email: user.email, role: user.role, fullName: user.fullName });
@@ -318,56 +308,185 @@ app.post(['/api/auth/login', '/auth/login'], async (req, res) => {
 });
 
 // USER ROUTES
-app.get(['/api/users', '/users'], (req, res) => {
+app.get(['/api/users', '/users'], async (req, res) => {
+  if (firestoreDb) {
+    try {
+      const snap = await firestoreDb.collection('users').get();
+      if (!snap.empty) {
+        return res.status(200).json({ success: true, data: snap.docs.map(d => ({ uid: d.id, ...d.data() })) });
+      }
+    } catch (e) {}
+  }
   return res.status(200).json({ success: true, data: Array.from(dbData.users.values()) });
 });
 
-app.get(['/api/users/me', '/users/me'], authenticateToken, (req, res) => {
+app.get(['/api/users/me', '/users/me'], authenticateToken, async (req, res) => {
+  if (firestoreDb) {
+    try {
+      const snap = await firestoreDb.collection('users').doc(req.user.uid).get();
+      if (snap.exists) return res.status(200).json({ success: true, data: { uid: snap.id, ...snap.data() } });
+    } catch (e) {}
+  }
   const user = dbData.users.get(req.user.uid) || { uid: req.user.uid, email: req.user.email, fullName: req.user.fullName, role: req.user.role };
   return res.status(200).json({ success: true, data: user });
 });
 
-// CONTACTS ROUTES
-app.get(['/api/contacts', '/contacts'], authenticateToken, (req, res) => {
+app.put(['/api/users/profile', '/users/profile'], authenticateToken, async (req, res) => {
+  const { role, status, ...safeUpdates } = req.body || {};
+  const updated = { uid: req.user.uid, ...safeUpdates, updatedAt: new Date().toISOString() };
+  dbData.users.set(req.user.uid, { ...(dbData.users.get(req.user.uid) || {}), ...updated });
+  if (firestoreDb) {
+    try { await firestoreDb.collection('users').doc(req.user.uid).set(updated, { merge: true }); } catch (e) {}
+  }
+  return res.status(200).json({ success: true, message: 'Profile updated in Firestore', data: updated });
+});
+
+// CONTACTS ROUTES (Firestore-backed)
+app.get(['/api/contacts', '/contacts'], authenticateToken, async (req, res) => {
+  if (firestoreDb) {
+    try {
+      const snap = await firestoreDb.collection('contacts').where('userId', '==', req.user.uid).get();
+      if (!snap.empty) {
+        return res.status(200).json({ success: true, data: snap.docs.map(d => ({ id: d.id, ...d.data() })) });
+      }
+    } catch (e) {}
+  }
   const contacts = Array.from(dbData.contacts.values()).filter(c => c.userId === req.user.uid);
   return res.status(200).json({ success: true, data: contacts });
 });
 
-app.post(['/api/contacts', '/contacts'], authenticateToken, (req, res) => {
-  const { name, phone, relationship, isPrimary } = req.body;
-  const id = 'contact_' + Date.now();
-  const contact = { id, userId: req.user.uid, name, phone, relationship, isPrimary: !!isPrimary, createdAt: new Date().toISOString() };
+app.post(['/api/contacts', '/contacts'], authenticateToken, async (req, res) => {
+  const { id: providedId, name, phone, email, relationship, isPrimary } = req.body;
+  const id = providedId || 'contact_' + Date.now();
+  const contact = {
+    id,
+    userId: req.user.uid,
+    name,
+    phone,
+    email: email || '',
+    relationship: relationship || 'Emergency Contact',
+    isPrimary: !!isPrimary,
+    createdAt: new Date().toISOString()
+  };
   dbData.contacts.set(id, contact);
-  return res.status(201).json({ success: true, message: 'Contact added', data: contact });
+  if (firestoreDb) {
+    try { await firestoreDb.collection('contacts').doc(id).set(contact, { merge: true }); } catch (e) {}
+  }
+  return res.status(201).json({ success: true, message: 'Contact saved to Cloud Firestore', data: contact });
 });
 
-app.delete(['/api/contacts/:id', '/contacts/:id'], authenticateToken, (req, res) => {
+app.delete(['/api/contacts/:id', '/contacts/:id'], authenticateToken, async (req, res) => {
   dbData.contacts.delete(req.params.id);
+  if (firestoreDb) {
+    try { await firestoreDb.collection('contacts').doc(req.params.id).delete(); } catch (e) {}
+  }
   return res.status(200).json({ success: true, message: 'Contact deleted' });
 });
 
-// SOS ROUTES
-app.post(['/api/sos/trigger', '/sos/trigger'], authenticateToken, (req, res) => {
-  const { latitude, longitude, address, contactsAlerted } = req.body;
+// SOS ROUTES (Firestore-backed — supports both /api/sos and /api/sos/trigger)
+const handleCreateSOS = async (req, res) => {
+  const { latitude, longitude, address, userName, userPhone, userEmail, contactsAlerted } = req.body;
   const id = 'sos_' + Date.now();
   const sos = {
     id,
     userId: req.user.uid,
-    userName: req.user.fullName,
-    latitude,
-    longitude,
+    userName: userName || req.user.fullName || 'User',
+    userPhone: userPhone || '',
+    userEmail: userEmail || req.user.email || '',
+    latitude: latitude || 23.8103,
+    longitude: longitude || 90.4125,
     address: address || `Lat: ${latitude}, Lng: ${longitude}`,
     status: 'ACTIVE',
     timestamp: new Date().toISOString(),
     contactsAlerted: contactsAlerted || []
   };
   dbData.sos.set(id, sos);
-  return res.status(201).json({ success: true, message: 'SOS alert triggered', data: sos });
+  if (firestoreDb) {
+    try { await firestoreDb.collection('sos').doc(id).set(sos, { merge: true }); } catch (e) {}
+  }
+  return res.status(201).json({ success: true, message: 'SOS alert saved to Cloud Firestore', data: sos });
+};
+
+app.post(['/api/sos', '/sos', '/api/sos/trigger', '/sos/trigger'], authenticateToken, handleCreateSOS);
+
+app.patch(['/api/sos/:id/status', '/sos/:id/status'], authenticateToken, async (req, res) => {
+  const { status } = req.body;
+  const id = req.params.id;
+  const updates = { status: status || 'RESOLVED', resolvedAt: new Date().toISOString() };
+  if (dbData.sos.has(id)) {
+    dbData.sos.set(id, { ...dbData.sos.get(id), ...updates });
+  }
+  if (firestoreDb) {
+    try { await firestoreDb.collection('sos').doc(id).set(updates, { merge: true }); } catch (e) {}
+  }
+  return res.status(200).json({ success: true, message: 'SOS status updated', data: { id, ...updates } });
 });
 
-app.get(['/api/sos/history', '/sos/history'], authenticateToken, (req, res) => {
+app.get(['/api/sos/history', '/sos/history'], authenticateToken, async (req, res) => {
+  if (firestoreDb) {
+    try {
+      const snap = await firestoreDb.collection('sos').where('userId', '==', req.user.uid).get();
+      if (!snap.empty) {
+        return res.status(200).json({ success: true, data: snap.docs.map(d => ({ id: d.id, ...d.data() })) });
+      }
+    } catch (e) {}
+  }
   const history = Array.from(dbData.sos.values()).filter(s => s.userId === req.user.uid);
   return res.status(200).json({ success: true, data: history });
+});
+
+// LANGCHAIN + LANGGRAPH AI AGENT ROUTES
+app.get(['/api/ai/status', '/ai/status'], (req, res) => {
+  return res.status(200).json({ success: true, data: getAgentMetadata() });
+});
+
+app.post(['/api/ai/chat', '/ai/chat'], async (req, res) => {
+  try {
+    const { query, mode = 'SOS_REPORTS', language = 'en', clientAlerts = [], clientUsers = [] } = req.body || {};
+    if (!query || !String(query).trim()) {
+      return res.status(400).json({ success: false, message: 'Query text is required.' });
+    }
+
+    let dbAlerts = Array.from(dbData.sos.values());
+    let dbUsers = Array.from(dbData.users.values());
+
+    if (firestoreDb) {
+      try {
+        const [sosSnap, userSnap] = await Promise.all([
+          firestoreDb.collection('sos').get(),
+          firestoreDb.collection('users').get()
+        ]);
+        if (!sosSnap.empty) dbAlerts = sosSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+        if (!userSnap.empty) dbUsers = userSnap.docs.map(d => ({ uid: d.id, ...d.data() }));
+      } catch (e) {}
+    }
+
+    const alertMap = new Map();
+    (Array.isArray(clientAlerts) ? clientAlerts : []).forEach(a => a?.id && alertMap.set(a.id, a));
+    dbAlerts.forEach(a => a?.id && alertMap.set(a.id, { ...(alertMap.get(a.id) || {}), ...a }));
+
+    const userMap = new Map();
+    (Array.isArray(clientUsers) ? clientUsers : []).forEach(u => u?.uid && userMap.set(u.uid, u));
+    dbUsers.forEach(u => u?.uid && userMap.set(u.uid, { ...(userMap.get(u.uid) || {}), ...u }));
+
+    const mergedAlerts = Array.from(alertMap.values()).sort(
+      (a, b) => new Date(b.timestamp || b.createdAt || 0) - new Date(a.timestamp || a.createdAt || 0)
+    );
+    const mergedUsers = Array.from(userMap.values());
+
+    const result = await runSafeHavenLangGraphAgent({
+      query: String(query).trim(),
+      mode,
+      language,
+      alerts: mergedAlerts,
+      users: mergedUsers
+    });
+
+    return res.status(200).json({ success: true, message: 'LangGraph AI agent executed', data: result });
+  } catch (err) {
+    console.error('LangGraph AI endpoint error:', err);
+    return res.status(500).json({ success: false, message: 'AI Agent execution error', error: err.message });
+  }
 });
 
 // PUBLIC DATA ROUTES
@@ -385,7 +504,7 @@ app.get(['/api/notifications', '/notifications'], (req, res) => {
 
 // Catch-all
 app.use('*', (req, res) => {
-  res.status(200).json({ status: 'online', service: 'SafeHaven API' });
+  res.status(200).json({ status: 'online', service: 'SafeHaven API (Firestore + LangGraph)' });
 });
 
 export default app;
