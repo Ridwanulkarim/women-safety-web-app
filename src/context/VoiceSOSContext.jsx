@@ -155,7 +155,7 @@ export const VoiceSOSProvider = ({ children }) => {
   // Execute actual SOS Dispatch
   const executeSOSDispatch = useCallback(async (phrase) => {
     const triggerSource = `VOICE_COMMAND: "${phrase || 'Distress Keyword'}"`;
-    toast.error(`🚨 AI VOICE SOS ACTIVATED: "${phrase || 'Emergency'}" detected!`, { duration: 6000 });
+    toast.error(`Voice SOS activated: "${phrase || 'Emergency'}" detected`, { duration: 6000 });
 
     try {
       await sendSOSAlert({
@@ -362,9 +362,8 @@ export const VoiceSOSProvider = ({ children }) => {
 
     if (nextState) {
       startListening();
-      toast.success('🎙️ হ্যান্ডস-ফ্রি এআই ভয়েস এসওএস গার্ডিয়ান সক্রিয় হয়েছে! বিপদে "Help" বা "বাঁচাও" বলুন।', {
-        duration: 5000,
-        icon: '🛡️'
+      toast.success('হ্যান্ডস-ফ্রি ভয়েস এসওএস সক্রিয় হয়েছে। বিপদে "Help" বা "বাঁচাও" বলুন।', {
+        duration: 5000
       });
     } else {
       stopListening();
@@ -374,7 +373,7 @@ export const VoiceSOSProvider = ({ children }) => {
         countdownTimerRef.current = null;
       }
       setIsEmergencyTriggered(false);
-      toast('হ্যান্ডস-ফ্রি গার্ডিয়ান মোড বন্ধ করা হয়েছে।', { icon: 'ℹ️' });
+      toast('হ্যান্ডস-ফ্রি ভয়েস এসওএস বন্ধ করা হয়েছে।');
     }
   }, [isGuardianActive, startListening, stopListening, stopSirenAudio]);
 

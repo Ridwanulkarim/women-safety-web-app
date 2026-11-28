@@ -1,22 +1,33 @@
 import React, { useState } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import {
-  FiLayout, FiUser, FiSettings, FiPhoneCall, FiClock,
-  FiMapPin, FiBell, FiShield, FiLogOut, FiMenu, FiX, FiAlertCircle, FiCamera
+  FiLayout,
+  FiUser,
+  FiSettings,
+  FiPhoneCall,
+  FiClock,
+  FiMapPin,
+  FiBell,
+  FiShield,
+  FiLogOut,
+  FiMenu,
+  FiX,
+  FiAlertCircle,
+  FiCamera,
+  FiMic
 } from 'react-icons/fi';
 import { useAuth } from '../context/AuthContext';
 import { useNotifications } from '../context/NotificationContext';
 import { useSOS } from '../context/SOSContext';
 import ThemeToggle from '../components/common/ThemeToggle';
 import LanguageToggle from '../components/common/LanguageToggle';
+import BrandMark from '../components/common/BrandMark';
 import SOSModal from '../components/sos/SOSModal';
 import VoiceSOSAlarmModal from '../components/safety/VoiceSOSAlarmModal';
 import { useVoiceSOS } from '../context/VoiceSOSContext';
 import { useLanguage } from '../context/LanguageContext';
 import { localizeNum } from '../utils/helpers';
-import { FiMic } from 'react-icons/fi';
 import ScrollToTop from '../components/common/ScrollToTop';
-import MobileBottomBar from '../components/common/MobileBottomBar';
 
 const DashboardLayout = () => {
   const { user, logoutUser, isAdmin } = useAuth();
@@ -28,24 +39,23 @@ const DashboardLayout = () => {
 
   const location = useLocation();
   const navigate = useNavigate();
-
   const isBn = language === 'bn';
 
   const baseMenuItems = [
     { name: isBn ? 'ড্যাশবোর্ড' : 'Dashboard', path: '/dashboard', icon: FiLayout },
-    { name: isBn ? 'প্রমাণ সংরক্ষণাগার' : 'Evidence Vault', path: '/dashboard/evidence', icon: FiCamera },
+    { name: isBn ? 'প্রমাণ সংরক্ষণাগার' : 'Evidence vault', path: '/dashboard/evidence', icon: FiCamera },
     { name: isBn ? 'প্রোফাইল' : 'Profile', path: '/dashboard/profile', icon: FiUser },
-    { name: isBn ? 'জরুরি পরিচিতি' : 'Emergency Contacts', path: '/dashboard/contacts', icon: FiPhoneCall },
-    { name: isBn ? 'এসওএস ইতিহাস' : 'SOS History', path: '/dashboard/sos-history', icon: FiClock },
-    { name: isBn ? 'লাইভ লোকেশন' : 'Live Location', path: '/dashboard/live-location', icon: FiMapPin },
+    { name: isBn ? 'জরুরি পরিচিতি' : 'Emergency contacts', path: '/dashboard/contacts', icon: FiPhoneCall },
+    { name: isBn ? 'এসওএস ইতিহাস' : 'SOS history', path: '/dashboard/sos-history', icon: FiClock },
+    { name: isBn ? 'লাইভ লোকেশন' : 'Live location', path: '/dashboard/live-location', icon: FiMapPin },
     { name: isBn ? 'নোটিফিকেশন' : 'Notifications', path: '/dashboard/notifications', icon: FiBell, badge: unreadCount },
     { name: isBn ? 'সেটিংস' : 'Settings', path: '/dashboard/settings', icon: FiSettings }
   ];
 
   const menuItems = isAdmin
     ? [
-        { name: isBn ? 'ড্যাশবোর্ড' : 'Dashboard', path: '/dashboard', icon: FiLayout },
-        { name: isBn ? 'অ্যাডমিন কমান্ড' : 'Admin Command', path: '/admin', icon: FiShield, isAdminPill: true },
+        baseMenuItems[0],
+        { name: isBn ? 'অ্যাডমিন কনসোল' : 'Admin console', path: '/admin', icon: FiShield },
         ...baseMenuItems.slice(1)
       ]
     : baseMenuItems;
@@ -53,34 +63,33 @@ const DashboardLayout = () => {
   const isActive = (path) => location.pathname === path;
 
   return (
-    <div className="min-h-screen flex bg-[#f8fafc] dark:bg-[#09090d] text-zinc-900 dark:text-zinc-100 transition-colors duration-200">
+    <div className="min-h-screen flex bg-[#fafafa] dark:bg-[#141415] text-[#171717] dark:text-[#ededed]">
       <ScrollToTop />
 
-      {/* Sidebar Desktop */}
-      <aside className="hidden lg:flex flex-col w-64 bg-white/90 dark:bg-[#0e0e13]/90 backdrop-blur-xl border-r border-zinc-200/80 dark:border-zinc-800/80 p-5 sticky top-0 h-screen z-30 shadow-xs">
-        <Link to="/" className="flex items-center gap-2.5 mb-6 group">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-rose-600 to-rose-700 text-white flex items-center justify-center font-bold shadow-md shadow-rose-600/30 group-hover:scale-105 transition-transform duration-200">
-            <FiShield className="w-4.5 h-4.5" />
-          </div>
-          <div>
-            <span className="text-base font-extrabold font-heading text-zinc-900 dark:text-white tracking-tight block">
-              SafeHaven
-            </span>
-            <span className="text-[10px] font-mono font-bold text-emerald-500 uppercase flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 telemetry-dot"></span> {isBn ? 'সুরক্ষা সক্রিয়' : 'Shield Active'}
-            </span>
-          </div>
+      {/* Sidebar Desktop (256px Graphite Deep Surface) */}
+      <aside className="hidden lg:flex flex-col w-64 shrink-0 bg-[#ffffff] dark:bg-[#0f0f10] border-r border-zinc-900/[0.08] dark:border-white/[0.08] p-4 sticky top-0 h-screen z-30">
+        <Link to="/" className="mb-5 px-1">
+          <BrandMark
+            name={t('nav.brandName')}
+            subtitle={isBn ? 'সুরক্ষা সক্রিয়' : 'Protection console'}
+          />
         </Link>
 
-        {/* SOS Quick Button */}
+        {/* Primary SOS Dispatch Button */}
         <button
           onClick={openSOSModal}
-          className="w-full btn-danger mb-6 font-mono text-xs shadow-lg shadow-rose-600/30"
+          className="w-full btn-danger mb-5 text-sm"
         >
-          <FiAlertCircle className="w-4 h-4 animate-pulse" /> {isBn ? 'জরুরি এসওএস পাঠান' : 'SOS DISPATCH'}
+          <FiAlertCircle className="w-4 h-4 dispatch-icon" /> {t('nav.sosDispatch')}
         </button>
 
-        {/* Nav Links */}
+        <div className="px-2 mb-2 mt-1">
+          <span className="text-xs font-medium text-[#737373] dark:text-[#85858b]">
+            {isBn ? 'নেভিগেশন' : 'Workspace'}
+          </span>
+        </div>
+
+        {/* Navigation List (Uniform 36px height, 4px vertical gap, 18px aligned icon column) */}
         <nav className="flex-1 space-y-1 overflow-y-auto">
           {menuItems.map((item) => {
             const Icon = item.icon;
@@ -89,25 +98,26 @@ const DashboardLayout = () => {
               <Link
                 key={item.path}
                 to={item.path}
-                className={`flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold transition-all duration-200 ${
+                className={`h-9 flex items-center justify-between px-2.5 rounded-lg text-[13px] font-medium transition-colors duration-150 ${
                   active
-                    ? 'bg-gradient-to-r from-rose-600 to-rose-700 text-white shadow-md shadow-rose-600/25 font-bold'
-                    : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800/60 hover:text-zinc-900 dark:hover:text-white'
+                    ? 'bg-[#f4f4f5] dark:bg-[#232325] text-[#171717] dark:text-[#ededed] border border-zinc-900/[0.08] dark:border-white/[0.1]'
+                    : 'text-[#525252] dark:text-[#a1a1a6] hover:text-[#171717] dark:hover:text-[#ededed] hover:bg-[#f4f4f5]/60 dark:hover:bg-[#19191b]'
                 }`}
               >
-                <div className="flex items-center gap-2.5">
-                  <Icon className={`w-4 h-4 ${item.isAdminPill ? 'text-purple-400' : active ? 'text-white' : 'text-zinc-500 dark:text-zinc-400'}`} />
-                  <span className={item.isAdminPill ? 'text-purple-600 dark:text-purple-400 font-bold' : ''}>{item.name}</span>
-                </div>
-                {item.isAdminPill && (
-                  <span className="px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-600 dark:text-purple-400 text-[9px] font-mono font-bold uppercase tracking-wider">
-                    ADMIN
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <span className="w-4 flex items-center justify-center shrink-0">
+                    <Icon
+                      className={`w-4 h-4 dispatch-icon ${
+                        active
+                          ? 'text-[#e11d48]'
+                          : 'text-[#737373] dark:text-[#85858b]'
+                      }`}
+                    />
                   </span>
-                )}
+                  <span className="truncate">{item.name}</span>
+                </div>
                 {item.badge > 0 && (
-                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-mono font-bold ${
-                    active ? 'bg-white text-rose-600' : 'bg-rose-600 text-white'
-                  }`}>
+                  <span className="text-xs font-mono tabular-nums text-[#737373] dark:text-[#85858b]">
                     {localizeNum(item.badge, isBn)}
                   </span>
                 )}
@@ -117,22 +127,22 @@ const DashboardLayout = () => {
         </nav>
 
         {/* User Footer */}
-        <div className="pt-4 border-t border-zinc-200/80 dark:border-zinc-800/80 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
+        <div className="pt-4 mt-4 border-t border-zinc-900/[0.08] dark:border-white/[0.08] flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2.5 min-w-0">
             {user?.profilePictureUrl || user?.profileImage ? (
               <img
                 src={user.profilePictureUrl || user.profileImage}
                 alt={user?.fullName}
-                className="w-9 h-9 rounded-xl object-cover ring-2 ring-rose-500/20"
+                className="w-8 h-8 rounded-lg object-cover shrink-0"
               />
             ) : (
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-rose-600 to-rose-700 text-white font-bold flex items-center justify-center text-xs shadow-sm">
+              <div className="w-8 h-8 rounded-lg bg-[#232325] dark:bg-[#232325] text-[#ededed] font-medium flex items-center justify-center text-xs shrink-0 border border-white/10">
                 {(user?.fullName || user?.email || 'U')[0].toUpperCase()}
               </div>
             )}
-            <div className="text-left max-w-[100px] truncate">
-              <p className="text-xs font-bold text-zinc-900 dark:text-white truncate">{user?.fullName}</p>
-              <p className="text-[10px] text-zinc-500 truncate font-mono">{user?.email}</p>
+            <div className="min-w-0">
+              <p className="text-xs font-medium text-[#171717] dark:text-[#ededed] truncate">{user?.fullName}</p>
+              <p className="text-[11px] text-[#737373] dark:text-[#85858b] truncate font-mono">{user?.email}</p>
             </div>
           </div>
           <button
@@ -140,96 +150,94 @@ const DashboardLayout = () => {
               logoutUser();
               navigate('/login');
             }}
-            className="p-2 rounded-xl text-zinc-400 hover:text-rose-600 hover:bg-rose-500/10 transition"
-            title="Logout"
+            className="h-8 w-8 rounded-lg text-[#737373] dark:text-[#85858b] hover:text-[#dc2626] dark:hover:text-[#e5484d] hover:bg-[#f4f4f5] dark:hover:bg-[#19191b] flex items-center justify-center transition-colors shrink-0 cursor-pointer"
+            title={t('nav.logout')}
           >
-            <FiLogOut className="w-4 h-4" />
+            <FiLogOut className="w-4 h-4 dispatch-icon" />
           </button>
         </div>
       </aside>
 
-      {/* Main Container */}
+      {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0">
-        
-        {/* Mobile / Header Bar */}
-        <header className="bg-white/95 dark:bg-[#09090b]/95 backdrop-blur-sm border-b border-zinc-200 dark:border-zinc-800 px-4 py-3 flex items-center justify-between sticky top-0 z-20">
-          <div className="flex items-center gap-3">
+        <header className="h-16 bg-[#ffffff] dark:bg-[#141415] border-b border-zinc-900/[0.08] dark:border-white/[0.08] px-4 sm:px-6 lg:px-8 flex items-center justify-between sticky top-0 z-20">
+          <div className="flex items-center gap-3 min-w-0">
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="p-2 rounded-lg lg:hidden bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700 min-h-[38px] flex items-center justify-center"
+              className="h-9 w-9 rounded-lg lg:hidden bg-[#f4f4f5] dark:bg-[#232325] text-[#171717] dark:text-[#ededed] border border-zinc-900/10 dark:border-white/10 flex items-center justify-center"
             >
-              {sidebarOpen ? <FiX className="w-4 h-4" /> : <FiMenu className="w-4 h-4" />}
+              {sidebarOpen ? <FiX className="w-4 h-4 dispatch-icon" /> : <FiMenu className="w-4 h-4 dispatch-icon" />}
             </button>
-            <h1 className="text-xs sm:text-sm font-bold font-heading text-zinc-900 dark:text-white truncate max-w-[130px] sm:max-w-none">
-              {isBn ? 'ইউজার কন্ট্রোল প্যানেল' : 'User Control Panel'}
+            <h1 className="text-sm font-medium text-[#171717] dark:text-[#ededed] truncate">
+              {isBn ? 'ব্যক্তিগত নিরাপত্তা পোর্টাল' : 'Safety portal'}
             </h1>
             {isGuardianActive && (
-              <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-[10px] font-mono font-bold animate-pulse">
-                <FiMic className="animate-bounce text-xs" />
-                <span>{isBn ? 'ভয়েস গার্ডিয়ান: কথা শুনছে ("বাঁচাও" / "Help")' : 'Voice Guardian: LISTENING ("বাঁচাও" / "Help")'}</span>
+              <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-[#16a34a] dark:text-[#4cc38a] text-xs font-medium">
+                <FiMic className="w-3.5 h-3.5 dispatch-icon" />
+                <span>{isBn ? 'ভয়েস গার্ডিয়ান সক্রিয়' : 'Voice guardian listening'}</span>
               </div>
             )}
           </div>
 
-          <div className="flex items-center gap-1.5 sm:gap-2">
+          <div className="flex items-center gap-2">
             {isAdmin && (
               <Link
                 to="/admin"
-                className="px-2.5 sm:px-3 py-1.5 rounded-lg bg-purple-600 hover:bg-purple-700 text-white font-mono text-xs font-bold flex items-center gap-1.5 shadow-sm transition active:scale-95"
-                title={isBn ? 'অ্যাডমিন কমান্ড সেন্টারে যান' : 'Access Admin Command Center'}
+                className="btn-outline h-9 px-3 text-xs hidden sm:inline-flex"
               >
-                <FiShield className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">{isBn ? 'অ্যাডমিন প্যানেল' : 'Admin Panel'}</span>
+                <FiShield className="w-4 h-4 text-[#e11d48] dispatch-icon" />
+                <span>{t('nav.adminPanel')}</span>
               </Link>
             )}
 
             <LanguageToggle />
             <ThemeToggle />
 
-            {/* Notification Bell Button on Mobile & Desktop */}
             <Link
               to="/dashboard/notifications"
-              className="relative p-1.5 sm:p-2 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700 min-h-[36px] sm:min-h-[38px] min-w-[36px] flex items-center justify-center"
-              title={isBn ? 'নোটিফিকেশন' : 'Notifications'}
+              className="relative h-9 w-9 rounded-lg bg-[#f4f4f5] dark:bg-[#232325] text-[#525252] dark:text-[#a1a1a6] hover:text-[#171717] dark:hover:text-[#ededed] border border-zinc-900/10 dark:border-white/10 flex items-center justify-center transition-colors"
+              title={t('nav.notifications')}
             >
-              <FiBell className="w-4 h-4 text-zinc-800 dark:text-zinc-200" />
+              <FiBell className="w-4 h-4 dispatch-icon" />
               {unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-4 h-4 bg-rose-600 text-white text-[9px] font-bold rounded-full flex items-center justify-center font-mono">
+                <span className="absolute -top-1 -right-1 min-w-4 h-4 px-1 bg-[#dc2626] text-white text-[10px] font-mono tabular-nums rounded-full flex items-center justify-center">
                   {localizeNum(unreadCount, isBn)}
                 </span>
               )}
             </Link>
 
-            {/* Quick Logout Icon Button on Mobile */}
             <button
               onClick={() => {
                 logoutUser();
                 navigate('/login');
               }}
-              className="p-1.5 sm:p-2 rounded-lg bg-rose-500/10 text-rose-600 border border-rose-500/20 hover:bg-rose-500/20 transition min-h-[36px] flex items-center justify-center font-mono text-xs font-bold gap-1"
-              title={isBn ? 'লগআউট' : 'Logout'}
+              className="btn-ghost h-9 px-2.5 text-xs text-[#dc2626] dark:text-[#e5484d] hidden sm:inline-flex"
+              title={t('nav.logout')}
             >
-              <FiLogOut className="w-4 h-4" />
-              <span className="hidden sm:inline">{isBn ? 'লগআউট' : 'Logout'}</span>
+              <FiLogOut className="w-4 h-4 dispatch-icon" />
+              <span>{t('nav.logout')}</span>
             </button>
           </div>
         </header>
 
         {/* Mobile Navigation Drawer */}
         {sidebarOpen && (
-          <div className="lg:hidden bg-white dark:bg-[#09090b] border-b border-zinc-200 dark:border-zinc-800 p-4 space-y-1">
+          <div className="lg:hidden bg-[#ffffff] dark:bg-[#0f0f10] border-b border-zinc-900/[0.08] dark:border-white/[0.08] p-4 space-y-1">
             {menuItems.map((item) => (
               <Link
                 key={item.path}
                 to={item.path}
                 onClick={() => setSidebarOpen(false)}
-                className={`flex items-center justify-between px-4 py-2.5 rounded-lg text-xs font-medium ${
+                className={`flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium ${
                   isActive(item.path)
-                    ? 'bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 font-bold'
-                    : 'text-zinc-700 dark:text-zinc-300'
+                    ? 'bg-[#f4f4f5] dark:bg-[#232325] text-[#171717] dark:text-[#ededed]'
+                    : 'text-[#525252] dark:text-[#a1a1a6]'
                 }`}
               >
                 <span>{item.name}</span>
+                {item.badge > 0 && (
+                  <span className="text-xs font-mono tabular-nums">{localizeNum(item.badge, isBn)}</span>
+                )}
               </Link>
             ))}
 
@@ -239,15 +247,15 @@ const DashboardLayout = () => {
                 logoutUser();
                 navigate('/login');
               }}
-              className="w-full flex items-center justify-between px-4 py-2.5 rounded-lg text-xs font-bold text-rose-600 bg-rose-500/10 hover:bg-rose-500/20 transition mt-2"
+              className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-[#dc2626] dark:text-[#e5484d] hover:bg-[#f4f4f5] dark:hover:bg-[#19191b] mt-2 cursor-pointer"
             >
-              <span className="flex items-center gap-2"><FiLogOut /> {isBn ? 'অ্যাকাউন্ট থেকে লগআউট' : 'Logout of Account'}</span>
+              <FiLogOut className="w-4 h-4 dispatch-icon" /> {t('nav.logout')}
             </button>
           </div>
         )}
 
-        {/* Page Content */}
-        <main className="p-4 sm:p-6 lg:p-8 flex-1 overflow-x-hidden">
+        {/* Fluid Main Viewport (capped at 1440px, 24-32px padding) */}
+        <main className="p-4 sm:p-6 lg:p-8 flex-1 w-full max-w-[1440px] mx-auto overflow-x-hidden">
           <Outlet />
         </main>
       </div>

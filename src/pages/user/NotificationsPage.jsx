@@ -10,89 +10,87 @@ const NotificationsPage = () => {
   const isBn = language === 'bn';
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8 font-sans relative overflow-hidden">
-      {/* Ambient background glow */}
-      <div className="absolute top-0 right-1/4 w-80 h-80 bg-rose-600/10 rounded-full blur-3xl pointer-events-none"></div>
-
-      <div className="glass-card-xl p-6 sm:p-8 flex items-center justify-between gap-4 relative z-10">
-        <div className="flex items-center gap-3.5">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-rose-600 to-rose-700 text-white flex items-center justify-center text-2xl font-bold shadow-lg shadow-rose-600/30">
-            <FiBell />
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-xl sm:text-2xl font-extrabold font-heading text-zinc-900 dark:text-white">
-                {isBn ? 'নোটিফিকেশন ও বার্তা' : 'Notifications'}
-              </h1>
-              <span className="mono-tag mono-tag-rose text-[10px]">
-                {isBn ? 'রিয়েল-টাইম টেলিমেট্রি' : 'REAL-TIME TELEMETRY'}
-              </span>
-            </div>
-            <p className="text-xs text-zinc-500 dark:text-zinc-400">
-              {isBn ? 'জরুরি অ্যালার্ট, নিরাপত্তা আপডেট এবং সিস্টেম ঘোষণাসমূহ।' : 'Emergency alerts, safety updates, and system announcements.'}
-            </p>
-          </div>
+    <div className="max-w-4xl mx-auto space-y-6">
+      <div className="surface-panel p-6 flex items-center gap-3.5">
+        <div className="w-10 h-10 rounded-lg bg-[#f4f4f5] dark:bg-[#232325] text-[#525252] dark:text-[#a1a1a6] flex items-center justify-center shrink-0">
+          <FiBell className="w-5 h-5 dispatch-icon" />
+        </div>
+        <div>
+          <h1 className="text-2xl font-medium text-[#171717] dark:text-[#ededed]">
+            {isBn ? 'নোটিফিকেশন ও বার্তা' : 'Notifications'}
+          </h1>
+          <p className="text-sm text-[#525252] dark:text-[#a1a1a6]">
+            {isBn ? 'জরুরি অ্যালার্ট, নিরাপত্তা আপডেট এবং সিস্টেম বার্তা' : 'Emergency alerts, safety advisories, and system messages'}
+          </p>
         </div>
       </div>
 
-      <div className="space-y-3.5 relative z-10">
+      <div className="space-y-3">
         {notifications.length === 0 ? (
-          <div className="glass-card-xl p-12 rounded-3xl text-center space-y-3 text-zinc-400">
-            <FiBell className="w-12 h-12 mx-auto opacity-30 text-rose-500" />
-            <p className="text-sm font-bold text-zinc-700 dark:text-zinc-300">
-              {isBn ? 'কোনো নোটিফিকেশন নেই' : 'No Notifications Found'}
+          <div className="surface-panel p-12 text-center space-y-3">
+            <FiBell className="w-6 h-6 mx-auto text-[#737373] dark:text-[#85858b] dispatch-icon" />
+            <p className="text-sm font-medium text-[#171717] dark:text-[#ededed]">
+              {isBn ? 'কোনো নোটিফিকেশন নেই' : 'No notifications'}
             </p>
-            <p className="text-xs text-zinc-500">
-              {isBn ? 'আপনি সকল নিরাপত্তা তথ্যের সাথে আপ-টু-ডেট আছেন।' : "You're completely up to date with all safety advisories."}
+            <p className="text-xs text-[#737373] dark:text-[#85858b]">
+              {isBn ? 'আপনার কোনো নতুন অ্যালার্ট বা ঘোষণা নেই।' : 'You are up to date with all safety advisories.'}
             </p>
           </div>
         ) : (
           notifications.map((item) => (
             <div
               key={item.id}
-              className={`glass-card-xl p-5 sm:p-6 rounded-2xl flex items-start justify-between gap-4 transition-all duration-200 ${
-                !item.isRead ? 'border-l-4 border-l-rose-600 bg-rose-500/5 dark:bg-rose-950/10' : ''
+              className={`surface-card p-5 flex items-start justify-between gap-4 ${
+                !item.isRead ? 'border-[#e11d48]/40' : ''
               }`}
             >
-              <div className="flex items-start gap-4">
-                <div className={`p-3 rounded-xl text-xl flex-shrink-0 ${
-                  item.type === 'SOS' ? 'bg-rose-500/20 text-rose-500' : 'bg-rose-500/10 text-rose-500'
-                }`}>
-                  {item.type === 'SOS' ? <FiAlertTriangle /> : <FiInfo />}
+              <div className="flex items-start gap-3.5">
+                <div
+                  className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${
+                    item.type === 'SOS'
+                      ? 'bg-[#dc2626]/10 text-[#dc2626] dark:text-[#e5484d]'
+                      : 'bg-[#f4f4f5] dark:bg-[#232325] text-[#525252] dark:text-[#a1a1a6]'
+                  }`}
+                >
+                  {item.type === 'SOS' ? (
+                    <FiAlertTriangle className="w-4 h-4 dispatch-icon" />
+                  ) : (
+                    <FiInfo className="w-4 h-4 dispatch-icon" />
+                  )}
                 </div>
 
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <h4 className="font-bold text-sm text-zinc-900 dark:text-white">{item.title}</h4>
+                    <h2 className="font-medium text-sm text-[#171717] dark:text-[#ededed]">{item.title}</h2>
                     {!item.isRead && (
-                      <span className="text-[9px] font-mono font-bold uppercase px-2 py-0.5 rounded-full bg-rose-600 text-white">
-                        {isBn ? 'নতুন' : 'New'}
+                      <span className="status-tag mono-tag-rose">
+                        {isBn ? 'নতুন' : 'Unread'}
                       </span>
                     )}
                   </div>
-                  <p className="text-xs text-zinc-600 dark:text-zinc-300 leading-relaxed">{item.message}</p>
-                  <span className="text-[10px] text-zinc-400 flex items-center gap-1 font-mono pt-1">
+                  <p className="text-xs text-[#525252] dark:text-[#a1a1a6] leading-relaxed">{item.message}</p>
+                  <span className="text-xs text-[#737373] dark:text-[#85858b] font-mono tabular-nums block pt-1">
                     {formatDate(item.createdAt || item.timestamp, isBn)}
                   </span>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5 shrink-0">
                 {!item.isRead && (
                   <button
                     onClick={() => markAsRead(item.id)}
-                    className="p-2 rounded-xl text-zinc-400 hover:text-emerald-500 hover:bg-emerald-500/10 transition"
-                    title={isBn ? 'পঠিত হিসেবে চিহ্নিত করুন' : 'Mark as Read'}
+                    className="h-8 w-8 rounded-lg text-[#737373] dark:text-[#85858b] hover:text-[#16a34a] dark:hover:text-[#4cc38a] hover:bg-[#f4f4f5] dark:hover:bg-[#232325] flex items-center justify-center transition-colors cursor-pointer"
+                    title={isBn ? 'পঠিত হিসেবে চিহ্নিত করুন' : 'Mark as read'}
                   >
-                    <FiCheck />
+                    <FiCheck className="w-4 h-4 dispatch-icon" />
                   </button>
                 )}
                 <button
                   onClick={() => deleteNotification(item.id)}
-                  className="p-2 rounded-xl text-zinc-400 hover:text-rose-500 hover:bg-rose-500/10 transition"
+                  className="h-8 w-8 rounded-lg text-[#737373] dark:text-[#85858b] hover:text-[#dc2626] dark:hover:text-[#e5484d] hover:bg-[#f4f4f5] dark:hover:bg-[#232325] flex items-center justify-center transition-colors cursor-pointer"
                   title={isBn ? 'মুছে ফেলুন' : 'Delete'}
                 >
-                  <FiTrash2 />
+                  <FiTrash2 className="w-4 h-4 dispatch-icon" />
                 </button>
               </div>
             </div>

@@ -9,94 +9,88 @@ const Contact = () => {
   const { language } = useLanguage();
   const isBn = language === 'bn';
 
-  const onSubmit = (data) => {
-    toast.success(isBn ? 'ধন্যবাদ! আপনার বার্তাটি সেফহ্যাভেন সাপোর্ট টিমের কাছে পৌঁছে গেছে।' : 'Thank you! Your message has been sent to the SafeHaven support team.');
+  const onSubmit = () => {
+    toast.success(isBn ? 'আপনার বার্তা সেফহেভেন সাপোর্ট টিমের কাছে পাঠানো হয়েছে' : 'Message sent to the SafeHaven support desk');
     reset();
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12 relative overflow-hidden font-sans">
-      {/* Ambient background glow */}
-      <div className="absolute top-10 left-1/2 -translate-x-1/2 w-96 h-96 bg-rose-600/10 rounded-full blur-3xl pointer-events-none"></div>
-
-      <div className="text-center max-w-2xl mx-auto space-y-3 relative z-10">
-        <span className="mono-tag mono-tag-rose">
-          <span className="w-1.5 h-1.5 rounded-full bg-rose-500 telemetry-dot"></span> {isBn ? 'কমিউনিটি ও কারিগরি সহায়তা' : 'Community & Technical Help'}
-        </span>
-        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold font-heading text-zinc-900 dark:text-white tracking-tight">
-          {isBn ? 'আমাদের সাথে ' : 'Get In '}<span className="gradient-text-rose">{isBn ? 'যোগাযোগ করুন' : 'Touch'}</span>
+    <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-10">
+      <div className="max-w-2xl space-y-3">
+        <p className="text-xs font-mono text-[#737373] dark:text-[#85858b]">
+          {isBn ? 'সহায়তা ও যোগাযোগ' : 'Support and technical desk'}
+        </p>
+        <h1 className="text-3xl sm:text-4xl font-medium tracking-[-0.02em] text-[#171717] dark:text-[#ededed]">
+          {isBn ? 'আমাদের সাথে যোগাযোগ করুন' : 'Contact support desk'}
         </h1>
-        <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400">
-          {isBn ? 'যেকোনো প্রশ্ন, প্রযুক্তিগত পরামর্শ বা জরুরি রেসপন্স পার্টনারশিপের জন্য আমরা সার্বক্ষণিক প্রস্তুত।' : 'Have questions, technical feedback, or need emergency response integration? We are here 24/7.'}
+        <p className="text-base text-[#525252] dark:text-[#a1a1a6]">
+          {isBn
+            ? 'যেকোনো প্রশ্ন, কারিগরি পরামর্শ বা জরুরি রেসপন্স সমন্বয়ের জন্য লিখুন'
+            : 'Reach out for platform questions, feedback, or responder integration requests'}
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 relative z-10">
-        <div className="space-y-6">
-          <div className="glass-card-xl p-7 sm:p-8 space-y-6">
-            <h3 className="text-lg font-extrabold font-heading text-zinc-900 dark:text-white">
-              {isBn ? 'যোগাযোগের তথ্য' : 'Contact Information'}
-            </h3>
-            
-            <div className="space-y-4 text-sm">
-              <div className="flex items-center gap-4 p-3 rounded-2xl bg-zinc-50/80 dark:bg-zinc-900/60 border border-zinc-200/60 dark:border-zinc-800/60">
-                <div className="w-11 h-11 rounded-xl bg-rose-500/10 text-rose-600 dark:text-rose-400 flex items-center justify-center text-lg">
-                  <FiMail />
-                </div>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div className="lg:col-span-5 space-y-4">
+          <div className="surface-panel p-6 space-y-4">
+            <h2 className="text-base font-medium text-[#171717] dark:text-[#ededed]">
+              {isBn ? 'যোগাযোগের মাধ্যম' : 'Direct channels'}
+            </h2>
+
+            <div className="space-y-3">
+              <div className="surface-raised p-4 flex items-center gap-3.5">
+                <FiMail className="w-4 h-4 text-[#525252] dark:text-[#a1a1a6] shrink-0 dispatch-icon" />
                 <div>
-                  <p className="text-[10px] text-zinc-400 uppercase font-bold font-mono">{isBn ? 'ইমেইল সাপোর্ট' : 'Email Support'}</p>
-                  <p className="font-semibold text-zinc-800 dark:text-zinc-100 text-xs sm:text-sm font-mono">support@safehaven-app.org</p>
+                  <span className="text-xs text-[#737373] dark:text-[#85858b] block">{isBn ? 'ইমেইল সাপোর্ট' : 'Email support'}</span>
+                  <span className="text-sm font-mono text-[#171717] dark:text-[#ededed]">support@safehaven-app.org</span>
                 </div>
               </div>
 
-              <div className="flex items-center gap-4 p-3 rounded-2xl bg-zinc-50/80 dark:bg-zinc-900/60 border border-zinc-200/60 dark:border-zinc-800/60">
-                <div className="w-11 h-11 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center text-lg">
-                  <FiPhone />
-                </div>
+              <div className="surface-raised p-4 flex items-center gap-3.5">
+                <FiPhone className="w-4 h-4 text-[#525252] dark:text-[#a1a1a6] shrink-0 dispatch-icon" />
                 <div>
-                  <p className="text-[10px] text-zinc-400 uppercase font-bold font-mono">{isBn ? 'হটলাইন ডেস্ক' : 'Hotline Desk'}</p>
-                  <p className="font-semibold text-zinc-800 dark:text-zinc-100 text-xs sm:text-sm font-mono">+880 9612-999999</p>
+                  <span className="text-xs text-[#737373] dark:text-[#85858b] block">{isBn ? 'হটলাইন ডেস্ক' : 'Hotline desk'}</span>
+                  <span className="text-sm font-mono tabular-nums text-[#171717] dark:text-[#ededed]">+880 9612-999999</span>
                 </div>
               </div>
 
-              <div className="flex items-center gap-4 p-3 rounded-2xl bg-zinc-50/80 dark:bg-zinc-900/60 border border-zinc-200/60 dark:border-zinc-800/60">
-                <div className="w-11 h-11 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-lg">
-                  <FiMapPin />
-                </div>
+              <div className="surface-raised p-4 flex items-center gap-3.5">
+                <FiMapPin className="w-4 h-4 text-[#525252] dark:text-[#a1a1a6] shrink-0 dispatch-icon" />
                 <div>
-                  <p className="text-[10px] text-zinc-400 uppercase font-bold font-mono">{isBn ? 'কমান্ড অপারেশন সেন্টার' : 'Operations Headquarters'}</p>
-                  <p className="font-semibold text-zinc-800 dark:text-zinc-100 text-xs sm:text-sm">
-                    {isBn ? 'ঢাকা ও চট্টগ্রাম, বাংলাদেশ' : 'Dhaka & Chittagong, Bangladesh'}
-                  </p>
+                  <span className="text-xs text-[#737373] dark:text-[#85858b] block">{isBn ? 'অপারেশন কেন্দ্র' : 'Operations center'}</span>
+                  <span className="text-sm text-[#171717] dark:text-[#ededed]">
+                    {isBn ? 'ঢাকা ও চট্টগ্রাম, বাংলাদেশ' : 'Dhaka and Chittagong, Bangladesh'}
+                  </span>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Contact Form */}
-        <div className="glass-card-xl p-7 sm:p-8">
+        <div className="lg:col-span-7 surface-panel p-6 sm:p-8">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <div>
-              <label className="human-label">{isBn ? 'আপনার নাম' : 'Your Name'}</label>
-              <input
-                type="text"
-                required
-                placeholder={isBn ? 'যেমন: সুমাইয়া আক্তার' : 'e.g. Sumaiya Akter'}
-                {...register('name')}
-                className="human-input"
-              />
-            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="human-label">{isBn ? 'আপনার নাম' : 'Name'}</label>
+                <input
+                  type="text"
+                  required
+                  placeholder={isBn ? 'আয়েশা রহমান' : 'Ayesha Rahman'}
+                  {...register('name')}
+                  className="human-input"
+                />
+              </div>
 
-            <div>
-              <label className="human-label">{isBn ? 'ইমেইল ঠিকানা' : 'Email Address'}</label>
-              <input
-                type="email"
-                required
-                placeholder="name@example.com"
-                {...register('email')}
-                className="human-input font-mono"
-              />
+              <div>
+                <label className="human-label">{isBn ? 'ইমেইল ঠিকানা' : 'Email'}</label>
+                <input
+                  type="email"
+                  required
+                  placeholder="name@example.com"
+                  {...register('email')}
+                  className="human-input font-mono"
+                />
+              </div>
             </div>
 
             <div>
@@ -104,28 +98,25 @@ const Contact = () => {
               <input
                 type="text"
                 required
-                placeholder={isBn ? 'যেমন: জরুরী সহায়তা সংক্রান্ত প্রশ্ন' : 'e.g. Technical Question'}
+                placeholder={isBn ? 'জরুরি সহায়তা বা প্রশ্ন' : 'Technical question'}
                 {...register('subject')}
                 className="human-input"
               />
             </div>
 
             <div>
-              <label className="human-label">{isBn ? 'বিস্তারিত বার্তা' : 'Message'}</label>
+              <label className="human-label">{isBn ? 'বার্তা' : 'Message'}</label>
               <textarea
                 rows="4"
                 required
-                placeholder={isBn ? 'আপনার বার্তা এখানে লিখুন...' : 'Write your message here...'}
+                placeholder={isBn ? 'বিস্তারিত লিখুন' : 'Write your message'}
                 {...register('message')}
                 className="human-input"
               ></textarea>
             </div>
 
-            <button
-              type="submit"
-              className="w-full btn-danger py-3.5 font-mono uppercase font-bold text-xs tracking-wider flex items-center justify-center gap-2"
-            >
-              <FiSend /> {isBn ? 'বার্তা পাঠান' : 'Send Message'}
+            <button type="submit" className="btn-solid h-11 px-5 text-sm">
+              <FiSend className="w-4 h-4 dispatch-icon" /> {isBn ? 'বার্তা পাঠান' : 'Send message'}
             </button>
           </form>
         </div>

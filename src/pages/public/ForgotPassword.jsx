@@ -22,25 +22,25 @@ const ForgotPassword = () => {
   };
 
   return (
-    <div className="w-full flex items-center justify-center p-4 font-sans">
-      <div className="max-w-md w-full glass-card-xl p-8 rounded-3xl space-y-6 text-center shadow-2xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-[#121215]">
-        <div className="w-12 h-12 mx-auto rounded-2xl bg-rose-500/10 text-rose-600 dark:text-rose-400 flex items-center justify-center text-2xl shadow-md">
-          <FiShield />
-        </div>
-        <div className="space-y-1.5">
-          <h2 className="text-2xl font-extrabold font-heading text-zinc-900 dark:text-white">
+    <div className="w-full flex items-center justify-center p-4">
+      <div className="max-w-md w-full surface-panel p-8 space-y-6">
+        <div className="space-y-2">
+          <div className="w-10 h-10 rounded-lg bg-[#e11d48]/10 text-[#e11d48] flex items-center justify-center">
+            <FiShield className="w-5 h-5 dispatch-icon" />
+          </div>
+          <h1 className="text-2xl font-medium tracking-[-0.02em] text-[#171717] dark:text-[#ededed]">
             {t('auth.resetTitle')}
-          </h2>
-          <p className="text-xs text-zinc-500 dark:text-zinc-400">
+          </h1>
+          <p className="text-sm text-[#525252] dark:text-[#a1a1a6]">
             {t('auth.resetSub')}
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4 text-left">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="human-label">{t('auth.emailLabel')}</label>
             <div className="relative">
-              <FiMail className="absolute left-3.5 top-3.5 text-zinc-400" />
+              <FiMail className="w-4 h-4 absolute left-3 top-3 text-[#737373] dark:text-[#85858b] dispatch-icon" />
               <input
                 type="email"
                 required
@@ -52,17 +52,16 @@ const ForgotPassword = () => {
             </div>
           </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full btn-danger py-3.5 text-xs font-mono font-bold uppercase tracking-wider shadow-lg shadow-rose-600/25"
-          >
+          <button type="submit" disabled={loading} className="w-full btn-solid h-11 text-sm">
             {loading ? t('auth.sending') : t('auth.sendResetLink')}
           </button>
         </form>
 
-        <Link to="/login" className="inline-flex items-center gap-2 text-xs font-semibold text-rose-600 dark:text-rose-400 hover:underline">
-          <FiArrowLeft /> {isBn ? 'লগইনে ফিরে যান' : 'Back to Login'}
+        <Link
+          to="/login"
+          className="inline-flex items-center gap-2 text-xs font-medium text-[#525252] dark:text-[#a1a1a6] hover:text-[#171717] dark:hover:text-[#ededed] transition-colors"
+        >
+          <FiArrowLeft className="w-3.5 h-3.5 dispatch-icon" /> {isBn ? 'লগইনে ফিরে যান' : 'Back to sign in'}
         </Link>
       </div>
     </div>

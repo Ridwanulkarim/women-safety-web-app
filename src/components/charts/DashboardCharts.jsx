@@ -6,12 +6,12 @@ import {
   BarElement,
   PointElement,
   LineElement,
-  ArcElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
+  Filler
 } from 'chart.js';
-import { Bar, Line, Pie } from 'react-chartjs-2';
+import { Bar, Line } from 'react-chartjs-2';
 
 ChartJS.register(
   CategoryScale,
@@ -19,56 +19,75 @@ ChartJS.register(
   BarElement,
   PointElement,
   LineElement,
-  ArcElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
+  Filler
 );
 
+const monoTickFont = { family: "'IBM Plex Mono', monospace", size: 11 };
+
 export const SOSChart = ({ data = [] }) => {
+  const counts = data.map((d) => d.count || 0);
+  const maxVal = Math.max(...counts, 1);
+
   const chartData = {
     labels: data.map((d) => d.month || 'Month'),
     datasets: [
       {
-        label: 'SOS Emergency Alerts',
-        data: data.map((d) => d.count || 0),
-        backgroundColor: 'rgba(225, 29, 72, 0.75)',
-        borderColor: '#E11D48',
-        borderRadius: 8
+        label: 'SOS alerts',
+        data: counts,
+        backgroundColor: counts.map((v, idx) =>
+          v > 0 && (v === maxVal || idx === counts.length - 1) ? '#e11d48' : 'rgba(133, 133, 139, 0.35)'
+        ),
+        borderRadius: 6,
+        maxBarThickness: 36
       }
     ]
   };
 
   const options = {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       legend: { display: false },
       tooltip: {
-        backgroundColor: '#18181b',
-        titleColor: '#f4f4f5',
-        bodyColor: '#e4e4e7',
-        borderColor: '#27272a',
-        borderWidth: 1
+        backgroundColor: '#19191b',
+        titleColor: '#ededed',
+        bodyColor: '#a1a1a6',
+        borderColor: 'rgba(237, 237, 237, 0.1)',
+        borderWidth: 1,
+        padding: 10,
+        displayColors: false
       }
     },
     scales: {
-      x: { grid: { display: false }, ticks: { color: '#71717a', font: { family: 'monospace' } } },
+      x: {
+        grid: { display: false },
+        ticks: { color: '#85858b', font: monoTickFont }
+      },
       y: {
-        grid: { color: 'rgba(150, 150, 150, 0.15)' },
-        ticks: { color: '#71717a', font: { family: 'monospace' }, stepSize: 1 }
+        beginAtZero: true,
+        grid: { color: 'rgba(133, 133, 139, 0.14)' },
+        border: { display: false },
+        ticks: { color: '#85858b', font: monoTickFont, stepSize: 1 }
       }
     }
   };
 
-  return <Bar data={chartData} options={options} />;
+  return (
+    <div className="h-[280px] w-full">
+      <Bar data={chartData} options={options} />
+    </div>
+  );
 };
 
 export const UserGrowthChart = ({ usersCount = 0, data }) => {
   const months = ['Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep'];
-  
-  // Calculate dynamic data series based on real usersCount
-  const dynamicSeries = data || (
-    usersCount === 0
+
+  const dynamicSeries =
+    data ||
+    (usersCount === 0
       ? [0, 0, 0, 0, 0, 0]
       : usersCount === 1
       ? [0, 0, 0, 0, 1, 1]
@@ -79,48 +98,61 @@ export const UserGrowthChart = ({ usersCount = 0, data }) => {
           Math.max(0, Math.floor(usersCount * 0.8)),
           usersCount,
           usersCount
-        ]
-  );
+        ]);
 
   const chartData = {
     labels: months,
     datasets: [
       {
-        label: 'Verified Users',
+        label: 'Verified accounts',
         data: dynamicSeries,
-        borderColor: '#E11D48',
-        backgroundColor: 'rgba(225, 29, 72, 0.15)',
+        borderColor: '#e11d48',
+        backgroundColor: 'rgba(225, 29, 72, 0.08)',
+        borderWidth: 2,
         tension: 0.35,
         fill: true,
-        pointBackgroundColor: '#E11D48',
-        pointBorderColor: '#fff',
-        pointRadius: 4
+        pointBackgroundColor: '#e11d48',
+        pointBorderWidth: 0,
+        pointRadius: 3,
+        pointHoverRadius: 5
       }
     ]
   };
 
   const options = {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       legend: { display: false },
       tooltip: {
-        backgroundColor: '#18181b',
-        titleColor: '#f4f4f5',
-        bodyColor: '#e4e4e7',
-        borderColor: '#27272a',
-        borderWidth: 1
+        backgroundColor: '#19191b',
+        titleColor: '#ededed',
+        bodyColor: '#a1a1a6',
+        borderColor: 'rgba(237, 237, 237, 0.1)',
+        borderWidth: 1,
+        padding: 10,
+        displayColors: false
       }
     },
     scales: {
-      x: { grid: { display: false }, ticks: { color: '#71717a', font: { family: 'monospace' } } },
+      x: {
+        grid: { display: false },
+        ticks: { color: '#85858b', font: monoTickFont }
+      },
       y: {
-        grid: { color: 'rgba(150, 150, 150, 0.15)' },
-        ticks: { color: '#71717a', font: { family: 'monospace' }, stepSize: 1 }
+        beginAtZero: true,
+        grid: { color: 'rgba(133, 133, 139, 0.14)' },
+        border: { display: false },
+        ticks: { color: '#85858b', font: monoTickFont, stepSize: 1 }
       }
     }
   };
 
-  return <Line data={chartData} options={options} />;
+  return (
+    <div className="h-[280px] w-full">
+      <Line data={chartData} options={options} />
+    </div>
+  );
 };
 
 export const SeverityPieChart = ({ data = [] }) => {
@@ -128,38 +160,40 @@ export const SeverityPieChart = ({ data = [] }) => {
 
   if (totalCount === 0 || data.length === 0) {
     return (
-      <div className="h-64 flex flex-col items-center justify-center text-center p-6 space-y-2">
-        <div className="w-12 h-12 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center text-xl font-bold">
-          ✓
-        </div>
-        <p className="text-xs font-bold text-zinc-300">No Incident Categories</p>
-        <p className="text-[11px] text-zinc-500 max-w-xs">
-          Zero distress categories recorded. Distribution will appear automatically when users trigger SOS dispatches.
+      <div className="h-[280px] flex flex-col items-center justify-center text-center p-6 space-y-2">
+        <p className="text-sm font-medium text-[#171717] dark:text-[#ededed]">No distress categories</p>
+        <p className="text-xs text-[#737373] dark:text-[#85858b] max-w-xs">
+          Distribution appears automatically once users trigger SOS dispatches.
         </p>
       </div>
     );
   }
 
-  const chartData = {
-    labels: data.map((d) => d.category),
-    datasets: [
-      {
-        data: data.map((d) => d.count),
-        backgroundColor: ['#E11D48', '#8B5CF6', '#3B82F6', '#10B981', '#F59E0B'],
-        borderWidth: 0
-      }
-    ]
-  };
+  const sorted = [...data].sort((a, b) => (b.count || 0) - (a.count || 0));
 
-  const options = {
-    responsive: true,
-    plugins: {
-      legend: {
-        position: 'bottom',
-        labels: { color: '#a1a1aa', font: { size: 11 }, boxWidth: 12, padding: 16 }
-      }
-    }
-  };
-
-  return <Pie data={chartData} options={options} />;
+  return (
+    <div className="space-y-4 py-2">
+      {sorted.map((item, idx) => {
+        const pct = Math.round(((item.count || 0) / totalCount) * 100);
+        return (
+          <div key={item.category || idx} className="space-y-1.5">
+            <div className="flex items-center justify-between text-xs">
+              <span className="font-medium text-[#171717] dark:text-[#ededed] truncate pr-3">
+                {item.category}
+              </span>
+              <span className="font-mono tabular-nums text-[#737373] dark:text-[#85858b] shrink-0">
+                {item.count} · {pct}%
+              </span>
+            </div>
+            <div className="h-2 w-full rounded-full bg-[#f4f4f5] dark:bg-[#232325] overflow-hidden">
+              <div
+                className={`h-full rounded-full ${idx === 0 ? 'bg-[#e11d48]' : 'bg-[#737373] dark:bg-[#85858b]'}`}
+                style={{ width: `${Math.max(4, pct)}%` }}
+              />
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
 };

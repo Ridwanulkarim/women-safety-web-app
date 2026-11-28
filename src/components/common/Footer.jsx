@@ -1,121 +1,108 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { FiShield, FiPhoneCall, FiLock, FiActivity, FiCheckCircle } from 'react-icons/fi';
 import { useLanguage } from '../../context/LanguageContext';
+import { localizeNum } from '../../utils/helpers';
+import BrandMark from './BrandMark';
 
 const Footer = () => {
   const { t, language } = useLanguage();
   const isBn = language === 'bn';
 
-  return (
-    <footer className="bg-[#09090d] text-zinc-400 pt-12 pb-16 lg:pb-12 border-t border-zinc-800/80 font-sans relative overflow-hidden">
-      {/* Ambient background glow */}
-      <div className="absolute top-0 right-1/4 w-96 h-96 bg-rose-600/5 rounded-full blur-3xl pointer-events-none"></div>
+  const hotlines = [
+    { label: t('hotlines.nationalService'), num: '999', href: 'tel:999' },
+    { label: t('hotlines.policeHelpline'), num: '999', href: 'tel:999' },
+    { label: t('hotlines.womenHelpline'), num: '109', href: 'tel:109' },
+    { label: t('hotlines.childHelpline'), num: '1098', href: 'tel:1098' },
+    { label: t('hotlines.shasthyoBatayon'), num: '16263', href: 'tel:16263' }
+  ];
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        
-        {/* Top Operational Status Strip */}
-        <div className="mb-10 p-4 rounded-2xl bg-zinc-900/70 border border-zinc-800/80 flex flex-wrap items-center justify-between gap-4 backdrop-blur-md">
-          <div className="flex items-center gap-3">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 telemetry-dot"></span>
-            <span className="text-xs font-semibold text-zinc-200">
-              {isBn ? 'জাতীয় জরুরি সেবা টেলিমেট্রি: ' : 'National Emergency Dispatch Telemetry: '}
-              <span className="text-emerald-400 font-bold">{isBn ? 'সক্রিয়' : 'OPERATIONAL'}</span>
+  return (
+    <footer className="bg-[#f4f4f5] dark:bg-[#0f0f10] text-[#525252] dark:text-[#a1a1a6] pt-12 pb-12 border-t border-zinc-900/[0.08] dark:border-white/[0.08]">
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+        {/* Dispatch Telemetry Strip */}
+        <div className="px-4 py-3 rounded-xl bg-[#ffffff] dark:bg-[#19191b] border border-zinc-900/[0.08] dark:border-white/[0.08] flex flex-wrap items-center justify-between gap-4">
+          <div className="flex items-center gap-2.5 text-xs">
+            <span className="w-2 h-2 rounded-full bg-[#16a34a] dark:bg-[#4cc38a]"></span>
+            <span className="font-medium text-[#171717] dark:text-[#ededed]">
+              {isBn ? 'জাতীয় জরুরি সেবা টেলিমেট্রি' : 'National emergency dispatch telemetry'}
+            </span>
+            <span className="text-[#737373] dark:text-[#85858b]">·</span>
+            <span className="text-[#16a34a] dark:text-[#4cc38a] font-medium">
+              {isBn ? 'সক্রিয়' : 'Operational'}
             </span>
           </div>
-          <div className="flex items-center gap-4 text-xs font-mono text-zinc-400">
-            <span className="flex items-center gap-1.5">
-              <FiActivity className="text-rose-500" /> {isBn ? 'বিলম্ব: <৩ সেকেন্ড' : 'Latency: <3s'}
-            </span>
-            <span className="flex items-center gap-1.5">
-              <FiCheckCircle className="text-emerald-500" /> {isBn ? 'এইএস-২৫৬ সুরক্ষিত ভল্ট' : 'AES-256 Vault'}
-            </span>
+          <div className="flex items-center gap-4 text-xs font-mono tabular-nums text-[#737373] dark:text-[#85858b]">
+            <span>{isBn ? 'বিলম্ব: < ৩ সেকেন্ড' : 'Latency: < 3s'}</span>
+            <span>{isBn ? 'SHA-256 কাস্টডি' : 'SHA-256 Custody'}</span>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 pb-10 border-b border-zinc-800/80">
-          
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 pb-10 border-b border-zinc-900/[0.08] dark:border-white/[0.08]">
           {/* Col 1: Brand Info */}
-          <div className="space-y-4 md:col-span-1">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-rose-600 to-rose-700 text-white flex items-center justify-center font-bold shadow-md shadow-rose-600/30">
-                <FiShield className="w-4.5 h-4.5" />
-              </div>
-              <span className="text-base font-extrabold text-white tracking-tight font-heading">
-                {t('nav.brandName')}
-              </span>
-            </div>
-            <p className="text-xs text-zinc-400 leading-relaxed font-normal">
+          <div className="space-y-3">
+            <BrandMark name={t('nav.brandName')} />
+            <p className="text-xs leading-relaxed text-[#525252] dark:text-[#a1a1a6]">
               {t('footer.desc')}
             </p>
           </div>
 
           {/* Col 2: Navigation */}
           <div className="space-y-3">
-            <h4 className="text-white font-bold text-xs tracking-wider uppercase font-mono">
-              {isBn ? 'দ্রুত নেভিগেশন' : 'Quick Navigation'}
+            <h4 className="text-[#171717] dark:text-[#ededed] font-medium text-xs">
+              {isBn ? 'নেভিগেশন' : 'Navigation'}
             </h4>
             <ul className="space-y-2 text-xs">
-              <li><Link to="/" className="hover:text-rose-400 transition-colors">{t('nav.home')}</Link></li>
-              <li><Link to="/about" className="hover:text-rose-400 transition-colors">{t('nav.about')}</Link></li>
-              <li><Link to="/features" className="hover:text-rose-400 transition-colors">{t('nav.features')}</Link></li>
-              <li><Link to="/safety-tips" className="hover:text-rose-400 transition-colors">{t('nav.safetyTips')}</Link></li>
-              <li><Link to="/emergency-help" className="hover:text-rose-400 transition-colors">{t('nav.emergencyHelp')}</Link></li>
-              <li><Link to="/blog" className="hover:text-rose-400 transition-colors">{t('nav.blog')}</Link></li>
-              <li><Link to="/contact" className="hover:text-rose-400 transition-colors">{t('nav.contact')}</Link></li>
+              <li><Link to="/" className="hover:text-[#171717] dark:hover:text-[#ededed] transition-colors">{t('nav.home')}</Link></li>
+              <li><Link to="/about" className="hover:text-[#171717] dark:hover:text-[#ededed] transition-colors">{t('nav.about')}</Link></li>
+              <li><Link to="/features" className="hover:text-[#171717] dark:hover:text-[#ededed] transition-colors">{t('nav.features')}</Link></li>
+              <li><Link to="/safety-tips" className="hover:text-[#171717] dark:hover:text-[#ededed] transition-colors">{t('nav.safetyTips')}</Link></li>
+              <li><Link to="/emergency-help" className="hover:text-[#171717] dark:hover:text-[#ededed] transition-colors">{t('nav.emergencyHelp')}</Link></li>
+              <li><Link to="/blog" className="hover:text-[#171717] dark:hover:text-[#ededed] transition-colors">{t('nav.blog')}</Link></li>
+              <li><Link to="/contact" className="hover:text-[#171717] dark:hover:text-[#ededed] transition-colors">{t('nav.contact')}</Link></li>
             </ul>
           </div>
 
-          {/* Col 3: Emergency Dispatch */}
+          {/* Col 3: Emergency Hotlines */}
           <div className="space-y-3">
-            <h4 className="text-white font-bold text-xs tracking-wider uppercase font-mono flex items-center gap-1.5">
-              <FiPhoneCall className="text-rose-500" /> {t('footer.hotlines')}
+            <h4 className="text-[#171717] dark:text-[#ededed] font-medium text-xs">
+              {t('footer.hotlines')}
             </h4>
-            <ul className="space-y-2 text-xs font-mono">
-              <li className="flex justify-between items-center text-zinc-300">
-                <span>{t('hotlines.nationalService')}</span>
-                <a href="tel:999" className="font-bold text-rose-400 hover:text-rose-300 hover:underline px-2 py-0.5 rounded bg-rose-500/10">৯৯৯</a>
-              </li>
-              <li className="flex justify-between items-center text-zinc-300">
-                <span>{t('hotlines.policeHelpline')}</span>
-                <a href="tel:999" className="font-bold text-blue-400 hover:text-blue-300 hover:underline px-2 py-0.5 rounded bg-blue-500/10">৯৯৯</a>
-              </li>
-              <li className="flex justify-between items-center text-zinc-300">
-                <span>{t('hotlines.womenHelpline')}</span>
-                <a href="tel:109" className="font-bold text-rose-400 hover:text-rose-300 hover:underline px-2 py-0.5 rounded bg-rose-500/10">১০৯</a>
-              </li>
-              <li className="flex justify-between items-center text-zinc-300">
-                <span>{t('hotlines.childHelpline')}</span>
-                <a href="tel:1098" className="font-bold text-purple-400 hover:text-purple-300 hover:underline px-2 py-0.5 rounded bg-purple-500/10">১০৯৮</a>
-              </li>
-              <li className="flex justify-between items-center text-zinc-300">
-                <span>{t('hotlines.shasthyoBatayon')}</span>
-                <a href="tel:16263" className="font-bold text-emerald-400 hover:text-emerald-300 hover:underline px-2 py-0.5 rounded bg-emerald-500/10">১৬২৬৩</a>
-              </li>
+            <ul className="space-y-2 text-xs">
+              {hotlines.map((item, idx) => (
+                <li key={idx} className="flex justify-between items-center gap-3">
+                  <span className="truncate">{item.label}</span>
+                  <a
+                    href={item.href}
+                    className="font-mono tabular-nums font-medium text-[#171717] dark:text-[#ededed] hover:text-[#e11d48] dark:hover:text-[#fb7185] transition-colors shrink-0"
+                  >
+                    {localizeNum(item.num, isBn)}
+                  </a>
+                </li>
+              ))}
             </ul>
           </div>
 
           {/* Col 4: Telemetry Security */}
           <div className="space-y-3">
-            <h4 className="text-white font-bold text-xs tracking-wider uppercase font-mono flex items-center gap-1.5">
-              <FiLock className="text-emerald-500" /> {t('footer.telemetry')}
+            <h4 className="text-[#171717] dark:text-[#ededed] font-medium text-xs">
+              {t('footer.telemetry')}
             </h4>
-            <p className="text-xs text-zinc-400 leading-relaxed font-normal">
+            <p className="text-xs leading-relaxed text-[#525252] dark:text-[#a1a1a6]">
               {t('footer.security')}
             </p>
           </div>
         </div>
 
-        {/* Bottom copyright */}
-        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-zinc-500">
-          <p>© {new Date().getFullYear()} {t('footer.allRightsReserved')}</p>
+        {/* Bottom Copyright */}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#737373] dark:text-[#85858b]">
+          <p className="tabular-nums">© {localizeNum(new Date().getFullYear(), isBn)} {t('footer.allRightsReserved')}</p>
           <div className="flex items-center gap-4">
-            <Link to="/privacy-policy" className="hover:text-zinc-300 transition-colors">
-              {isBn ? 'গোপনীয়তা নীতি' : 'Privacy Policy'}
+            <Link to="/privacy-policy" className="hover:text-[#171717] dark:hover:text-[#ededed] transition-colors">
+              {isBn ? 'গোপনীয়তা নীতি' : 'Privacy policy'}
             </Link>
-            <span>•</span>
-            <Link to="/contact" className="hover:text-zinc-300 transition-colors">
-              {isBn ? 'সহায়তা ডেস্ক' : 'Support Desk'}
+            <span>·</span>
+            <Link to="/contact" className="hover:text-[#171717] dark:hover:text-[#ededed] transition-colors">
+              {isBn ? 'সহায়তা ডেস্ক' : 'Support desk'}
             </Link>
           </div>
         </div>

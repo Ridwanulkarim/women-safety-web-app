@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { FiShield, FiLock, FiMail, FiEye, FiEyeOff, FiCheckCircle, FiActivity, FiAlertCircle } from 'react-icons/fi';
+import { FiLock, FiMail, FiEye, FiEyeOff, FiCheckCircle, FiActivity, FiAlertCircle } from 'react-icons/fi';
 import { FcGoogle } from 'react-icons/fc';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
+import BrandMark from '../../components/common/BrandMark';
 
 const Login = () => {
   const { loginUser, loginWithGoogle } = useAuth();
@@ -47,88 +48,85 @@ const Login = () => {
 
   return (
     <div className="w-full flex items-center justify-center p-2 sm:p-4">
-      <div className="max-w-4xl w-full grid grid-cols-1 lg:grid-cols-12 rounded-3xl overflow-hidden shadow-2xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-[#121215]">
-        
-        {/* Left Side: Modern Visual Security Banner (Desktop) */}
-        <div className="hidden lg:flex lg:col-span-5 bg-gradient-to-br from-zinc-900 via-[#18181b] to-rose-950 p-8 flex-col justify-between relative overflow-hidden text-white">
-          {/* Subtle Ambient Glow Effect */}
-          <div className="absolute -top-16 -left-16 w-56 h-56 bg-rose-600/20 rounded-full blur-3xl pointer-events-none"></div>
-          <div className="absolute -bottom-16 -right-16 w-56 h-56 bg-rose-500/20 rounded-full blur-3xl pointer-events-none"></div>
+      <div className="max-w-4xl w-full grid grid-cols-1 lg:grid-cols-12 surface-panel overflow-hidden">
+        {/* Left: Calm Dispatch Summary Panel */}
+        <div className="hidden lg:flex lg:col-span-5 bg-[#0f0f10] text-[#ededed] p-8 flex-col justify-between border-r border-white/[0.08]">
+          <div className="space-y-5">
+            <BrandMark name={t('nav.brandName')} subtitle={isBn ? 'নিরাপত্তা নেটওয়ার্ক' : 'Emergency network'} inverted />
 
-          <div className="relative z-10 space-y-4">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs font-mono font-bold uppercase tracking-wider">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> {isBn ? 'সেফহ্যাভেন সুরক্ষা নেটওয়ার্ক' : 'SafeHaven Security Network'}
+            <div className="space-y-3 pt-4">
+              <h2 className="text-2xl font-medium tracking-[-0.02em] leading-snug text-[#ededed]">
+                {isBn
+                  ? 'তাৎক্ষণিক জিপিএস বিপদ সংকেত ও জরুরি ডিসপ্যাচ'
+                  : 'Real-time GPS distress broadcast and guardian dispatch'}
+              </h2>
+              <p className="text-sm text-[#a1a1a6] leading-relaxed">
+                {isBn
+                  ? 'আপনার ৫ জন জরুরি পরিচিতি পরিচালনা করতে, এসওএস রেকর্ড দেখতে এবং প্রমাণ সংরক্ষণাগারে প্রবেশ করতে সাইন ইন করুন।'
+                  : 'Sign in to manage your five emergency contacts, monitor SOS broadcasts, and export local evidence.'}
+              </p>
             </div>
-            <h3 className="text-2xl font-extrabold font-heading leading-tight tracking-tight">
-              {isBn ? 'তাৎক্ষণিক লাইভ জিপিএস বিপদ সংকেত ও জরুরি সহায়তা' : 'Instant Geolocation Distress Telemetry & Emergency Help'}
-            </h3>
-            <p className="text-xs text-zinc-400 leading-relaxed font-sans">
-              {isBn
-                ? 'আপনার ৫ জন জরুরি পরিচিতি পরিচালনা করতে, রিয়েল-টাইম এসওএস ট্র্যাক করতে ও এনক্রিপ্টেড এভিডেন্স লকারে ঢুকতে সাইন ইন করুন।'
-                : 'Sign in to manage your 5 priority emergency contacts, monitor real-time SOS broadcasts, and access your encrypted evidence locker.'}
-            </p>
           </div>
 
-          <div className="relative z-10 space-y-3 pt-6 border-t border-zinc-800">
-            <div className="flex items-center gap-2.5 text-xs text-zinc-300 font-medium">
-              <FiCheckCircle className="text-emerald-400 text-sm flex-shrink-0" />
-              <span>{isBn ? 'প্রতিক্রিয়ার সময়: < ৩ সেকেন্ড' : 'Response Latency: < 3 Seconds'}</span>
+          <div className="space-y-3 pt-6 border-t border-white/[0.08] text-xs text-[#a1a1a6]">
+            <div className="flex items-center gap-2.5">
+              <FiCheckCircle className="w-4 h-4 text-[#4cc38a] dispatch-icon shrink-0" />
+              <span>{isBn ? 'প্রতিক্রিয়ার সময় < ৩ সেকেন্ড' : 'Sub-3 second dispatch relay'}</span>
             </div>
-            <div className="flex items-center gap-2.5 text-xs text-zinc-300 font-medium">
-              <FiCheckCircle className="text-emerald-400 text-sm flex-shrink-0" />
-              <span>{isBn ? 'AES-256 এনক্রিপ্টেড অডিট রেকর্ড' : 'AES-256 Encrypted Telemetry Logs'}</span>
+            <div className="flex items-center gap-2.5">
+              <FiCheckCircle className="w-4 h-4 text-[#4cc38a] dispatch-icon shrink-0" />
+              <span>{isBn ? 'SHA-256 প্রমাণ সংরক্ষণাগার' : 'SHA-256 chain-of-custody locker'}</span>
             </div>
-            <div className="flex items-center gap-2.5 text-xs text-zinc-300 font-medium">
-              <FiCheckCircle className="text-emerald-400 text-sm flex-shrink-0" />
-              <span>{isBn ? 'জাতীয় জরুরি সেবা ৯৯৯ সরাসরি সংযোগ' : 'National Dispatch 999 Integration'}</span>
+            <div className="flex items-center gap-2.5">
+              <FiCheckCircle className="w-4 h-4 text-[#4cc38a] dispatch-icon shrink-0" />
+              <span>{isBn ? 'জাতীয় জরুরি সেবা ৯৯৯ সংযোগ' : 'Direct Bangladesh 999 speed dial'}</span>
             </div>
           </div>
         </div>
 
-        {/* Right Side: Sleek Sign-In Form */}
+        {/* Right: Sign-In Form */}
         <div className="lg:col-span-7 p-6 sm:p-10 space-y-6 flex flex-col justify-center">
-          
-          <div className="text-center sm:text-left space-y-1.5">
-            <div className="w-10 h-10 rounded-2xl bg-rose-600 text-white flex items-center justify-center text-xl shadow-lg shadow-rose-600/30 mb-3 sm:mb-2 inline-flex lg:flex">
-              <FiShield />
+          <div className="space-y-1.5">
+            <div className="lg:hidden mb-3">
+              <BrandMark name={t('nav.brandName')} />
             </div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold font-heading text-zinc-900 dark:text-white tracking-tight">
+            <h1 className="text-2xl font-medium tracking-[-0.02em] text-[#171717] dark:text-[#ededed]">
               {t('auth.loginTitle')}
-            </h2>
-            <p className="text-xs text-zinc-500 dark:text-zinc-400">
+            </h1>
+            <p className="text-sm text-[#525252] dark:text-[#a1a1a6]">
               {t('auth.loginSub')}
             </p>
           </div>
 
-          {/* Google Login Button */}
           <button
             type="button"
             onClick={handleGoogleSignIn}
             disabled={loading}
-            className="w-full py-2.5 px-4 rounded-xl bg-zinc-50 dark:bg-zinc-900/90 border border-zinc-200 dark:border-zinc-700/80 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 font-semibold text-xs flex items-center justify-center gap-3 transition-all duration-200 shadow-xs min-h-[44px] active:scale-[0.99]"
+            className="w-full btn-outline h-11 text-sm"
           >
-            <FcGoogle className="text-lg flex-shrink-0" /> {t('auth.googleContinue')}
+            <FcGoogle className="text-base shrink-0" />
+            <span>{t('auth.googleContinue')}</span>
           </button>
 
           <div className="relative flex items-center justify-center">
-            <div className="border-t border-zinc-200 dark:border-zinc-800 w-full"></div>
-            <span className="absolute bg-white dark:bg-[#121215] px-3 text-[10px] text-zinc-400 uppercase tracking-widest font-mono font-bold">
+            <div className="border-t border-zinc-900/[0.08] dark:border-white/[0.08] w-full"></div>
+            <span className="absolute bg-[#ffffff] dark:bg-[#19191b] px-3 text-xs text-[#737373] dark:text-[#85858b]">
               {t('auth.orEmail')}
             </span>
           </div>
 
           {authError && (
-            <div className="p-3.5 rounded-xl bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/30 text-rose-700 dark:text-rose-400 text-xs flex items-start gap-2.5 font-medium">
-              <FiAlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+            <div className="p-3.5 rounded-lg bg-[#dc2626]/10 border border-[#dc2626]/25 text-[#dc2626] dark:text-[#e5484d] text-xs flex items-start gap-2.5">
+              <FiAlertCircle className="w-4 h-4 mt-0.5 shrink-0 dispatch-icon" />
               <div className="space-y-1">
                 <p>{authError}</p>
                 {authError.includes('Google') && (
                   <button
                     type="button"
                     onClick={handleGoogleSignIn}
-                    className="text-rose-700 dark:text-rose-300 font-bold underline cursor-pointer text-xs"
+                    className="font-medium underline cursor-pointer text-xs"
                   >
-                    Click here to Sign In with Google
+                    Sign in with Google instead
                   </button>
                 )}
               </div>
@@ -139,7 +137,7 @@ const Login = () => {
             <div>
               <label className="human-label">{t('auth.emailLabel')}</label>
               <div className="relative">
-                <FiMail className="absolute left-3.5 top-3.5 text-zinc-400 text-sm" />
+                <FiMail className="w-4 h-4 absolute left-3 top-3 text-[#737373] dark:text-[#85858b] dispatch-icon" />
                 <input
                   type="email"
                   placeholder={t('auth.emailPlaceholder')}
@@ -147,20 +145,20 @@ const Login = () => {
                   className={`human-input human-input-has-icon ${errors.email ? 'human-input-error' : ''}`}
                 />
               </div>
-              {errors.email && <p className="text-[11px] font-medium text-rose-500 mt-1">{errors.email.message}</p>}
+              {errors.email && <p className="text-xs text-[#dc2626] dark:text-[#e5484d] mt-1">{errors.email.message}</p>}
             </div>
 
             <div>
-              <div className="flex justify-between items-center mb-1">
+              <div className="flex justify-between items-center mb-1.5">
                 <label className="human-label mb-0">{t('auth.passwordLabel')}</label>
-                <Link to="/forgot-password" className="text-[11px] font-semibold text-rose-600 dark:text-rose-400 hover:underline">
+                <Link to="/forgot-password" className="text-xs font-medium text-[#e11d48] dark:text-[#fb7185] hover:underline">
                   {t('auth.forgotPassword')}
                 </Link>
               </div>
               <div className="relative">
-                <FiLock className="absolute left-3.5 top-3.5 text-zinc-400 text-sm" />
+                <FiLock className="w-4 h-4 absolute left-3 top-3 text-[#737373] dark:text-[#85858b] dispatch-icon" />
                 <input
-                  type={showPassword ? "text" : "password"}
+                  type={showPassword ? 'text' : 'password'}
                   placeholder={t('auth.passwordPlaceholder')}
                   {...register('password', { required: 'Password is required' })}
                   className={`human-input human-input-has-icon pr-10 ${errors.password ? 'human-input-error' : ''}`}
@@ -168,23 +166,23 @@ const Login = () => {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3.5 top-3.5 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 text-sm transition"
-                  title={showPassword ? "Hide password" : "Show password"}
+                  className="absolute right-3 top-3 text-[#737373] dark:text-[#85858b] hover:text-[#171717] dark:hover:text-[#ededed] transition-colors cursor-pointer"
+                  title={showPassword ? 'Hide password' : 'Show password'}
                 >
-                  {showPassword ? <FiEyeOff /> : <FiEye />}
+                  {showPassword ? <FiEyeOff className="w-4 h-4 dispatch-icon" /> : <FiEye className="w-4 h-4 dispatch-icon" />}
                 </button>
               </div>
-              {errors.password && <p className="text-[11px] font-medium text-rose-500 mt-1">{errors.password.message}</p>}
+              {errors.password && <p className="text-xs text-[#dc2626] dark:text-[#e5484d] mt-1">{errors.password.message}</p>}
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full btn-danger py-3 text-xs font-mono font-bold uppercase tracking-wider shadow-lg shadow-rose-600/25 active:scale-[0.99] transition-all"
+              className="w-full btn-solid h-11 text-sm"
             >
               {loading ? (
                 <span className="flex items-center justify-center gap-2">
-                  <FiActivity className="animate-spin text-sm" /> {t('auth.authenticating')}
+                  <FiActivity className="w-4 h-4 animate-spin dispatch-icon" /> {t('auth.authenticating')}
                 </span>
               ) : (
                 t('auth.signInBtn')
@@ -192,13 +190,12 @@ const Login = () => {
             </button>
           </form>
 
-          <p className="text-center text-xs text-zinc-500 dark:text-zinc-400">
+          <p className="text-center text-xs text-[#525252] dark:text-[#a1a1a6]">
             {t('auth.dontHaveAccount')}{' '}
-            <Link to="/register" className="font-bold text-rose-600 dark:text-rose-400 hover:underline">
+            <Link to="/register" className="font-medium text-[#e11d48] dark:text-[#fb7185] hover:underline">
               {t('auth.registerFree')}
             </Link>
           </p>
-
         </div>
       </div>
     </div>

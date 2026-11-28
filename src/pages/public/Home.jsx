@@ -1,290 +1,269 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { FiShield, FiAlertCircle, FiPhoneCall, FiMapPin, FiArrowRight, FiActivity, FiCheckCircle, FiLock, FiRadio, FiCpu } from 'react-icons/fi';
+import { FiShield, FiAlertCircle, FiPhoneCall, FiMapPin, FiArrowRight, FiCheckCircle } from 'react-icons/fi';
 import SOSButton from '../../components/sos/SOSButton';
 import LiveMap from '../../components/map/LiveMap';
 import { EMERGENCY_NUMBERS } from '../../utils/constants';
 import { useLanguage } from '../../context/LanguageContext';
-import { toBengaliDigits } from '../../utils/helpers';
+import { toBengaliDigits, localizeNum } from '../../utils/helpers';
 import { useGeolocation } from '../../hooks/useGeolocation';
-import LanguageToggle from '../../components/common/LanguageToggle';
 
 const Home = () => {
   const { t, language } = useLanguage();
   const isBn = language === 'bn';
   const location = useGeolocation(true);
 
-  return (
-    <div className="space-y-12 pb-24 relative overflow-hidden">
-      
-      {/* Background Ambient Glow Accents */}
-      <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-gradient-to-tr from-rose-600/10 via-pink-600/5 to-transparent rounded-full blur-3xl pointer-events-none"></div>
+  const hotlineNames = {
+    'National Emergency Service': isBn ? 'জাতীয় জরুরি সেবা' : 'National Emergency Service',
+    'Police Emergency Helpline': isBn ? 'পুলিশ জরুরি হেল্পলাইন' : 'Police Emergency Helpline',
+    'National Women Helpline': isBn ? 'জাতীয় নারী হেল্পলাইন' : 'National Women Helpline',
+    'Child Helpline Bangladesh': isBn ? 'চাইল্ড হেল্পলাইন বাংলাদেশ' : 'Child Helpline Bangladesh',
+    'Shasthyo Batayon': isBn ? 'স্বাস্থ্য বাতায়ন' : 'Shasthyo Batayon'
+  };
 
-      {/* Real-Time Security Telemetry Marquee Bar */}
-      <div className="bg-zinc-100/80 text-zinc-700 dark:bg-[#121216]/80 dark:text-zinc-400 py-2.5 px-4 border-b border-zinc-200/80 dark:border-zinc-800/80 text-xs font-mono backdrop-blur-md transition-colors">
-        <div className="max-w-7xl mx-auto flex items-center justify-between overflow-x-auto gap-6 whitespace-nowrap">
+  const hotlineCategories = {
+    'National Hotline': isBn ? 'জাতীয় হটলাইন' : 'National hotline',
+    'Law Enforcement': isBn ? 'আইন শৃঙ্খলা' : 'Law enforcement',
+    'Specialized Hotline': isBn ? 'বিশেষ হটলাইন' : 'Specialized line',
+    'Child Protection': isBn ? 'শিশু সুরক্ষা' : 'Child protection',
+    'Medical Advice': isBn ? 'স্বাস্থ্য পরামর্শ' : 'Medical advice'
+  };
+
+  return (
+    <div className="space-y-16 pb-20">
+      {/* Operational Status Strip */}
+      <div className="bg-[#f4f4f5] dark:bg-[#0f0f10] border-b border-zinc-900/[0.08] dark:border-white/[0.08] py-2.5 px-4 sm:px-6 lg:px-8 text-xs">
+        <div className="max-w-[1440px] mx-auto flex items-center justify-between gap-6 overflow-x-auto whitespace-nowrap text-[#525252] dark:text-[#a1a1a6]">
           <div className="flex items-center gap-4">
-            <span className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-semibold">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 telemetry-dot"></span> {t('common.systemOperational')}
+            <span className="flex items-center gap-2 font-medium text-[#171717] dark:text-[#ededed]">
+              <span className="w-2 h-2 rounded-full bg-[#16a34a] dark:bg-[#4cc38a]"></span>
+              {t('common.systemOperational')}
             </span>
-            <span className="text-zinc-300 dark:text-zinc-700">|</span>
-            <span className="flex items-center gap-1.5"><FiActivity className="text-rose-500" /> {t('common.gpsAccuracy')}</span>
-            <span className="text-zinc-300 dark:text-zinc-700">|</span>
-            <span className="flex items-center gap-1.5"><FiLock className="text-emerald-500" /> {t('common.encryption')}</span>
+            <span className="text-[#737373] dark:text-[#85858b]">·</span>
+            <span>{t('common.gpsAccuracy')}</span>
+            <span className="text-[#737373] dark:text-[#85858b] hidden sm:inline">·</span>
+            <span className="hidden sm:inline">{t('common.encryption')}</span>
           </div>
-          <div className="flex items-center gap-4 text-zinc-500 dark:text-zinc-400">
-            <LanguageToggle />
+          <div className="flex items-center gap-4 font-mono tabular-nums text-[#737373] dark:text-[#85858b]">
             <span>{t('common.nationalDispatch')}</span>
-            <span className="text-zinc-300 dark:text-zinc-700">|</span>
-            <span className="text-emerald-500 font-bold">{isBn ? 'ল্যাটেন্সি: <১৫ মি.সে.' : 'LATENCY: <15ms'}</span>
           </div>
         </div>
       </div>
 
-      {/* Main Bento Hero Grid */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
-          
-          {/* Main Hero Bento Card (8 Cols) */}
-          <motion.div
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-            className="lg:col-span-8 glass-card-xl p-6 sm:p-10 flex flex-col justify-between space-y-8 relative overflow-hidden"
-          >
-            {/* Ambient card corner glow */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-rose-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      {/* Asymmetric Dispatch Hero */}
+      <section className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+          className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center"
+        >
+          {/* Left: Core Message & Actions (7 Cols) */}
+          <div className="lg:col-span-7 space-y-6">
+            <p className="text-xs font-mono text-[#737373] dark:text-[#85858b]">
+              {isBn ? 'জাতীয় জরুরি নেটওয়ার্ক · বাংলাদেশ' : 'National emergency network · Bangladesh'}
+            </p>
 
-            <div className="space-y-4 relative z-10">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="mono-tag mono-tag-zinc">
-                  <FiCpu className="w-3.5 h-3.5 text-zinc-500" /> {isBn ? 'প্ল্যাটফর্ম সংস্করণ ২.৪' : 'Platform v2.4'}
-                </span>
-                <span className="mono-tag mono-tag-emerald">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 telemetry-dot"></span> {isBn ? '২৪/৭ সার্বক্ষণিক সুরক্ষা কবচ' : '24/7 Protection Shield'}
-                </span>
-              </div>
+            <h1 className="text-4xl sm:text-5xl lg:text-[52px] font-medium tracking-[-0.025em] leading-[1.08] text-[#171717] dark:text-[#ededed]">
+              {t('home.heroTitlePrefix')} {t('home.heroTitleSuffix')}
+            </h1>
 
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-zinc-900 dark:text-white font-heading leading-tight">
-                {t('home.heroTitlePrefix')} <br className="hidden sm:block" />
-                <span className="gradient-text-rose">{t('home.heroTitleSuffix')}</span>.
-              </h1>
+            <p className="text-base sm:text-lg text-[#525252] dark:text-[#a1a1a6] max-w-[36rem] leading-[1.6] font-normal">
+              {t('home.heroSub')}
+            </p>
 
-              <p className="text-sm sm:text-base text-zinc-600 dark:text-zinc-400 max-w-2xl font-normal leading-relaxed">
-                {t('home.heroSub')}
-              </p>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-3 pt-2 relative z-10">
-              <Link to="/register" className="btn-danger text-xs py-3 px-6 shadow-lg shadow-rose-600/30">
-                {t('home.createAccount')} <FiArrowRight className="text-sm" />
+            {/* Primary & Secondary Actions */}
+            <div className="flex flex-wrap items-center gap-3 pt-1">
+              <Link to="/register" className="btn-solid h-11 px-5 text-sm">
+                {t('home.createAccount')} <FiArrowRight className="w-4 h-4 dispatch-icon" />
               </Link>
-              <Link to="/emergency-help" className="btn-outline text-xs py-3 px-6">
+              <Link to="/emergency-help" className="btn-outline h-11 px-5 text-sm">
                 {t('home.emergencyDirectory')}
               </Link>
             </div>
 
-            {/* Technical Specs Footer */}
-            <div className="pt-6 border-t border-zinc-200/80 dark:border-zinc-800/80 grid grid-cols-3 gap-4 font-mono text-xs relative z-10">
-              <div className="p-3 rounded-xl bg-zinc-50/80 dark:bg-zinc-900/60 border border-zinc-200/60 dark:border-zinc-800/60">
-                <span className="block text-[10px] text-zinc-500 dark:text-zinc-400 uppercase font-bold">{t('home.responseTime')}</span>
-                <span className="font-extrabold text-sm text-zinc-900 dark:text-zinc-100">{t('home.responseVal')}</span>
-              </div>
-              <div className="p-3 rounded-xl bg-zinc-50/80 dark:bg-zinc-900/60 border border-zinc-200/60 dark:border-zinc-800/60">
-                <span className="block text-[10px] text-zinc-500 dark:text-zinc-400 uppercase font-bold">{t('home.priorityContactsSpec')}</span>
-                <span className="font-extrabold text-sm text-zinc-900 dark:text-zinc-100">{t('home.priorityContactsVal')}</span>
-              </div>
-              <div className="p-3 rounded-xl bg-zinc-50/80 dark:bg-zinc-900/60 border border-zinc-200/60 dark:border-zinc-800/60">
-                <span className="block text-[10px] text-zinc-500 dark:text-zinc-400 uppercase font-bold">{t('home.dispatchProtocol')}</span>
-                <span className="font-extrabold text-sm text-zinc-900 dark:text-zinc-100">{t('home.dispatchVal')}</span>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Distress Control Bento Card (4 Cols) */}
-          <motion.div
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.1 }}
-            className="lg:col-span-4 glass-card-xl p-6 sm:p-8 flex flex-col justify-between text-center space-y-6 relative overflow-hidden"
-          >
-            <div className="flex items-center justify-between border-b border-zinc-200/80 dark:border-zinc-800/80 pb-4 text-left">
+            {/* Aligned Spec Strip */}
+            <div className="pt-6 mt-2 border-t border-zinc-900/[0.08] dark:border-white/[0.08] grid grid-cols-3 gap-4 max-w-xl">
               <div>
-                <span className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 dark:text-zinc-400 font-bold">{t('home.panicBeacon')}</span>
-                <h3 className="text-sm font-extrabold text-zinc-900 dark:text-white uppercase tracking-wider">{t('home.sosDistressTrigger')}</h3>
+                <span className="block text-xs text-[#737373] dark:text-[#85858b]">{t('home.responseTime')}</span>
+                <span className="font-mono tabular-nums text-base font-medium text-[#171717] dark:text-[#ededed] mt-0.5 block">
+                  {t('home.responseVal')}
+                </span>
               </div>
-              <span className="mono-tag mono-tag-emerald py-0.5 text-[10px]">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 telemetry-dot"></span> {t('common.active')}
+              <div>
+                <span className="block text-xs text-[#737373] dark:text-[#85858b]">{t('home.priorityContactsSpec')}</span>
+                <span className="font-mono tabular-nums text-base font-medium text-[#171717] dark:text-[#ededed] mt-0.5 block">
+                  {t('home.priorityContactsVal')}
+                </span>
+              </div>
+              <div>
+                <span className="block text-xs text-[#737373] dark:text-[#85858b]">{t('home.dispatchProtocol')}</span>
+                <span className="font-mono text-base font-medium text-[#171717] dark:text-[#ededed] mt-0.5 block">
+                  {t('home.dispatchVal')}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Right: Distress Instrument Panel (5 Cols) */}
+          <div className="lg:col-span-5 surface-panel p-6 sm:p-8 flex flex-col justify-between space-y-6">
+            <div className="flex items-center justify-between border-b border-zinc-900/[0.08] dark:border-white/[0.08] pb-4">
+              <div>
+                <span className="text-xs text-[#737373] dark:text-[#85858b] block">{t('home.panicBeacon')}</span>
+                <h2 className="text-sm font-medium text-[#171717] dark:text-[#ededed] mt-0.5">
+                  {t('home.sosDistressTrigger')}
+                </h2>
+              </div>
+              <span className="status-tag mono-tag-emerald">
+                {t('common.active')}
               </span>
             </div>
 
-            <div className="py-4 relative flex items-center justify-center">
-              <div className="absolute w-44 h-44 rounded-full bg-rose-500/10 blur-xl pulse-radar-ring pointer-events-none"></div>
-              <SOSButton size="large" />
+            {/* Instrument Reticle Around Physical Trigger */}
+            <div className="py-6 relative flex items-center justify-center rounded-xl bg-[#fafafa] dark:bg-[#141415] border border-zinc-900/[0.08] dark:border-white/[0.08]">
+              <div className="w-60 h-60 rounded-full border border-dashed border-zinc-900/[0.08] dark:border-white/[0.08] flex items-center justify-center">
+                <SOSButton size="large" />
+              </div>
             </div>
 
-            <div className="p-3.5 rounded-xl bg-zinc-50/90 dark:bg-zinc-900/80 border border-zinc-200/80 dark:border-zinc-800/80 text-[11px] font-mono text-zinc-600 dark:text-zinc-400 flex items-center justify-between text-left shadow-xs">
-              <span className="flex items-center gap-1.5 text-rose-600 dark:text-rose-400 font-bold">
-                <FiMapPin /> {t('home.gpsTelemetry')}
+            {/* Live Tabular Coordinates Bar */}
+            <div className="px-3.5 py-2.5 rounded-lg bg-[#f4f4f5] dark:bg-[#232325] border border-zinc-900/[0.08] dark:border-white/[0.08] text-xs font-mono tabular-nums flex items-center justify-between gap-3">
+              <span className="flex items-center gap-2 text-[#525252] dark:text-[#a1a1a6]">
+                <FiMapPin className="w-4 h-4 text-[#e11d48] dispatch-icon shrink-0" />
+                <span>{t('home.gpsTelemetry')}</span>
               </span>
-              <span className="text-zinc-800 dark:text-zinc-300 font-semibold">
+              <span className="text-[#171717] dark:text-[#ededed] font-medium truncate">
                 {location.latitude
                   ? isBn
-                    ? `${toBengaliDigits(location.latitude.toFixed(4))}° উত্তর, ${toBengaliDigits(location.longitude.toFixed(4))}° পূর্ব`
-                    : `${location.latitude.toFixed(4)}° N, ${location.longitude.toFixed(4)}° E`
+                    ? `${toBengaliDigits(location.latitude.toFixed(4))}° উত্তর · ${toBengaliDigits(location.longitude.toFixed(4))}° পূর্ব`
+                    : `${location.latitude.toFixed(4)}° N · ${location.longitude.toFixed(4)}° E`
                   : isBn
-                    ? 'জিপিএস খোঁজা হচ্ছে...'
-                    : 'Detecting GPS...'}
+                    ? 'অবস্থান নির্ণয় হচ্ছে'
+                    : 'Acquiring GPS'}
               </span>
             </div>
-          </motion.div>
-
-        </div>
+          </div>
+        </motion.div>
       </section>
 
-      {/* Emergency Hotline Directory Bento Bar */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="glass-card-xl p-6 sm:p-8 space-y-5">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 border-b border-zinc-200/80 dark:border-zinc-800/80 pb-4">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-xl bg-rose-500/10 text-rose-600 dark:text-rose-400 flex items-center justify-center text-sm font-bold">
-                <FiPhoneCall />
-              </div>
-              <h2 className="text-base font-extrabold uppercase tracking-wider text-zinc-900 dark:text-white font-heading">
-                {t('home.speedDialTitle')}
-              </h2>
-            </div>
-            <Link to="/emergency-help" className="text-xs font-mono font-bold text-rose-600 dark:text-rose-400 hover:underline flex items-center gap-1.5">
-              {t('home.viewAllHotlines')} <FiArrowRight />
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5">
-            {EMERGENCY_NUMBERS.map((num) => {
-              const categoryMap = {
-                'National Hotline': isBn ? 'জাতীয় হটলাইন' : 'National Hotline',
-                'Law Enforcement': isBn ? 'আইন শৃঙ্খলা' : 'Law Enforcement',
-                'Specialized Hotline': isBn ? 'বিশেষ হটলাইন' : 'Specialized Hotline',
-                'Child Protection': isBn ? 'শিশু সুরক্ষা' : 'Child Protection',
-                'Medical Advice': isBn ? 'স্বাস্থ্য পরামর্শ' : 'Medical Advice'
-              };
-              const nameMap = {
-                'National Emergency Service': isBn ? 'জাতীয় জরুরি সেবা' : 'National Emergency Service',
-                'Police Emergency Helpline': isBn ? 'পুলিশ জরুরি হেল্পলাইন' : 'Police Emergency Helpline',
-                'National Women Helpline': isBn ? 'জাতীয় নারী হেল্পলাইন' : 'National Women Helpline',
-                'Child Helpline Bangladesh': isBn ? 'চাইল্ড হেল্পলাইন' : 'Child Helpline Bangladesh',
-                'Shasthyo Batayon': isBn ? 'স্বাস্থ্য বাতায়ন' : 'Shasthyo Batayon'
-              };
-              const numberMap = {
-                '999': isBn ? '৯৯৯' : '999',
-                '109': isBn ? '১০৯' : '109',
-                '1098': isBn ? '১০৯৮' : '1098',
-                '16263': isBn ? '১৬২৬৩' : '16263'
-              };
-
-              return (
-                <a
-                  key={num.id}
-                  href={`tel:${num.number}`}
-                  className="p-4 rounded-2xl bg-zinc-50/90 dark:bg-zinc-900/60 hover:bg-rose-500/10 border border-zinc-200/80 dark:border-zinc-800/80 transition-all duration-200 group text-center space-y-1.5 hover-lift"
-                >
-                  <span className="block text-[10px] uppercase font-mono text-zinc-400 font-bold">
-                    {categoryMap[num.category] || num.category}
-                  </span>
-                  <h4 className="font-semibold text-xs text-zinc-800 dark:text-zinc-200 truncate">
-                    {nameMap[num.name] || num.name}
-                  </h4>
-                  <span className="block text-base font-extrabold text-rose-600 dark:text-rose-400 font-mono">
-                    {numberMap[num.number] || num.number}
-                  </span>
-                </a>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* Geolocation Telemetry Radar Bento Card */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4 relative z-10">
-        <div className="flex flex-wrap items-center justify-between gap-2">
+      {/* Emergency Speed Dial Directory Bar */}
+      <section className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 space-y-5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-zinc-900/[0.08] dark:border-white/[0.08]">
           <div className="flex items-center gap-2.5">
-            <div className="w-7 h-7 rounded-lg bg-emerald-500/10 text-emerald-500 flex items-center justify-center font-bold">
-              <FiRadio />
-            </div>
-            <h2 className="text-lg font-extrabold text-zinc-900 dark:text-white font-heading">{t('home.monitoringRadar')}</h2>
-            {location.isApproximate ? (
-              <span className="mono-tag mono-tag-amber text-[10px] py-0.5">
-                {isBn ? '⚠️ আনুমানিক নেটওয়ার্ক পয়েন্ট' : '⚠️ Approximate Network IP'}
-              </span>
-            ) : (
-              <span className="mono-tag mono-tag-emerald text-[10px] py-0.5">
-                {isBn ? '🛰️ লাইভ জিপিএস লক' : '🛰️ Live GPS Locked'}
-              </span>
-            )}
+            <FiPhoneCall className="w-4 h-4 text-[#737373] dark:text-[#85858b] dispatch-icon" />
+            <h2 className="text-lg font-medium text-[#171717] dark:text-[#ededed]">
+              {t('home.speedDialTitle')}
+            </h2>
           </div>
-          <span className="mono-tag mono-tag-zinc hidden sm:inline-flex">
-            {isBn ? 'লিফলেট / ওপেনস্ট্রিটম্যাপ ডুয়াল ইঞ্জিন' : 'Leaflet / OpenStreetMap Dual Engine'}
+          <Link
+            to="/emergency-help"
+            className="text-xs font-medium text-[#e11d48] dark:text-[#fb7185] hover:underline inline-flex items-center gap-1.5"
+          >
+            {t('home.viewAllHotlines')} <FiArrowRight className="w-3.5 h-3.5 dispatch-icon" />
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+          {EMERGENCY_NUMBERS.map((num) => (
+            <a
+              key={num.id}
+              href={`tel:${num.number}`}
+              className="surface-card product-card-hover p-4 flex flex-col justify-between space-y-3"
+            >
+              <div className="space-y-1">
+                <span className="block text-xs text-[#737373] dark:text-[#85858b]">
+                  {hotlineCategories[num.category] || num.category}
+                </span>
+                <h3 className="text-sm font-medium text-[#171717] dark:text-[#ededed] line-clamp-1">
+                  {hotlineNames[num.name] || num.name}
+                </h3>
+              </div>
+              <span className="block text-xl font-medium font-mono tabular-nums text-[#e11d48] dark:text-[#fb7185]">
+                {localizeNum(num.number, isBn)}
+              </span>
+            </a>
+          ))}
+        </div>
+      </section>
+
+      {/* Live Geolocation Radar Section */}
+      <section className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 space-y-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5">
+            <FiMapPin className="w-4 h-4 text-[#737373] dark:text-[#85858b] dispatch-icon" />
+            <h2 className="text-lg font-medium text-[#171717] dark:text-[#ededed]">
+              {t('home.monitoringRadar')}
+            </h2>
+            <span className={`status-tag ${location.isApproximate ? '' : 'mono-tag-emerald'}`}>
+              {location.isApproximate
+                ? (isBn ? 'আনুমানিক নেটওয়ার্ক পয়েন্ট' : 'Approximate network point')
+                : (isBn ? 'লাইভ জিপিএস নির্ধারিত' : 'GPS position locked')}
+            </span>
+          </div>
+          <span className="text-xs font-mono text-[#737373] dark:text-[#85858b] hidden sm:inline">
+            Leaflet · OpenStreetMap
           </span>
         </div>
 
-        <div className="rounded-3xl overflow-hidden border border-zinc-200/80 dark:border-zinc-800/80 shadow-xl">
-          <LiveMap 
-            latitude={location.latitude}
-            longitude={location.longitude}
-            accuracy={location.accuracy}
-            source={location.source}
-            isApproximate={location.isApproximate}
-            permissionDenied={location.permissionDenied}
-            title={isBn ? 'সেফহ্যাভেন লাইভ লোকেশন রাডার' : 'SafeHaven Geolocation Radar'}
-            onLocationChange={(lat, lng, acc, addr) => {
-              location.setManualLocation(lat, lng, addr);
-            }}
-            onRefreshGPS={location.refreshLocation}
-          />
-        </div>
+        <LiveMap
+          latitude={location.latitude}
+          longitude={location.longitude}
+          accuracy={location.accuracy}
+          source={location.source}
+          isApproximate={location.isApproximate}
+          permissionDenied={location.permissionDenied}
+          title={isBn ? 'সেফহ্যাভেন লাইভ লোকেশন' : 'SafeHaven live location'}
+          onLocationChange={(lat, lng, acc, addr) => {
+            location.setManualLocation(lat, lng, addr);
+          }}
+          onRefreshGPS={location.refreshLocation}
+        />
       </section>
 
-      {/* Product Architecture Features Grid */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 relative z-10">
-        <div className="border-b border-zinc-200/80 dark:border-zinc-800/80 pb-4">
-          <h2 className="text-xl font-extrabold text-zinc-900 dark:text-white font-heading">{t('home.systemCapabilities')}</h2>
-          <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">{t('home.capabilitiesSub')}</p>
+      {/* Core Capabilities */}
+      <section className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+        <div className="pb-4 border-b border-zinc-900/[0.08] dark:border-white/[0.08]">
+          <h2 className="text-xl font-medium text-[#171717] dark:text-[#ededed]">
+            {t('home.systemCapabilities')}
+          </h2>
+          <p className="text-sm text-[#525252] dark:text-[#a1a1a6] mt-1">
+            {t('home.capabilitiesSub')}
+          </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="product-card product-card-hover p-6 sm:p-7 space-y-3.5">
-            <div className="w-10 h-10 rounded-xl bg-rose-500/10 text-rose-600 dark:text-rose-400 flex items-center justify-center text-xl font-bold">
-              <FiAlertCircle />
-            </div>
-            <h3 className="text-sm font-bold text-zinc-900 dark:text-white">{t('home.cap1Title')}</h3>
-            <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed font-normal">
+          <div className="surface-card p-6 space-y-3">
+            <FiAlertCircle className="w-5 h-5 text-[#e11d48] dispatch-icon" />
+            <h3 className="text-base font-medium text-[#171717] dark:text-[#ededed]">
+              {t('home.cap1Title')}
+            </h3>
+            <p className="text-sm text-[#525252] dark:text-[#a1a1a6] leading-relaxed">
               {t('home.cap1Desc')}
             </p>
           </div>
 
-          <div className="product-card product-card-hover p-6 sm:p-7 space-y-3.5">
-            <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-xl font-bold">
-              <FiCheckCircle />
-            </div>
-            <h3 className="text-sm font-bold text-zinc-900 dark:text-white">{t('home.cap2Title')}</h3>
-            <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed font-normal">
+          <div className="surface-card p-6 space-y-3">
+            <FiCheckCircle className="w-5 h-5 text-[#525252] dark:text-[#a1a1a6] dispatch-icon" />
+            <h3 className="text-base font-medium text-[#171717] dark:text-[#ededed]">
+              {t('home.cap2Title')}
+            </h3>
+            <p className="text-sm text-[#525252] dark:text-[#a1a1a6] leading-relaxed">
               {t('home.cap2Desc')}
             </p>
           </div>
 
-          <div className="product-card product-card-hover p-6 sm:p-7 space-y-3.5">
-            <div className="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center text-xl font-bold">
-              <FiShield />
-            </div>
-            <h3 className="text-sm font-bold text-zinc-900 dark:text-white">{t('home.cap3Title')}</h3>
-            <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed font-normal">
+          <div className="surface-card p-6 space-y-3">
+            <FiShield className="w-5 h-5 text-[#525252] dark:text-[#a1a1a6] dispatch-icon" />
+            <h3 className="text-base font-medium text-[#171717] dark:text-[#ededed]">
+              {t('home.cap3Title')}
+            </h3>
+            <p className="text-sm text-[#525252] dark:text-[#a1a1a6] leading-relaxed">
               {t('home.cap3Desc')}
             </p>
           </div>
         </div>
       </section>
-
     </div>
   );
 };

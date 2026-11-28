@@ -17,46 +17,48 @@ const ContactModal = ({ isOpen, onClose, onSave }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm">
-      <div className="relative max-w-md w-full human-card p-6 sm:p-8 space-y-6 shadow-2xl">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75">
+      <div className="relative max-w-md w-full surface-panel p-6 sm:p-8 space-y-6 shadow-xl">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-200 rounded-lg bg-slate-100 dark:bg-slate-800"
+          className="absolute top-4 right-4 h-8 w-8 rounded-lg bg-[#f4f4f5] dark:bg-[#232325] text-[#737373] dark:text-[#85858b] hover:text-[#171717] dark:hover:text-[#ededed] flex items-center justify-center cursor-pointer"
           title={isBn ? 'বন্ধ করুন' : 'Close'}
         >
-          <FiX className="w-4 h-4" />
+          <FiX className="w-4 h-4 dispatch-icon" />
         </button>
 
         <div className="space-y-1">
-          <h3 className="text-xl font-extrabold text-slate-900 dark:text-white font-heading">
-            {isBn ? 'জরুরি পরিচিতি যোগ করুন' : 'Add Emergency Contact'}
-          </h3>
-          <p className="text-xs text-slate-500 dark:text-slate-400">
-            {isBn ? 'আপনার একজন বিশ্বস্ত মানুষের যোগাযোগের তথ্য দিন (সর্বোচ্চ ৫ জন)।' : "Enter a trusted person's contact details (Max 5 contacts)."}
+          <h2 className="text-xl font-medium text-[#171717] dark:text-[#ededed]">
+            {isBn ? 'জরুরি পরিচিতি যোগ করুন' : 'Add emergency contact'}
+          </h2>
+          <p className="text-xs text-[#525252] dark:text-[#a1a1a6]">
+            {isBn
+              ? 'সর্বোচ্চ ৫ জন বিশ্বস্ত পরিচিতির যোগাযোগের তথ্য দিন।'
+              : 'Add a trusted guardian to notify during emergency dispatches (max 5).'}
           </p>
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>
-            <label className="human-label">{isBn ? 'পুরো নাম' : 'Full Name'}</label>
+            <label className="human-label">{isBn ? 'পুরো নাম' : 'Full name'}</label>
             <input
               type="text"
-              placeholder={isBn ? 'যেমন: আয়েশা রহমান' : 'e.g. Ayesha Rahman'}
+              placeholder={isBn ? 'আয়েশা রহমান' : 'Ayesha Rahman'}
               {...register('name', { required: isBn ? 'নাম দেওয়া আবশ্যক' : 'Name is required' })}
               className={`human-input ${errors.name ? 'human-input-error' : ''}`}
             />
-            {errors.name && <p className="text-[11px] font-medium text-rose-500 mt-1">{errors.name.message}</p>}
+            {errors.name && <p className="text-xs text-[#dc2626] dark:text-[#e5484d] mt-1">{errors.name.message}</p>}
           </div>
 
           <div>
-            <label className="human-label">{isBn ? 'ফোন নম্বর' : 'Phone Number'}</label>
+            <label className="human-label">{isBn ? 'ফোন নম্বর' : 'Phone number'}</label>
             <input
               type="tel"
-              placeholder={isBn ? 'যেমন: +8801700000000' : 'e.g. +8801700000000'}
+              placeholder="+8801700000000"
               {...register('phone', { required: isBn ? 'ফোন নম্বর দেওয়া আবশ্যক' : 'Phone number is required' })}
-              className={`human-input ${errors.phone ? 'human-input-error' : ''}`}
+              className={`human-input font-mono tabular-nums ${errors.phone ? 'human-input-error' : ''}`}
             />
-            {errors.phone && <p className="text-[11px] font-medium text-rose-500 mt-1">{errors.phone.message}</p>}
+            {errors.phone && <p className="text-xs text-[#dc2626] dark:text-[#e5484d] mt-1">{errors.phone.message}</p>}
           </div>
 
           <div>
@@ -80,26 +82,19 @@ const ContactModal = ({ isOpen, onClose, onSave }) => {
               type="checkbox"
               id="isPrimary"
               {...register('isPrimary')}
-              className="w-4 h-4 accent-rose-600 rounded cursor-pointer"
+              className="w-4 h-4 accent-[#e11d48] rounded cursor-pointer"
             />
-            <label htmlFor="isPrimary" className="text-xs font-semibold text-slate-700 dark:text-slate-300 cursor-pointer">
-              {isBn ? 'প্রধান জরুরি পরিচিতি হিসেবে সেট করুন' : 'Set as Primary Emergency Contact'}
+            <label htmlFor="isPrimary" className="text-xs font-medium text-[#525252] dark:text-[#a1a1a6] cursor-pointer">
+              {isBn ? 'প্রধান জরুরি পরিচিতি হিসেবে নির্ধারণ করুন' : 'Set as primary guardian'}
             </label>
           </div>
 
           <div className="flex gap-3 pt-2">
-            <button
-              type="button"
-              onClick={onClose}
-              className="w-1/2 btn-secondary"
-            >
+            <button type="button" onClick={onClose} className="w-1/2 btn-outline h-10 text-xs">
               {isBn ? 'বাতিল' : 'Cancel'}
             </button>
-            <button
-              type="submit"
-              className="w-1/2 btn-primary"
-            >
-              <FiPlusCircle /> {isBn ? 'সংরক্ষণ করুন' : 'Save Contact'}
+            <button type="submit" className="w-1/2 btn-solid h-10 text-xs">
+              <FiPlusCircle className="w-4 h-4 dispatch-icon" /> {isBn ? 'সংরক্ষণ করুন' : 'Save contact'}
             </button>
           </div>
         </form>

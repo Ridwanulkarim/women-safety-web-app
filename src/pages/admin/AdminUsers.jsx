@@ -244,174 +244,148 @@ const AdminUsers = () => {
   });
 
   return (
-    <div className="space-y-8 font-sans">
+    <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="mono-tag mono-tag-rose text-[10px]">
-              <span className="w-1.5 h-1.5 rounded-full bg-rose-500 telemetry-dot"></span> LIVE CLOUD DIRECTORY
-            </span>
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold font-heading text-zinc-900 dark:text-white tracking-tight">
-            User <span className="gradient-text-rose">Management</span>
+        <div className="space-y-1">
+          <span className="text-xs font-mono text-[#737373] dark:text-[#85858b]">Cloud directory</span>
+          <h1 className="text-2xl sm:text-3xl font-medium tracking-[-0.02em] text-[#171717] dark:text-[#ededed]">
+            User management
           </h1>
-          <p className="text-xs text-zinc-500 dark:text-zinc-400">
-            Real-time registered platform accounts, role verification, and access controls.
+          <p className="text-sm text-[#525252] dark:text-[#a1a1a6]">
+            Registered accounts, role assignment, and status controls
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2.5">
           <div className="relative w-full sm:w-64">
-            <FiSearch className="absolute left-3.5 top-3.5 text-zinc-400 dark:text-zinc-500" />
+            <FiSearch className="w-4 h-4 absolute left-3 top-3 text-[#737373] dark:text-[#85858b] dispatch-icon" />
             <input
               type="text"
-              placeholder="Search by name or email..."
+              placeholder="Search"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:border-rose-500 transition shadow-sm"
+              className="human-input human-input-has-icon text-sm"
             />
           </div>
 
           <button
             onClick={handleManualSync}
             disabled={loading}
-            className="p-2.5 rounded-xl bg-white hover:bg-zinc-100 dark:bg-zinc-900 dark:hover:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition shadow-sm"
+            className="btn-outline h-10 w-10 px-0"
             title="Sync Cloud Firestore"
           >
-            <FiRefreshCw className={`w-4 h-4 ${loading ? 'animate-spin text-rose-500' : ''}`} />
+            <FiRefreshCw className={`w-4 h-4 dispatch-icon ${loading ? 'animate-spin text-[#e11d48]' : ''}`} />
           </button>
 
-          <button
-            onClick={() => setShowAddModal(true)}
-            className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-500 hover:to-rose-600 text-white font-bold text-xs uppercase font-mono tracking-wider flex items-center gap-2 shadow-lg shadow-rose-600/30 transition"
-          >
-            <FiUserPlus /> Add User
+          <button onClick={() => setShowAddModal(true)} className="btn-solid h-10 px-4 text-xs">
+            <FiUserPlus className="w-4 h-4 dispatch-icon" /> Add user
           </button>
         </div>
       </div>
 
-      {/* Directory Table / List */}
-      <div className="glass-card-xl rounded-3xl overflow-hidden border border-zinc-200/80 dark:border-zinc-800/80 shadow-xl">
-        <div className="p-4 sm:p-5 border-b border-zinc-200/80 dark:border-zinc-800/80 flex items-center justify-between bg-zinc-50/80 dark:bg-zinc-900/40">
+      {/* Directory Table */}
+      <div className="surface-panel overflow-hidden">
+        <div className="px-5 py-3.5 border-b border-zinc-900/[0.08] dark:border-white/[0.08] flex items-center justify-between bg-[#fafafa] dark:bg-[#141415]">
           <div className="flex items-center gap-2">
-            <FiUsers className="text-rose-500" />
-            <h3 className="text-xs font-bold text-zinc-800 dark:text-zinc-200 uppercase tracking-wider font-mono">
-              Verified Accounts ({filteredUsers.length})
-            </h3>
+            <FiUsers className="w-4 h-4 text-[#525252] dark:text-[#a1a1a6] dispatch-icon" />
+            <h2 className="text-xs font-medium text-[#171717] dark:text-[#ededed] font-mono tabular-nums">
+              Verified accounts ({filteredUsers.length})
+            </h2>
           </div>
-          <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-[10px] font-mono">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span>
-              FIRESTORE CLOUD SYNC ACTIVE
-            </span>
-          </div>
+          <span className="status-tag mono-tag-emerald">Firestore synced</span>
         </div>
 
         {filteredUsers.length === 0 ? (
           <div className="py-16 px-6 text-center space-y-4">
-            <div className="w-14 h-14 mx-auto rounded-2xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 flex items-center justify-center text-zinc-400 dark:text-zinc-500 text-2xl">
-              <FiUsers />
-            </div>
+            <FiUsers className="w-6 h-6 mx-auto text-[#737373] dark:text-[#85858b] dispatch-icon" />
             <div className="space-y-1">
-              <h3 className="text-base font-bold text-zinc-800 dark:text-zinc-200">No Users Found</h3>
-              <p className="text-xs text-zinc-500 dark:text-zinc-400 max-w-md mx-auto">
+              <h3 className="text-sm font-medium text-[#171717] dark:text-[#ededed]">No users found</h3>
+              <p className="text-xs text-[#737373] dark:text-[#85858b] max-w-md mx-auto">
                 {search
                   ? `No user accounts match "${search}".`
-                  : 'No registered accounts in database yet. New registrations will automatically appear here via Cloud Firestore.'}
+                  : 'No registered accounts found in Firestore yet.'}
               </p>
             </div>
-            <div className="flex items-center justify-center gap-3 pt-2">
-              <button
-                onClick={() => setShowAddModal(true)}
-                className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-semibold font-mono flex items-center gap-1.5 transition shadow-sm"
-              >
-                <FiUserPlus /> Register / Link User
+            <div className="flex items-center justify-center gap-2.5 pt-1">
+              <button onClick={() => setShowAddModal(true)} className="btn-solid h-9 px-4 text-xs">
+                <FiUserPlus className="w-3.5 h-3.5 dispatch-icon" /> Add user
               </button>
-              <button
-                onClick={handleManualSync}
-                className="px-4 py-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 text-xs font-semibold font-mono flex items-center gap-1.5 transition border border-zinc-200 dark:border-zinc-700"
-              >
-                <FiRefreshCw /> Refresh Database
+              <button onClick={handleManualSync} className="btn-outline h-9 px-4 text-xs">
+                <FiRefreshCw className="w-3.5 h-3.5 dispatch-icon" /> Refresh
               </button>
             </div>
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs text-zinc-700 dark:text-zinc-300">
-              <thead className="bg-zinc-100/90 dark:bg-zinc-900/80 text-zinc-600 dark:text-zinc-400 font-bold uppercase tracking-wider border-b border-zinc-200 dark:border-zinc-800 text-[10px] font-mono">
+            <table className="w-full text-left text-xs">
+              <thead className="bg-[#fafafa] dark:bg-[#141415] text-[#737373] dark:text-[#85858b] font-medium border-b border-zinc-900/[0.08] dark:border-white/[0.08]">
                 <tr>
-                  <th className="p-4 sm:px-6">User / Identity</th>
-                  <th className="p-4">Contact Phone</th>
-                  <th className="p-4">Assigned Role</th>
-                  <th className="p-4">Status</th>
-                  <th className="p-4">Registration Date</th>
-                  <th className="p-4 sm:px-6 text-right">Actions</th>
+                  <th className="py-3 px-5">User</th>
+                  <th className="py-3 px-4">Phone</th>
+                  <th className="py-3 px-4">Role</th>
+                  <th className="py-3 px-4">Status</th>
+                  <th className="py-3 px-4">Created</th>
+                  <th className="py-3 px-5 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800/80">
-                {filteredUsers.map((u) => (
-                  <tr key={u.uid || u.email} className="hover:bg-zinc-50 dark:hover:bg-zinc-900/40 transition">
-                    <td className="p-4 sm:px-6 font-semibold text-zinc-900 dark:text-zinc-100">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-rose-600 to-purple-600 flex items-center justify-center text-white font-bold text-xs uppercase flex-shrink-0">
-                          {u.fullName?.charAt(0) || u.email?.charAt(0) || 'U'}
+              <tbody className="divide-y divide-zinc-900/[0.08] dark:divide-white/[0.08]">
+                {filteredUsers.map((u) => {
+                  const userIsAdmin =
+                    u.role === 'admin' || u.email?.toLowerCase().trim() === 'ridwanulk08@gmail.com';
+                  return (
+                    <tr key={u.uid || u.email} className="hover:bg-[#fafafa] dark:hover:bg-[#141415] transition-colors">
+                      <td className="py-3.5 px-5">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-[#232325] text-[#ededed] flex items-center justify-center font-medium text-xs uppercase shrink-0">
+                            {u.fullName?.charAt(0) || u.email?.charAt(0) || 'U'}
+                          </div>
+                          <div>
+                            <p className="font-medium text-[#171717] dark:text-[#ededed]">{u.fullName}</p>
+                            <p className="text-[#737373] dark:text-[#85858b] font-mono">{u.email}</p>
+                          </div>
                         </div>
-                        <div>
-                          <p className="font-bold text-zinc-900 dark:text-zinc-100">{u.fullName}</p>
-                          <p className="text-[11px] text-zinc-500 dark:text-zinc-400 font-normal font-mono">{u.email}</p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="p-4 font-mono text-zinc-600 dark:text-zinc-400">{u.phone || 'N/A'}</td>
-                    <td className="p-4">
-                      <span
-                        className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase font-mono ${
-                          (u.role === 'admin' || u.email?.toLowerCase().trim() === 'ridwanulk08@gmail.com')
-                            ? 'bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/30'
-                            : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700'
-                        }`}
-                      >
-                        {(u.role === 'admin' || u.email?.toLowerCase().trim() === 'ridwanulk08@gmail.com') && <FiShield className="w-3 h-3" />}
-                        {(u.role === 'admin' || u.email?.toLowerCase().trim() === 'ridwanulk08@gmail.com') ? 'admin' : 'user'}
-                      </span>
-                    </td>
-                    <td className="p-4">
-                      <span
-                        className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase font-mono ${
-                          u.status === 'active'
-                            ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30'
-                            : 'bg-red-500/15 text-red-600 dark:text-red-400 border border-red-500/30'
-                        }`}
-                      >
-                        {u.status || 'active'}
-                      </span>
-                    </td>
-                    <td className="p-4 font-mono text-zinc-500 dark:text-zinc-400 text-[11px]">
-                      {formatDate(u.createdAt)}
-                    </td>
-                    <td className="p-4 sm:px-6 text-right space-x-2">
-                      <button
-                        onClick={() => handleToggleStatus(u.uid, u.status || 'active')}
-                        className={`px-3 py-1.5 rounded-xl font-bold text-[10px] uppercase transition font-mono ${
-                          u.status === 'active'
-                            ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 hover:bg-amber-500/25 border border-amber-500/30'
-                            : 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/25 border border-emerald-500/30'
-                        }`}
-                        title={u.status === 'active' ? 'Suspend Account' : 'Reactivate Account'}
-                      >
-                        {u.status === 'active' ? 'Suspend' : 'Reactivate'}
-                      </button>
+                      </td>
+                      <td className="py-3.5 px-4 font-mono tabular-nums text-[#525252] dark:text-[#a1a1a6]">
+                        {u.phone || '—'}
+                      </td>
+                      <td className="py-3.5 px-4">
+                        <span className={`status-tag ${userIsAdmin ? 'mono-tag-rose' : ''}`}>
+                          {userIsAdmin && <FiShield className="w-3 h-3 dispatch-icon" />}
+                          {userIsAdmin ? 'Admin' : 'User'}
+                        </span>
+                      </td>
+                      <td className="py-3.5 px-4">
+                        <span
+                          className={`status-tag ${
+                            u.status === 'suspended' ? 'mono-tag-rose' : 'mono-tag-emerald'
+                          }`}
+                        >
+                          {u.status === 'suspended' ? 'Suspended' : 'Active'}
+                        </span>
+                      </td>
+                      <td className="py-3.5 px-4 font-mono tabular-nums text-[#737373] dark:text-[#85858b]">
+                        {formatDate(u.createdAt)}
+                      </td>
+                      <td className="py-3.5 px-5 text-right space-x-2">
+                        <button
+                          onClick={() => handleToggleStatus(u.uid, u.status || 'active')}
+                          className="btn-outline h-8 px-2.5 text-xs"
+                          title={u.status === 'active' ? 'Suspend account' : 'Reactivate account'}
+                        >
+                          {u.status === 'active' ? 'Suspend' : 'Reactivate'}
+                        </button>
 
-                      <button
-                        onClick={() => handleDeleteUser(u.uid, u.fullName)}
-                        className="p-1.5 rounded-xl bg-red-500/10 text-red-500 hover:bg-red-500/20 border border-red-500/20 transition inline-flex items-center justify-center"
-                        title="Delete User"
-                      >
-                        <FiTrash2 className="w-3.5 h-3.5" />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                        <button
+                          onClick={() => handleDeleteUser(u.uid, u.fullName)}
+                          className="h-8 w-8 rounded-lg bg-[#f4f4f5] dark:bg-[#232325] text-[#737373] dark:text-[#85858b] hover:text-[#dc2626] dark:hover:text-[#e5484d] border border-zinc-900/[0.08] dark:border-white/[0.08] inline-flex items-center justify-center transition-colors cursor-pointer"
+                          title="Delete user"
+                        >
+                          <FiTrash2 className="w-3.5 h-3.5 dispatch-icon" />
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -420,104 +394,90 @@ const AdminUsers = () => {
 
       {/* Add User Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-          <div className="bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl space-y-5">
-            <div className="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 pb-3">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4">
+          <div className="surface-panel p-6 sm:p-8 max-w-md w-full shadow-xl space-y-5">
+            <div className="flex items-center justify-between border-b border-zinc-900/[0.08] dark:border-white/[0.08] pb-3">
               <div className="flex items-center gap-2">
-                <FiUserPlus className="text-rose-500 text-lg" />
-                <h3 className="text-base font-bold font-heading text-zinc-900 dark:text-white">Register / Link User Account</h3>
+                <FiUserPlus className="w-4 h-4 text-[#e11d48] dispatch-icon" />
+                <h2 className="text-base font-medium text-[#171717] dark:text-[#ededed]">
+                  Add user account
+                </h2>
               </div>
               <button
                 onClick={() => setShowAddModal(false)}
-                className="p-1.5 rounded-xl text-zinc-400 hover:text-zinc-600 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-900 transition"
+                className="h-8 w-8 rounded-lg text-[#737373] dark:text-[#85858b] hover:text-[#171717] dark:hover:text-[#ededed] hover:bg-[#f4f4f5] dark:hover:bg-[#232325] flex items-center justify-center cursor-pointer"
               >
-                <FiX />
+                <FiX className="w-4 h-4 dispatch-icon" />
               </button>
             </div>
 
-            <p className="text-xs text-zinc-500 dark:text-zinc-400">
-              Add or link any registered citizen email into the platform Firestore directory immediately.
+            <p className="text-xs text-[#525252] dark:text-[#a1a1a6]">
+              Register or link a citizen account into the Firestore directory.
             </p>
 
             <form onSubmit={handleCreateUser} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1 font-mono uppercase">
-                  Full Name
-                </label>
+                <label className="human-label">Full name</label>
                 <div className="relative">
-                  <FiUser className="absolute left-3.5 top-3.5 text-zinc-400 dark:text-zinc-500" />
+                  <FiUser className="w-4 h-4 absolute left-3 top-3 text-[#737373] dark:text-[#85858b] dispatch-icon" />
                   <input
                     type="text"
                     required
-                    placeholder="e.g. Citizen Name"
+                    placeholder="Ayesha Rahman"
                     value={newFullName}
                     onChange={(e) => setNewFullName(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-800 text-xs text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:border-rose-500 transition"
+                    className="human-input human-input-has-icon"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1 font-mono uppercase">
-                  Email Address
-                </label>
+                <label className="human-label">Email address</label>
                 <div className="relative">
-                  <FiMail className="absolute left-3.5 top-3.5 text-zinc-400 dark:text-zinc-500" />
+                  <FiMail className="w-4 h-4 absolute left-3 top-3 text-[#737373] dark:text-[#85858b] dispatch-icon" />
                   <input
                     type="email"
                     required
-                    placeholder="e.g. user@gmail.com"
+                    placeholder="user@gmail.com"
                     value={newEmail}
                     onChange={(e) => setNewEmail(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-800 text-xs text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:border-rose-500 transition"
+                    className="human-input human-input-has-icon font-mono"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1 font-mono uppercase">
-                  Phone Number (Optional)
-                </label>
+                <label className="human-label">Phone number</label>
                 <div className="relative">
-                  <FiPhone className="absolute left-3.5 top-3.5 text-zinc-400 dark:text-zinc-500" />
+                  <FiPhone className="w-4 h-4 absolute left-3 top-3 text-[#737373] dark:text-[#85858b] dispatch-icon" />
                   <input
                     type="tel"
-                    placeholder="e.g. +8801700000000"
+                    placeholder="+8801700000000"
                     value={newPhone}
                     onChange={(e) => setNewPhone(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-800 text-xs text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:border-rose-500 transition"
+                    className="human-input human-input-has-icon font-mono tabular-nums"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1 font-mono uppercase">
-                  Role
-                </label>
+                <label className="human-label">Role</label>
                 <select
                   value={newRole}
                   onChange={(e) => setNewRole(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-800 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-rose-500 transition"
+                  className="human-input"
                 >
-                  <option value="user">Citizen User</option>
-                  <option value="admin">Platform Administrator</option>
+                  <option value="user">User</option>
+                  <option value="admin">Administrator</option>
                 </select>
               </div>
 
-              <div className="flex items-center justify-end gap-3 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setShowAddModal(false)}
-                  className="px-4 py-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-900 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-semibold transition"
-                >
+              <div className="flex items-center justify-end gap-2.5 pt-2">
+                <button type="button" onClick={() => setShowAddModal(false)} className="btn-outline h-9 px-4 text-xs">
                   Cancel
                 </button>
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-500 hover:to-rose-600 text-white text-xs font-bold font-mono tracking-wider shadow-lg shadow-rose-600/30 transition flex items-center gap-2"
-                >
-                  {isSubmitting ? 'Registering...' : 'Save User to Cloud'}
+                <button type="submit" disabled={isSubmitting} className="btn-solid h-9 px-4 text-xs">
+                  {isSubmitting ? 'Saving' : 'Save user'}
                 </button>
               </div>
             </form>

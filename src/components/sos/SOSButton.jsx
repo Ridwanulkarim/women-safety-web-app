@@ -1,5 +1,4 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 import { FiAlertCircle } from 'react-icons/fi';
 import { useSOS } from '../../context/SOSContext';
 import { useLanguage } from '../../context/LanguageContext';
@@ -9,33 +8,31 @@ const SOSButton = ({ size = 'large', label }) => {
   const { language } = useLanguage();
   const isBn = language === 'bn';
 
-  const defaultLabel = isBn ? 'জরুরি এসওএস' : 'EMERGENCY SOS';
+  const defaultLabel = isBn ? 'জরুরি এসওএস' : 'Emergency SOS';
   const displayLabel = label || defaultLabel;
   const isLg = size === 'large';
 
   return (
     <div className="flex flex-col items-center justify-center">
-      <motion.button
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
+      <button
+        type="button"
         onClick={openSOSModal}
-        className={`relative group rounded-full font-black text-white shadow-2xl flex flex-col items-center justify-center transition-all ${
-          isLg ? 'w-48 h-48 sm:w-56 sm:h-56 text-xl' : 'w-24 h-24 text-sm'
+        className={`relative rounded-full font-medium text-white flex flex-col items-center justify-center cursor-pointer transition-[background-color,transform] duration-150 ease-[cubic-bezier(0.22,1,0.36,1)] active:scale-[0.97] border border-white/15 shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] ${
+          isLg ? 'w-44 h-44 sm:w-48 sm:h-48 text-base' : 'w-24 h-24 text-xs'
         } ${
           isSOSActive
-            ? 'bg-red-600 animate-pulse shadow-red-600/70 ring-8 ring-red-500/50'
-            : 'bg-gradient-to-tr from-pink-600 via-pink-500 to-rose-600 shadow-pink-600/50 sos-pulse-button'
+            ? 'bg-[#b91c1c] ring-4 ring-[#dc2626]/30'
+            : 'bg-[#dc2626] hover:bg-[#b91c1c] ring-4 ring-zinc-900/[0.06] dark:ring-white/[0.06]'
         }`}
       >
-        <span className="absolute inset-0 rounded-full bg-white/20 opacity-0 group-hover:opacity-100 transition" />
-        <FiAlertCircle className={`${isLg ? 'w-16 h-16 sm:w-20 sm:h-20' : 'w-8 h-8'} mb-1 animate-bounce`} />
-        <span className="tracking-widest uppercase font-heading">{displayLabel}</span>
+        <FiAlertCircle className={`${isLg ? 'w-10 h-10 mb-2' : 'w-6 h-6 mb-1'} dispatch-icon`} />
+        <span className="font-medium tracking-[-0.01em]">{displayLabel}</span>
         {isLg && (
-          <span className="text-[10px] opacity-80 mt-1 font-sans">
-            {isBn ? 'সাহায্যের জন্য ট্যাপ করুন' : 'TAP FOR QUICK DISTRESS'}
+          <span className="text-xs text-white/80 mt-1 font-normal">
+            {isBn ? 'পাঠাতে ট্যাপ করুন' : 'Tap to trigger'}
           </span>
         )}
-      </motion.button>
+      </button>
     </div>
   );
 };

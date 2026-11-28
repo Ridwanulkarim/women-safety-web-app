@@ -1,11 +1,21 @@
 import React, { useState } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import {
-  FiShield, FiUsers, FiPieChart, FiAlertTriangle, FiRadio,
-  FiFileText, FiSettings, FiLogOut, FiMenu, FiX, FiArrowLeft
+  FiShield,
+  FiUsers,
+  FiPieChart,
+  FiAlertTriangle,
+  FiRadio,
+  FiFileText,
+  FiSettings,
+  FiLogOut,
+  FiMenu,
+  FiX,
+  FiArrowLeft
 } from 'react-icons/fi';
 import { useAuth } from '../context/AuthContext';
 import ThemeToggle from '../components/common/ThemeToggle';
+import BrandMark from '../components/common/BrandMark';
 import ScrollToTop from '../components/common/ScrollToTop';
 
 const AdminLayout = () => {
@@ -15,47 +25,41 @@ const AdminLayout = () => {
   const navigate = useNavigate();
 
   const adminMenu = [
-    { name: 'Admin Overview', path: '/admin', icon: FiPieChart },
-    { name: 'User Management', path: '/admin/users', icon: FiUsers },
+    { name: 'Overview', path: '/admin', icon: FiShield },
+    { name: 'Emergency alerts', path: '/admin/alerts', icon: FiAlertTriangle },
+    { name: 'SOS reports', path: '/admin/sos-reports', icon: FiFileText },
     { name: 'Analytics', path: '/admin/analytics', icon: FiPieChart },
-    { name: 'Emergency Alerts', path: '/admin/alerts', icon: FiAlertTriangle },
+    { name: 'User directory', path: '/admin/users', icon: FiUsers },
     { name: 'Announcements', path: '/admin/announcements', icon: FiRadio },
-    { name: 'SOS Reports', path: '/admin/sos-reports', icon: FiFileText },
     { name: 'Settings', path: '/admin/settings', icon: FiSettings }
   ];
 
   const isActive = (path) => location.pathname === path;
 
   return (
-    <div className="min-h-screen flex bg-zinc-50 dark:bg-[#08080c] text-zinc-900 dark:text-zinc-100 font-sans transition-colors duration-200">
+    <div className="min-h-screen flex bg-[#fafafa] dark:bg-[#141415] text-[#171717] dark:text-[#ededed]">
       <ScrollToTop />
 
-      {/* Sidebar Desktop */}
-      <aside className="hidden lg:flex flex-col w-64 bg-white/95 dark:bg-[#0d0d12]/95 backdrop-blur-xl border-r border-zinc-200/80 dark:border-zinc-800/80 p-5 sticky top-0 h-screen z-30 shadow-sm transition-colors duration-200">
-        <div className="flex items-center justify-between mb-6">
-          <Link to="/admin" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-rose-600 to-rose-700 flex items-center justify-center text-white font-bold shadow-lg shadow-rose-600/30 group-hover:scale-105 transition-transform duration-200">
-              <FiShield className="w-5 h-5" />
-            </div>
-            <div>
-              <span className="text-base font-extrabold font-heading text-zinc-900 dark:text-white tracking-tight block">
-                SafeHaven
-              </span>
-              <span className="text-[10px] font-mono font-bold text-rose-500 uppercase tracking-wider flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-rose-500 telemetry-dot"></span> Admin Command
-              </span>
-            </div>
-          </Link>
-        </div>
+      {/* Desktop Sidebar */}
+      <aside className="hidden lg:flex flex-col w-64 shrink-0 bg-[#ffffff] dark:bg-[#0f0f10] border-r border-zinc-900/[0.08] dark:border-white/[0.08] p-4 sticky top-0 h-screen z-30">
+        <Link to="/admin" className="mb-5 px-1">
+          <BrandMark name="SafeHaven" subtitle="Dispatch command" />
+        </Link>
 
         <Link
           to="/dashboard"
-          className="mb-4 px-3.5 py-2.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-900/80 dark:hover:bg-zinc-800 border border-zinc-200 dark:border-zinc-800/80 text-xs font-semibold text-zinc-700 dark:text-zinc-300 flex items-center gap-2 transition"
+          className="btn-outline mb-5 h-9 text-xs justify-start px-3"
         >
-          <FiArrowLeft className="text-rose-500" /> Return to User Portal
+          <FiArrowLeft className="w-4 h-4 text-[#737373] dark:text-[#85858b] dispatch-icon" />
+          <span>Return to user portal</span>
         </Link>
 
-        {/* Admin Nav */}
+        <div className="px-2 mb-2">
+          <span className="text-xs font-medium text-[#737373] dark:text-[#85858b]">
+            Operations
+          </span>
+        </div>
+
         <nav className="flex-1 space-y-1 overflow-y-auto">
           {adminMenu.map((item) => {
             const Icon = item.icon;
@@ -64,78 +68,83 @@ const AdminLayout = () => {
               <Link
                 key={item.path}
                 to={item.path}
-                className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all duration-200 ${
+                className={`h-9 flex items-center gap-2.5 px-2.5 rounded-lg text-[13px] font-medium transition-colors duration-150 ${
                   active
-                    ? 'bg-gradient-to-r from-rose-600 to-rose-700 text-white shadow-md shadow-rose-600/25 font-bold'
-                    : 'text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-900 dark:hover:text-zinc-200'
+                    ? 'bg-[#f4f4f5] dark:bg-[#232325] text-[#171717] dark:text-[#ededed] border border-zinc-900/[0.08] dark:border-white/[0.1]'
+                    : 'text-[#525252] dark:text-[#a1a1a6] hover:text-[#171717] dark:hover:text-[#ededed] hover:bg-[#f4f4f5]/60 dark:hover:bg-[#19191b]'
                 }`}
               >
-                <Icon className={`w-4 h-4 ${active ? 'text-white' : 'text-zinc-500 dark:text-zinc-400'}`} />
-                <span>{item.name}</span>
+                <span className="w-4 flex items-center justify-center shrink-0">
+                  <Icon
+                    className={`w-4 h-4 dispatch-icon ${
+                      active ? 'text-[#e11d48]' : 'text-[#737373] dark:text-[#85858b]'
+                    }`}
+                  />
+                </span>
+                <span className="truncate">{item.name}</span>
               </Link>
             );
           })}
         </nav>
 
-        {/* Footer */}
-        <div className="pt-4 border-t border-zinc-200/80 dark:border-zinc-800/80 flex items-center justify-between">
-          <div className="text-left">
-            <p className="text-xs font-bold text-zinc-900 dark:text-zinc-200 truncate max-w-[130px]">{user?.fullName || 'Admin User'}</p>
-            <p className="text-[10px] text-rose-500 uppercase font-mono font-bold">Administrator</p>
+        <div className="pt-4 mt-4 border-t border-zinc-900/[0.08] dark:border-white/[0.08] flex items-center justify-between gap-2">
+          <div className="min-w-0">
+            <p className="text-xs font-medium text-[#171717] dark:text-[#ededed] truncate">
+              {user?.fullName || 'Admin User'}
+            </p>
+            <p className="text-[11px] text-[#737373] dark:text-[#85858b]">Administrator</p>
           </div>
           <button
             onClick={() => {
               logoutUser();
               navigate('/login');
             }}
-            className="p-2 rounded-xl text-zinc-500 hover:text-rose-500 hover:bg-rose-500/10 transition"
-            title="Logout"
+            className="h-8 w-8 rounded-lg text-[#737373] dark:text-[#85858b] hover:text-[#dc2626] dark:hover:text-[#e5484d] hover:bg-[#f4f4f5] dark:hover:bg-[#19191b] flex items-center justify-center transition-colors cursor-pointer shrink-0"
+            title="Log out"
           >
-            <FiLogOut className="w-4 h-4" />
+            <FiLogOut className="w-4 h-4 dispatch-icon" />
           </button>
         </div>
       </aside>
 
-      {/* Main Body */}
+      {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="bg-white/90 dark:bg-[#0e0e13]/90 backdrop-blur-xl border-b border-zinc-200/80 dark:border-zinc-800/80 px-4 py-3 flex items-center justify-between sticky top-0 z-20 transition-colors duration-200">
+        <header className="h-16 bg-[#ffffff] dark:bg-[#141415] border-b border-zinc-900/[0.08] dark:border-white/[0.08] px-4 sm:px-6 lg:px-8 flex items-center justify-between sticky top-0 z-20">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="p-2 rounded-xl lg:hidden bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700"
+              className="h-9 w-9 rounded-lg lg:hidden bg-[#f4f4f5] dark:bg-[#232325] text-[#171717] dark:text-[#ededed] border border-zinc-900/10 dark:border-white/10 flex items-center justify-center"
             >
-              {sidebarOpen ? <FiX className="w-5 h-5" /> : <FiMenu className="w-5 h-5" />}
+              {sidebarOpen ? <FiX className="w-4 h-4 dispatch-icon" /> : <FiMenu className="w-4 h-4 dispatch-icon" />}
             </button>
             <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-purple-500 animate-ping"></span>
-              <h1 className="text-xs sm:text-sm font-bold font-heading text-purple-600 dark:text-purple-400">Admin Command Center</h1>
+              <span className="w-2 h-2 rounded-full bg-[#e11d48]"></span>
+              <h1 className="text-sm font-medium text-[#171717] dark:text-[#ededed]">
+                Dispatch command center
+              </h1>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
-            <Link
-              to="/dashboard"
-              className="px-3 py-1.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 text-xs font-semibold flex items-center gap-1.5 transition border border-zinc-200 dark:border-zinc-700/60"
-              title="Return to User Dashboard"
-            >
-              <FiArrowLeft className="text-rose-500" />
-              <span className="hidden sm:inline">User Portal</span>
+            <Link to="/dashboard" className="btn-outline h-9 px-3 text-xs">
+              <FiArrowLeft className="w-4 h-4 text-[#737373] dark:text-[#85858b] dispatch-icon" />
+              <span className="hidden sm:inline">User portal</span>
             </Link>
             <ThemeToggle />
           </div>
         </header>
 
         {sidebarOpen && (
-          <div className="lg:hidden bg-white dark:bg-slate-900 border-b border-zinc-200 dark:border-slate-800 p-4 space-y-1 shadow-lg">
+          <div className="lg:hidden bg-[#ffffff] dark:bg-[#0f0f10] border-b border-zinc-900/[0.08] dark:border-white/[0.08] p-4 space-y-1">
             {adminMenu.map((item) => (
               <Link
                 key={item.path}
                 to={item.path}
                 onClick={() => setSidebarOpen(false)}
-                className={`block px-4 py-2.5 rounded-xl text-xs font-semibold ${
-                  isActive(item.path) 
-                    ? 'bg-purple-600 text-white' 
-                    : 'text-zinc-700 dark:text-slate-300 hover:bg-zinc-100 dark:hover:bg-slate-800'
+                className={`block px-3 py-2 rounded-lg text-sm font-medium ${
+                  isActive(item.path)
+                    ? 'bg-[#f4f4f5] dark:bg-[#232325] text-[#171717] dark:text-[#ededed]'
+                    : 'text-[#525252] dark:text-[#a1a1a6]'
                 }`}
               >
                 {item.name}
@@ -144,7 +153,7 @@ const AdminLayout = () => {
           </div>
         )}
 
-        <main className="p-4 sm:p-6 lg:p-8 flex-1 overflow-x-hidden">
+        <main className="p-4 sm:p-6 lg:p-8 flex-1 w-full max-w-[1440px] mx-auto overflow-x-hidden">
           <Outlet />
         </main>
       </div>

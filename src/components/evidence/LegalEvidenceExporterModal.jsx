@@ -99,125 +99,125 @@ const LegalEvidenceExporterModal = ({ isOpen, onClose, item }) => {
     a.href = url;
     a.download = `SafeHaven_ChainOfCustody_${documentId}.json`;
     a.click();
-    toast.success(isBn ? '📦 আইনি প্রমাণাদি মেটাডাটা প্যাকেজ ডাউনলোড সম্পন্ন!' : '📦 Legal Evidence Metadata Package Downloaded!');
+    toast.success(isBn ? 'আইনি মেটাডাটা প্যাকেজ ডাউনলোড হয়েছে' : 'Legal metadata package downloaded');
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/80 backdrop-blur-sm font-sans animate-fade-in">
-      <div className="product-card max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 sm:p-8 space-y-6 shadow-2xl relative border-zinc-300 dark:border-zinc-700">
-        
-        {/* Modal Close Button */}
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75">
+      <div className="surface-panel max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 sm:p-8 space-y-6 shadow-xl relative">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-2 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition"
+          className="absolute top-4 right-4 h-8 w-8 rounded-lg bg-[#f4f4f5] dark:bg-[#232325] text-[#737373] dark:text-[#85858b] hover:text-[#171717] dark:hover:text-[#ededed] flex items-center justify-center cursor-pointer"
+          title={isBn ? 'বন্ধ করুন' : 'Close'}
         >
-          <FiX className="w-5 h-5" />
+          <FiX className="w-4 h-4 dispatch-icon" />
         </button>
 
         {/* Modal Header */}
-        <div className="flex items-center gap-3 border-b border-zinc-200 dark:border-zinc-800 pb-4">
-          <div className="w-12 h-12 rounded-2xl bg-rose-600 text-white flex items-center justify-center text-2xl font-bold shadow-md">
-            <FiShield />
+        <div className="flex items-center gap-3.5 border-b border-zinc-900/[0.08] dark:border-white/[0.08] pb-4">
+          <div className="w-10 h-10 rounded-lg bg-[#e11d48]/10 text-[#e11d48] flex items-center justify-center shrink-0">
+            <FiShield className="w-5 h-5 dispatch-icon" />
           </div>
           <div>
-            <span className="mono-tag mono-tag-rose">{isBn ? 'চেইন-অব-কাস্টডি এক্সপোর্টার' : 'CHAIN-OF-CUSTODY EXPORTER'}</span>
-            <h2 className="text-xl font-bold font-heading text-zinc-900 dark:text-white mt-1">
-              {isBn ? 'অফিসিয়াল আইনি প্রমাণাদি ডকেট' : 'Official Legal Evidence Docket'}
+            <span className="status-tag">{isBn ? 'চেইন-অব-কাস্টডি এক্সপোর্টার' : 'Chain-of-custody exhibit'}</span>
+            <h2 className="text-xl font-medium text-[#171717] dark:text-[#ededed] mt-1">
+              {isBn ? 'অফিসিয়াল আইনি প্রমাণাদি ডকেট' : 'Legal evidence docket'}
             </h2>
           </div>
         </div>
 
-        {/* Printable Legal Document Section */}
+        {/* Printable Document Preview */}
         <div id="legal-docket-printable" className="space-y-4 text-left">
-          
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-zinc-200 dark:border-zinc-800 pb-3 gap-2">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-zinc-900/[0.08] dark:border-white/[0.08] pb-3 gap-2">
             <div>
-              <p className="text-xs font-mono font-bold text-rose-600 dark:text-rose-400 uppercase tracking-wider">
-                {isBn ? 'বাংলাদেশ পুলিশ ও আদালত প্রমাণাদি প্রদর্শনী' : 'BANGLADESH POLICE & COURT EVIDENCE EXHIBIT'}
+              <p className="text-xs font-medium text-[#e11d48]">
+                {isBn ? 'বাংলাদেশ পুলিশ ও আদালত প্রমাণাদি প্রদর্শনী' : 'Court and police evidence exhibit'}
               </p>
-              <h3 className="text-lg font-bold text-zinc-900 dark:text-white">
-                {isBn ? 'কেস নিয়ন্ত্রণ নম্বর' : 'Case Control Ref'}: {documentId}
+              <h3 className="text-base font-medium font-mono tabular-nums text-[#171717] dark:text-[#ededed]">
+                {isBn ? 'কেস নম্বর' : 'Reference'}: {documentId}
               </h3>
             </div>
-            <span className="mono-tag mono-tag-emerald">
-              <FiCheckCircle /> {isBn ? 'অক্ষত ও অপরিবর্তিত রেকর্ড' : 'UNTAMPERED RECORD'}
+            <span className="status-tag mono-tag-emerald">
+              <FiCheckCircle className="w-3.5 h-3.5 dispatch-icon" /> {isBn ? 'অপরিবর্তিত রেকর্ড' : 'Untampered'}
             </span>
           </div>
 
-          {/* Cryptographic SHA-256 Checksum */}
-          <div className="p-3.5 rounded-xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 space-y-1">
-            <div className="flex items-center gap-1.5 text-xs font-mono font-bold text-zinc-700 dark:text-zinc-300">
-              <FiHash className="text-rose-500" /> {isBn ? 'ক্রিপ্টোগ্রাফিক SHA-256 হ্যাশ ডাইজেস্ট (অকাট্য প্রমাণ):' : 'Cryptographic SHA-256 Hash Digest (Chain-of-Custody Proof):'}
+          <div className="surface-raised p-4 space-y-1.5">
+            <div className="flex items-center gap-1.5 text-xs font-medium text-[#171717] dark:text-[#ededed]">
+              <FiHash className="w-3.5 h-3.5 text-[#e11d48] dispatch-icon" />
+              {isBn ? 'SHA-256 ক্রিপ্টোগ্রাফিক ডাইজেস্ট' : 'SHA-256 verification digest'}
             </div>
-            <p className="font-mono text-[11px] text-zinc-900 dark:text-zinc-100 bg-white dark:bg-zinc-950 p-2 rounded border border-zinc-300 dark:border-zinc-800 break-all select-all">
+            <p className="font-mono text-xs text-[#171717] dark:text-[#ededed] bg-[#ffffff] dark:bg-[#141415] p-2.5 rounded-md border border-zinc-900/[0.08] dark:border-white/[0.08] break-all select-all">
               {sha256Hash}
             </p>
           </div>
 
-          {/* Victim & Incident Metadata Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            
-            <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 space-y-1">
-              <span className="text-[10px] font-mono font-bold uppercase text-zinc-400 block">
-                {isBn ? 'ভিকটিম / আবেদনকারীর বিবরণ' : 'Victim / Reporter Profile'}
+            <div className="surface-raised p-4 space-y-1">
+              <span className="text-xs text-[#737373] dark:text-[#85858b] block">
+                {isBn ? 'আবেদনকারীর তথ্য' : 'Reporter profile'}
               </span>
-              <p className="text-xs font-bold text-zinc-900 dark:text-white">{user?.fullName || (isBn ? 'সুরক্ষিত ব্যবহারকারী' : 'Protected User')}</p>
-              <p className="text-[11px] text-zinc-500 font-mono">{user?.email || 'N/A'}</p>
-              <p className="text-[11px] text-zinc-500 font-mono">{isBn ? 'ফোন:' : 'Phone:'} {user?.phone || 'N/A'}</p>
-            </div>
-
-            <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 space-y-1">
-              <span className="text-[10px] font-mono font-bold uppercase text-zinc-400 block">
-                {isBn ? 'ঘটনার টেলিমেট্রি রেকর্ড' : 'Incident Telemetry'}
-              </span>
-              <p className="text-xs font-bold text-zinc-900 dark:text-white">{isBn ? 'সময়:' : 'Timestamp:'} {item.date || new Date().toLocaleString()}</p>
-              <p className="text-[11px] text-zinc-500 font-mono">GPS: {item.lat || '22.3347'}, {item.lng || '91.8106'}</p>
-              <p className="text-[11px] text-zinc-500 font-mono">
-                {isBn ? `সতর্কীকৃত জরুরি পরিচিতি: ${toBengaliDigits(savedContacts.length)} জন` : `Alerted Emergency Contacts: ${savedContacts.length}`}
+              <p className="text-sm font-medium text-[#171717] dark:text-[#ededed]">
+                {user?.fullName || (isBn ? 'সুরক্ষিত ব্যবহারকারী' : 'Protected user')}
+              </p>
+              <p className="text-xs text-[#525252] dark:text-[#a1a1a6] font-mono">{user?.email || '—'}</p>
+              <p className="text-xs text-[#525252] dark:text-[#a1a1a6] font-mono tabular-nums">
+                {isBn ? 'ফোন:' : 'Phone:'} {user?.phone || '—'}
               </p>
             </div>
 
+            <div className="surface-raised p-4 space-y-1">
+              <span className="text-xs text-[#737373] dark:text-[#85858b] block">
+                {isBn ? 'ঘটনার টেলিমেট্রি' : 'Incident telemetry'}
+              </span>
+              <p className="text-xs font-mono tabular-nums font-medium text-[#171717] dark:text-[#ededed]">
+                {item.date || new Date().toLocaleString()}
+              </p>
+              <p className="text-xs text-[#525252] dark:text-[#a1a1a6] font-mono tabular-nums">
+                GPS: {item.lat || '23.8103'}, {item.lng || '90.4125'}
+              </p>
+              <p className="text-xs text-[#525252] dark:text-[#a1a1a6] font-mono tabular-nums">
+                {isBn
+                  ? `সতর্কীকৃত পরিচিতি: ${toBengaliDigits(savedContacts.length)}`
+                  : `Alerted contacts: ${savedContacts.length}`}
+              </p>
+            </div>
           </div>
 
-          {/* Media Preview Section */}
-          <div className="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 space-y-2">
-            <span className="text-[10px] font-mono font-bold uppercase text-zinc-400 block">
-              {isBn ? 'সংগৃহীত মিডিয়া প্রমাণাদি' : 'Captured Media Exhibit'}
+          <div className="surface-raised p-4 space-y-2">
+            <span className="text-xs text-[#737373] dark:text-[#85858b] block">
+              {isBn ? 'সংগৃহীত প্রমাণাদি' : 'Media exhibit'}
             </span>
-            
+
             {item.dataUrl && item.dataUrl.startsWith('data:audio') ? (
               <audio controls src={item.dataUrl} className="w-full h-10" />
             ) : item.dataUrl || item.url ? (
-              <img src={item.dataUrl || item.url} alt="Evidence Exhibit" className="max-h-48 rounded-lg object-contain mx-auto border border-zinc-300 dark:border-zinc-700" />
+              <img src={item.dataUrl || item.url} alt="Evidence exhibit" className="max-h-48 rounded-lg object-contain mx-auto border border-zinc-900/10 dark:border-white/10" />
             ) : (
-              <p className="text-xs text-zinc-500 font-mono">{isBn ? 'ভয়েস / ক্যামেরা টেলিমেট্রি লগ' : 'Voice / Camera Telemetry Log'} (ID: {item.id})</p>
+              <p className="text-xs text-[#737373] dark:text-[#85858b] font-mono">
+                {isBn ? 'অডিও / ক্যামেরা টেলিমেট্রি প্যাকেজ' : 'Evidence telemetry docket'} ({item.id})
+              </p>
             )}
           </div>
 
-          {/* Verification Legal Stamp */}
-          <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-center font-mono text-xs font-bold uppercase tracking-wider">
-            {isBn ? '🔒 আইনি চেইন-অব-কাস্টডি পরীক্ষিত • আদালত উপযোগী অফিসিয়াল প্রদর্শনী' : '🔒 Legal Chain-of-Custody Verified • Official Court Exhibit Ready'}
+          <div className="p-3 rounded-lg bg-[#16a34a]/10 dark:bg-[#4cc38a]/10 border border-[#16a34a]/25 dark:border-[#4cc38a]/25 text-[#16a34a] dark:text-[#4cc38a] text-center text-xs font-medium">
+            {isBn
+              ? 'চেইন-অব-কাস্টডি যাচাইকৃত · আদালত ও পুলিশ প্রদর্শনীর জন্য প্রস্তুত'
+              : 'Chain-of-custody verified · Ready for legal submission'}
           </div>
-
         </div>
 
-        {/* Modal Action Buttons */}
-        <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">
-          <button
-            onClick={handlePrintPDF}
-            className="w-full sm:w-1/2 btn-danger py-3 font-mono text-xs uppercase font-bold flex items-center justify-center gap-2"
-          >
-            <FiPrinter /> {isBn ? 'ডকেট প্রিন্ট / PDF সংরক্ষণ' : 'Print / Save PDF Docket'}
+        <div className="flex flex-col sm:flex-row items-center gap-3 pt-1">
+          <button onClick={handlePrintPDF} className="w-full sm:w-1/2 btn-danger h-10 text-xs">
+            <FiPrinter className="w-4 h-4 dispatch-icon" />
+            {isBn ? 'ডকেট প্রিন্ট / PDF' : 'Print or save PDF'}
           </button>
 
-          <button
-            onClick={handleDownloadZIPPackage}
-            className="w-full sm:w-1/2 btn-solid py-3 font-mono text-xs uppercase font-bold flex items-center justify-center gap-2"
-          >
-            <FiDownload /> {isBn ? 'মেটাডাটা ফাইল রপ্তানি (.JSON)' : 'Export Metadata Package (.JSON)'}
+          <button onClick={handleDownloadZIPPackage} className="w-full sm:w-1/2 btn-solid h-10 text-xs">
+            <FiDownload className="w-4 h-4 dispatch-icon" />
+            {isBn ? 'মেটাডাটা ডাউনলোড (JSON)' : 'Export metadata JSON'}
           </button>
         </div>
-
       </div>
     </div>
   );

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FiSettings, FiShield, FiSave, FiRadio, FiLock, FiBell } from 'react-icons/fi';
+import { FiSave } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 
 const AdminSettings = () => {
@@ -29,77 +29,71 @@ const AdminSettings = () => {
   const handleSave = (e) => {
     e.preventDefault();
     localStorage.setItem('safehaven_admin_config', JSON.stringify(config));
-    toast.success('Admin system configuration saved successfully.');
+    toast.success('System configuration saved');
   };
 
   return (
-    <div className="space-y-8 max-w-4xl mx-auto font-sans">
-      <div>
-        <div className="flex items-center gap-2">
-          <span className="mono-tag mono-tag-rose text-[10px]">
-            <span className="w-1.5 h-1.5 rounded-full bg-rose-500 telemetry-dot"></span> DISPATCH CONFIG
-          </span>
-        </div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold font-heading text-zinc-900 dark:text-white tracking-tight">
-          Admin System <span className="gradient-text-rose">Settings</span>
+    <div className="space-y-6 max-w-4xl mx-auto">
+      <div className="space-y-1">
+        <span className="text-xs font-mono text-[#737373] dark:text-[#85858b]">Dispatch configuration</span>
+        <h1 className="text-2xl sm:text-3xl font-medium tracking-[-0.02em] text-[#171717] dark:text-[#ededed]">
+          System settings
         </h1>
-        <p className="text-xs text-zinc-500 dark:text-zinc-400">
-          Configure national dispatch gateway routing, platform thresholds, and security parameters.
+        <p className="text-sm text-[#525252] dark:text-[#a1a1a6]">
+          Configure emergency dispatch routing, guardian limits, and security parameters
         </p>
       </div>
 
-      <form onSubmit={handleSave} className="glass-card-xl p-6 sm:p-8 rounded-3xl space-y-6 border border-zinc-200/80 dark:border-zinc-800 shadow-xl">
+      <form onSubmit={handleSave} className="surface-panel p-6 sm:p-8 space-y-6">
         <div className="space-y-5">
           <div>
-            <label className="block text-xs font-semibold mb-1 text-zinc-700 dark:text-zinc-300 font-mono uppercase">
-              National Emergency Dispatch Gateway
-            </label>
+            <label className="human-label">National emergency dispatch gateway</label>
             <input
               type="text"
               value={config.dispatchGateway}
               onChange={(e) => setConfig({ ...config, dispatchGateway: e.target.value })}
-              className="w-full px-4 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-800 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-rose-500 transition shadow-sm"
+              className="human-input"
             />
-            <span className="text-[11px] text-zinc-500 mt-1 block">
-              Primary routing destination for SOS distress coordinates in Bangladesh.
+            <span className="text-xs text-[#737373] dark:text-[#85858b] mt-1.5 block">
+              Primary routing endpoint for SOS coordinates across Bangladesh.
             </span>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold mb-1 text-zinc-700 dark:text-zinc-300 font-mono uppercase">
-              SMS / Telephony Broadcast Provider
-            </label>
+            <label className="human-label">SMS broadcast provider</label>
             <input
               type="text"
               value={config.smsGateway}
               onChange={(e) => setConfig({ ...config, smsGateway: e.target.value })}
-              className="w-full px-4 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-800 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-rose-500 transition shadow-sm"
+              className="human-input"
             />
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-1">
             <div>
-              <label className="block text-xs font-semibold mb-1 text-zinc-700 dark:text-zinc-300 font-mono uppercase">
-                Max Contacts Allowed Per User
-              </label>
+              <label className="human-label">Max emergency contacts per account</label>
               <input
                 type="number"
                 value={config.maxContacts}
                 disabled
-                className="w-full px-4 py-3 rounded-xl bg-zinc-100 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 text-xs text-zinc-400 dark:text-zinc-500 cursor-not-allowed font-mono"
+                className="human-input opacity-60 cursor-not-allowed font-mono tabular-nums"
               />
-              <span className="text-[10px] text-zinc-500 mt-1 block">Safety protocol standard: 5 contacts.</span>
+              <span className="text-xs text-[#737373] dark:text-[#85858b] mt-1.5 block">
+                Protocol limit fixed at 5 contacts.
+              </span>
             </div>
 
-            <div className="space-y-3 pt-4">
+            <div className="space-y-3 pt-6">
               <label className="flex items-center gap-3 cursor-pointer">
                 <input
                   type="checkbox"
                   checked={config.autoAlertPolice}
                   onChange={(e) => setConfig({ ...config, autoAlertPolice: e.target.checked })}
-                  className="w-4 h-4 rounded text-rose-600 bg-white dark:bg-zinc-900 border-zinc-300 dark:border-zinc-700 focus:ring-rose-500"
+                  className="w-4 h-4 rounded accent-[#e11d48]"
                 />
-                <span className="text-xs text-zinc-700 dark:text-zinc-300 font-medium">Auto-dispatch to 999 on Critical SOS</span>
+                <span className="text-xs text-[#171717] dark:text-[#ededed] font-medium">
+                  Auto-route critical SOS to 999
+                </span>
               </label>
 
               <label className="flex items-center gap-3 cursor-pointer">
@@ -107,20 +101,19 @@ const AdminSettings = () => {
                   type="checkbox"
                   checked={config.highPrioritySiren}
                   onChange={(e) => setConfig({ ...config, highPrioritySiren: e.target.checked })}
-                  className="w-4 h-4 rounded text-rose-600 bg-white dark:bg-zinc-900 border-zinc-300 dark:border-zinc-700 focus:ring-rose-500"
+                  className="w-4 h-4 rounded accent-[#e11d48]"
                 />
-                <span className="text-xs text-zinc-700 dark:text-zinc-300 font-medium">Enable high-priority audible alarms</span>
+                <span className="text-xs text-[#171717] dark:text-[#ededed] font-medium">
+                  Enable audible alert prompts
+                </span>
               </label>
             </div>
           </div>
         </div>
 
-        <div className="pt-4 border-t border-zinc-200 dark:border-zinc-800 flex justify-end">
-          <button
-            type="submit"
-            className="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-500 hover:to-rose-600 text-white font-bold text-xs uppercase tracking-wider font-mono flex items-center gap-2 shadow-lg shadow-rose-600/30 transition"
-          >
-            <FiSave /> Save System Configuration
+        <div className="pt-4 border-t border-zinc-900/[0.08] dark:border-white/[0.08] flex justify-end">
+          <button type="submit" className="btn-solid h-10 px-5 text-xs">
+            <FiSave className="w-4 h-4 dispatch-icon" /> Save configuration
           </button>
         </div>
       </form>

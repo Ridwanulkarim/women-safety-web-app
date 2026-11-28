@@ -1,6 +1,5 @@
 import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { FiAlertTriangle, FiVolume2, FiVolumeX, FiXCircle, FiSend, FiMapPin, FiShield } from 'react-icons/fi';
+import { FiAlertTriangle, FiVolumeX, FiXCircle, FiSend, FiMapPin, FiShield } from 'react-icons/fi';
 import { useVoiceSOS } from '../../context/VoiceSOSContext';
 import { useGeolocation } from '../../hooks/useGeolocation';
 import { useLanguage } from '../../context/LanguageContext';
@@ -26,136 +25,122 @@ const VoiceSOSAlarmModal = () => {
   const isCountdownActive = countdown > 0;
 
   return (
-    <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-xl overflow-y-auto animate-fade-in font-sans">
-        
-        {/* Pulsing red alarm ambient backlight */}
-        <div className="absolute inset-0 bg-rose-600/20 animate-pulse pointer-events-none"></div>
-
-        <motion.div
-          initial={{ scale: 0.9, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 0.9, opacity: 0 }}
-          className="relative max-w-lg w-full bg-[#0e0e14] border-2 border-rose-500 rounded-3xl p-6 sm:p-8 text-center space-y-6 shadow-2xl shadow-rose-900/50 text-white z-10"
-        >
-          {/* Header Siren Badge */}
-          <div className="space-y-3">
-            <div className="relative inline-flex items-center justify-center">
-              <div className="w-20 h-20 rounded-full bg-rose-500/20 animate-ping absolute"></div>
-              <div className="w-20 h-20 rounded-full bg-rose-600 text-white flex items-center justify-center text-3xl shadow-xl shadow-rose-600/50 relative z-10">
-                <FiAlertTriangle className="animate-bounce" />
-              </div>
-            </div>
-
-            <div>
-              <span className="mono-tag mono-tag-rose text-xs px-3 py-1">
-                <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping"></span>
-                {isBn ? 'এআই ভয়েস বিপদ সংকেত শনাক্ত' : 'AI VOICE DISTRESS DETECTED'}
-              </span>
-              <h2 className="text-2xl sm:text-3xl font-extrabold font-heading text-white tracking-tight mt-2">
-                {isBn ? 'ভয়েস এসওএস এলার্ট সক্রিয়!' : 'Voice SOS Alert Triggered!'}
-              </h2>
-              <p className="text-xs sm:text-sm text-zinc-300 max-w-sm mx-auto mt-1">
-                {isBn ? 'আপনার মুখে উচ্চারিত বিপদ সংকেত শনাক্ত করা হয়েছে।' : 'A distress keyword has been detected via hands-free listener.'}
-              </p>
-            </div>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 overflow-y-auto">
+      <div className="relative max-w-lg w-full bg-[#19191b] border border-[#dc2626] rounded-2xl p-6 sm:p-8 text-center space-y-6 text-[#ededed] shadow-xl">
+        <div className="space-y-3">
+          <div className="w-12 h-12 mx-auto rounded-xl bg-[#dc2626] text-white flex items-center justify-center">
+            <FiAlertTriangle className="w-6 h-6 dispatch-icon" />
           </div>
 
-          {/* Detected Keyword Highlight Box */}
-          <div className="p-4 rounded-2xl bg-zinc-900/90 border border-zinc-800 text-left space-y-2">
-            <div className="flex items-center justify-between text-xs font-mono">
-              <span className="text-zinc-400">{isBn ? 'শনাক্তকৃত কীওয়ার্ড (Keyword):' : 'Detected Distress Keyword:'}</span>
-              <span className="text-rose-400 font-bold uppercase tracking-wider">
-                {isBn ? '১০০% নিশ্চিত' : 'MATCHED 100%'}
-              </span>
-            </div>
-            <div className="text-xl sm:text-2xl font-black text-rose-500 font-heading">
-              "{lastDetectedPhrase || (isBn ? 'বাঁচাও / Help' : 'Help / Emergency')}"
-            </div>
-            {location && location.latitude && (
-              <div className="flex items-center gap-1.5 text-[11px] text-zinc-400 font-mono pt-1 border-t border-zinc-800/80">
-                <FiMapPin className="text-rose-500 shrink-0" />
-                <span className="truncate">{location.address || (isBn ? `${toBengaliDigits(location.latitude.toFixed(4))}° উত্তর, ${toBengaliDigits(location.longitude.toFixed(4))}° পূর্ব` : `${location.latitude.toFixed(4)}° N, ${location.longitude.toFixed(4)}° E`)}</span>
-              </div>
-            )}
+          <div className="space-y-1">
+            <span className="status-tag mono-tag-rose">
+              {isBn ? 'ভয়েস বিপদ সংকেত শনাক্ত' : 'Voice distress detected'}
+            </span>
+            <h2 className="text-2xl font-medium tracking-[-0.02em] text-[#ededed]">
+              {isBn ? 'ভয়েস এসওএস এলার্ট সক্রিয়' : 'Voice SOS alert active'}
+            </h2>
+            <p className="text-sm text-[#a1a1a6]">
+              {isBn ? 'আপনার মুখে উচ্চারিত বিপদ সংকেত শনাক্ত হয়েছে।' : 'A distress phrase was recognized by hands-free listener.'}
+            </p>
           </div>
+        </div>
 
-          {/* Dynamic Countdown Circle or Dispatched Status */}
-          {isCountdownActive ? (
-            <div className="space-y-3">
-              <div className="relative flex items-center justify-center">
-                <div className="w-24 h-24 rounded-full border-4 border-rose-500/30 flex items-center justify-center">
-                  <span className="text-5xl font-black font-heading text-rose-500 animate-pulse">
-                    {localizeNum(countdown, isBn)}
-                  </span>
-                </div>
-              </div>
-              <p className="text-xs text-zinc-400 font-mono">
-                {isBn
-                  ? <>স্বয়ংক্রিয়ভাবে জিপিএস ব্রডকাস্ট হতে <span className="text-rose-400 font-bold">{toBengaliDigits(countdown)} সেকেন্ড</span> বাকি</>
-                  : <>Broadcasting live GPS SOS in <span className="text-rose-400 font-bold">{countdown} seconds</span></>}
-              </p>
-            </div>
-          ) : (
-            <div className="p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-mono flex items-center justify-center gap-2">
-              <FiShield className="text-base shrink-0" />
-              <span>{isBn ? 'লাইভ জিপিএস লোকেশন ও এসওএস ব্রডকাস্ট সফলভাবে পাঠানো হয়েছে!' : 'Live GPS location & SOS alert broadcasted successfully!'}</span>
+        {/* Detected Phrase */}
+        <div className="p-4 rounded-xl bg-[#141415] border border-white/[0.08] text-left space-y-2">
+          <div className="flex items-center justify-between text-xs">
+            <span className="text-[#85858b]">{isBn ? 'শনাক্তকৃত শব্দ' : 'Matched phrase'}</span>
+            <span className="text-[#fb7185] font-mono tabular-nums font-medium">
+              {isBn ? 'নিশ্চিত' : 'Matched'}
+            </span>
+          </div>
+          <div className="text-xl font-medium text-[#ededed]">
+            "{lastDetectedPhrase || (isBn ? 'বাঁচাও' : 'Help')}"
+          </div>
+          {location && location.latitude && (
+            <div className="flex items-center gap-1.5 text-xs text-[#a1a1a6] font-mono tabular-nums pt-2 border-t border-white/[0.08]">
+              <FiMapPin className="w-4 h-4 text-[#e11d48] shrink-0 dispatch-icon" />
+              <span className="truncate">
+                {location.address ||
+                  (isBn
+                    ? `${toBengaliDigits(location.latitude.toFixed(4))}° উত্তর · ${toBengaliDigits(location.longitude.toFixed(4))}° পূর্ব`
+                    : `${location.latitude.toFixed(4)}° N · ${location.longitude.toFixed(4)}° E`)}
+              </span>
             </div>
           )}
+        </div>
 
-          {/* Action Buttons */}
-          <div className="space-y-3 pt-2">
-            {isCountdownActive ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <button
-                  type="button"
-                  onClick={cancelEmergencyCountdown}
-                  className="w-full py-3.5 px-4 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 font-bold text-xs uppercase font-mono tracking-wider flex items-center justify-center gap-2 border border-zinc-700 transition active:scale-95 cursor-pointer"
-                >
-                  <FiXCircle className="text-base text-zinc-400" />
-                  {isBn ? 'বাতিল করুন (ভুল এলার্ম)' : 'Cancel (False Alarm)'}
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => triggerImmediateSOS(lastDetectedPhrase)}
-                  className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-500 hover:to-rose-600 text-white font-bold text-xs uppercase font-mono tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-rose-600/40 transition active:scale-95 cursor-pointer"
-                >
-                  <FiSend className="text-base" />
-                  {isBn ? 'এখনই পাঠান (এসওএস)' : 'Send SOS Now'}
-                </button>
-              </div>
-            ) : (
-              <div className="flex flex-col sm:flex-row gap-3">
-                {isSirenPlaying && (
-                  <button
-                    type="button"
-                    onClick={stopSirenAudio}
-                    className="flex-1 py-3 px-4 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 font-bold text-xs font-mono uppercase flex items-center justify-center gap-2 border border-zinc-700"
-                  >
-                    <FiVolumeX /> {isBn ? 'সাইরেন বন্ধ করুন' : 'Mute Siren'}
-                  </button>
-                )}
-                <button
-                  type="button"
-                  onClick={cancelEmergencyCountdown}
-                  className="flex-1 py-3 px-4 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs font-mono uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg"
-                >
-                  <FiShield /> {isBn ? 'উইন্ডো বন্ধ করুন' : 'Dismiss'}
-                </button>
-              </div>
-            )}
+        {/* Countdown or Dispatched Status */}
+        {isCountdownActive ? (
+          <div className="space-y-2">
+            <div className="w-20 h-20 mx-auto rounded-full border-2 border-[#dc2626] bg-[#141415] flex items-center justify-center">
+              <span className="text-4xl font-mono tabular-nums font-medium text-[#e5484d]">
+                {localizeNum(countdown, isBn)}
+              </span>
+            </div>
+            <p className="text-xs text-[#a1a1a6] font-mono tabular-nums">
+              {isBn
+                ? `জিপিএস ব্রডকাস্ট হতে ${toBengaliDigits(countdown)} সেকেন্ড বাকি`
+                : `Sending GPS SOS in ${countdown}s`}
+            </p>
           </div>
+        ) : (
+          <div className="p-3.5 rounded-lg bg-[#4cc38a]/10 border border-[#4cc38a]/25 text-[#4cc38a] text-xs font-medium flex items-center justify-center gap-2">
+            <FiShield className="w-4 h-4 shrink-0 dispatch-icon" />
+            <span>{isBn ? 'লাইভ জিপিএস লোকেশন ও এসওএস পাঠানো হয়েছে' : 'Live GPS location and SOS dispatched'}</span>
+          </div>
+        )}
 
-          <p className="text-[10px] text-zinc-500 font-mono">
-            {isBn
-              ? "ভুলবশত এই মোড ট্রিগার হয়ে থাকলে 'বাতিল করুন' চাপুন। ৫ সেকেন্ডের মধ্যে কোনো বাটন না চাপলে এটি স্বয়ংক্রিয়ভাবে জরুরি সাহায্যকারীদের কল ও এসএমএস পাঠাবে।"
-              : "If triggered by mistake, tap 'Cancel'. After 5 seconds, an emergency broadcast will automatically be transmitted."}
-          </p>
+        {/* Controls */}
+        <div className="space-y-3">
+          {isCountdownActive ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={cancelEmergencyCountdown}
+                className="btn-outline h-11 text-xs"
+              >
+                <FiXCircle className="w-4 h-4 dispatch-icon" />
+                {isBn ? 'বাতিল করুন' : 'Cancel broadcast'}
+              </button>
 
-        </motion.div>
+              <button
+                type="button"
+                onClick={() => triggerImmediateSOS(lastDetectedPhrase)}
+                className="btn-danger h-11 text-xs"
+              >
+                <FiSend className="w-4 h-4 dispatch-icon" />
+                {isBn ? 'এখনই পাঠান' : 'Send SOS now'}
+              </button>
+            </div>
+          ) : (
+            <div className="flex flex-col sm:flex-row gap-3">
+              {isSirenPlaying && (
+                <button
+                  type="button"
+                  onClick={stopSirenAudio}
+                  className="btn-outline flex-1 h-11 text-xs"
+                >
+                  <FiVolumeX className="w-4 h-4 dispatch-icon" /> {isBn ? 'সাইরেন থামান' : 'Mute siren'}
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={cancelEmergencyCountdown}
+                className="btn-danger flex-1 h-11 text-xs"
+              >
+                <FiShield className="w-4 h-4 dispatch-icon" /> {isBn ? 'বন্ধ করুন' : 'Dismiss'}
+              </button>
+            </div>
+          )}
+        </div>
+
+        <p className="text-xs text-[#85858b]">
+          {isBn
+            ? "ভুলবশত চালু হলে 'বাতিল করুন' চাপুন, অন্যথায় ৫ সেকেন্ড পর স্বয়ংক্রিয়ভাবে বার্তা পাঠানো হবে।"
+            : "Tap 'Cancel broadcast' if triggered accidentally, or dispatch runs automatically in 5 seconds."}
+        </p>
       </div>
-    </AnimatePresence>
+    </div>
   );
 };
 

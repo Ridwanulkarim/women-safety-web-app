@@ -8,7 +8,7 @@ export const ProtectedRoute = ({ children }) => {
   const location = useLocation();
 
   if (loading) {
-    return <LoadingSpinner message="Verifying session security..." />;
+    return <LoadingSpinner message="Checking session" />;
   }
 
   if (!user) {
@@ -23,19 +23,16 @@ export const AdminRoute = ({ children }) => {
   const location = useLocation();
 
   if (loading) {
-    return <LoadingSpinner message="Verifying administrator credentials..." />;
+    return <LoadingSpinner message="Checking administrator access" />;
   }
 
-  // If not logged in, direct to dedicated admin login
   if (!user) {
     return <Navigate to="/admin/login" state={{ from: location }} replace />;
   }
 
-  // If logged in as regular user, block access and return to user dashboard
   if (!isAdmin) {
     return <Navigate to="/dashboard" replace />;
   }
 
-  // Authenticated administrator has access
   return children;
 };

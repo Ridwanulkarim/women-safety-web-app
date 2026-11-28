@@ -6,7 +6,7 @@ import api from '../../services/api';
 const VerifyEmail = () => {
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
-  const [status, setStatus] = useState('verifying'); // 'verifying' | 'success' | 'error'
+  const [status, setStatus] = useState('verifying');
   const [message, setMessage] = useState('');
 
   useEffect(() => {
@@ -20,7 +20,7 @@ const VerifyEmail = () => {
       try {
         const res = await api.post('/auth/verify-email', { token });
         setStatus('success');
-        setMessage(res.data?.message || 'Email verified successfully!');
+        setMessage(res.data?.message || 'Email verified.');
       } catch (err) {
         setStatus('error');
         setMessage(err.response?.data?.message || 'Verification failed or token expired.');
@@ -31,46 +31,42 @@ const VerifyEmail = () => {
   }, [token]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6 bg-zinc-900 text-white">
-      <div className="max-w-md w-full glass-card p-8 rounded-3xl text-center space-y-6">
+    <div className="min-h-screen flex items-center justify-center p-6 bg-[#fafafa] dark:bg-[#141415] text-[#171717] dark:text-[#ededed]">
+      <div className="max-w-md w-full surface-panel p-8 text-center space-y-5">
         {status === 'verifying' && (
           <>
-            <div className="w-16 h-16 mx-auto bg-pink-500/20 text-pink-500 rounded-full flex items-center justify-center text-3xl animate-spin">
-              <FiLoader />
+            <div className="w-10 h-10 mx-auto rounded-lg bg-[#f4f4f5] dark:bg-[#232325] text-[#525252] dark:text-[#a1a1a6] flex items-center justify-center">
+              <FiLoader className="w-5 h-5 dispatch-icon animate-spin" />
             </div>
-            <h2 className="text-2xl font-bold font-heading">Verifying Your Email</h2>
-            <p className="text-sm text-slate-400">Please wait while we validate your security verification token...</p>
+            <h1 className="text-xl font-medium">Verifying your email</h1>
+            <p className="text-sm text-[#525252] dark:text-[#a1a1a6]">
+              Validating your security token
+            </p>
           </>
         )}
 
         {status === 'success' && (
           <>
-            <div className="w-16 h-16 mx-auto bg-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center text-3xl">
-              <FiCheckCircle />
+            <div className="w-10 h-10 mx-auto rounded-lg bg-emerald-500/10 text-[#16a34a] dark:text-[#4cc38a] flex items-center justify-center">
+              <FiCheckCircle className="w-5 h-5 dispatch-icon" />
             </div>
-            <h2 className="text-2xl font-bold font-heading text-emerald-400">Email Verified!</h2>
-            <p className="text-sm text-slate-300">{message}</p>
-            <Link
-              to="/login"
-              className="inline-block w-full py-3 bg-pink-600 hover:bg-pink-700 rounded-xl font-semibold transition"
-            >
-              Proceed to Login
+            <h1 className="text-xl font-medium">Email verified</h1>
+            <p className="text-sm text-[#525252] dark:text-[#a1a1a6]">{message}</p>
+            <Link to="/login" className="btn-solid w-full h-11 text-sm">
+              Continue to sign in
             </Link>
           </>
         )}
 
         {status === 'error' && (
           <>
-            <div className="w-16 h-16 mx-auto bg-rose-500/20 text-rose-500 rounded-full flex items-center justify-center text-3xl">
-              <FiXCircle />
+            <div className="w-10 h-10 mx-auto rounded-lg bg-[#dc2626]/10 text-[#dc2626] dark:text-[#e5484d] flex items-center justify-center">
+              <FiXCircle className="w-5 h-5 dispatch-icon" />
             </div>
-            <h2 className="text-2xl font-bold font-heading text-rose-500">Verification Failed</h2>
-            <p className="text-sm text-slate-400">{message}</p>
-            <Link
-              to="/login"
-              className="inline-block w-full py-3 bg-zinc-800 hover:bg-zinc-700 rounded-xl font-semibold transition text-slate-200"
-            >
-              Return to Login
+            <h1 className="text-xl font-medium">Verification failed</h1>
+            <p className="text-sm text-[#525252] dark:text-[#a1a1a6]">{message}</p>
+            <Link to="/login" className="btn-outline w-full h-11 text-sm">
+              Return to sign in
             </Link>
           </>
         )}

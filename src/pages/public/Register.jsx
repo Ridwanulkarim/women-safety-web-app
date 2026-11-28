@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { FiShield, FiUser, FiMail, FiLock, FiEye, FiEyeOff, FiCheckCircle, FiActivity } from 'react-icons/fi';
+import { FiUser, FiMail, FiLock, FiEye, FiEyeOff, FiCheckCircle, FiActivity } from 'react-icons/fi';
 import { FcGoogle } from 'react-icons/fc';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
+import BrandMark from '../../components/common/BrandMark';
 
 const Register = () => {
   const { registerUser, loginWithGoogle } = useAuth();
@@ -22,7 +23,7 @@ const Register = () => {
       await registerUser(data.email, data.password, data.fullName);
       navigate('/dashboard', { replace: true });
     } catch (e) {
-      // toast shown in AuthContext
+      // toast handled in AuthContext
     } finally {
       setLoading(false);
     }
@@ -34,62 +35,58 @@ const Register = () => {
       await loginWithGoogle();
       navigate('/dashboard', { replace: true });
     } catch (e) {
-      // toast shown in AuthContext
+      // toast handled in AuthContext
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="w-full flex items-center justify-center p-2 sm:p-4 font-sans">
-      <div className="max-w-4xl w-full grid grid-cols-1 lg:grid-cols-12 rounded-3xl overflow-hidden shadow-2xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-[#121215]">
-        
-        {/* Left Side: Modern Visual Security Banner (Desktop) */}
-        <div className="hidden lg:flex lg:col-span-5 bg-gradient-to-br from-zinc-900 via-[#18181b] to-rose-950 p-8 flex-col justify-between relative overflow-hidden text-white">
-          <div className="absolute -top-16 -left-16 w-56 h-56 bg-rose-600/20 rounded-full blur-3xl pointer-events-none"></div>
-          <div className="absolute -bottom-16 -right-16 w-56 h-56 bg-rose-500/20 rounded-full blur-3xl pointer-events-none"></div>
+    <div className="w-full flex items-center justify-center p-2 sm:p-4">
+      <div className="max-w-4xl w-full grid grid-cols-1 lg:grid-cols-12 surface-panel overflow-hidden">
+        {/* Left: Summary Panel */}
+        <div className="hidden lg:flex lg:col-span-5 bg-[#0f0f10] text-[#ededed] p-8 flex-col justify-between border-r border-white/[0.08]">
+          <div className="space-y-5">
+            <BrandMark name={t('nav.brandName')} subtitle={isBn ? 'অ্যাকাউন্ট নিবন্ধন' : 'Account setup'} inverted />
 
-          <div className="relative z-10 space-y-4">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs font-mono font-bold uppercase tracking-wider">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> {isBn ? 'বিনামূল্যে তাৎক্ষণিক নিবন্ধন' : 'Free Instant Registration'}
+            <div className="space-y-3 pt-4">
+              <h2 className="text-2xl font-medium tracking-[-0.02em] leading-snug text-[#ededed]">
+                {isBn ? 'জাতীয় জরুরি নিরাপত্তা নেটওয়ার্কে যুক্ত হোন' : 'Set up your personal emergency network'}
+              </h2>
+              <p className="text-sm text-[#a1a1a6] leading-relaxed">
+                {isBn
+                  ? 'কয়েক সেকেন্ডে অ্যাকাউন্ট তৈরি করে আপনার এসওএস প্যানিক ট্রিগার, পরিচিতি তালিকা ও প্রমাণ সংরক্ষণাগার সক্রিয় করুন।'
+                  : 'Create an account to link up to five emergency contacts, enable voice SOS alerts, and save timestamped evidence.'}
+              </p>
             </div>
-            <h3 className="text-2xl font-extrabold font-heading leading-tight tracking-tight">
-              {isBn ? 'যুক্ত হোন ২৪/৭ জাতীয় জরুরি নিরাপত্তা নেটওয়ার্কে' : 'Join the 24/7 National Emergency Safety Network'}
-            </h3>
-            <p className="text-xs text-zinc-400 leading-relaxed font-sans">
-              {isBn
-                ? 'কয়েক সেকেন্ডে অ্যাকাউন্ট তৈরি করুন এবং আপনার পার্সোনাল এসওএস প্যানিক বিকন ও এভিডেন্স লকার সক্রিয় করুন।'
-                : 'Create your account in seconds to activate your personal SOS panic beacon, set up speed-dial emergency contacts, and protect your digital evidence.'}
-            </p>
           </div>
 
-          <div className="relative z-10 space-y-3 pt-6 border-t border-zinc-800">
-            <div className="flex items-center gap-2.5 text-xs text-zinc-300 font-medium">
-              <FiCheckCircle className="text-emerald-400 text-sm flex-shrink-0" />
-              <span>{isBn ? 'সর্বোচ্চ ৫ জন জরুরি পরিচিতি সংরক্ষণ' : 'Up to 5 Priority Emergency Contacts'}</span>
+          <div className="space-y-3 pt-6 border-t border-white/[0.08] text-xs text-[#a1a1a6]">
+            <div className="flex items-center gap-2.5">
+              <FiCheckCircle className="w-4 h-4 text-[#4cc38a] dispatch-icon shrink-0" />
+              <span>{isBn ? 'সর্বোচ্চ ৫ জন জরুরি পরিচিতি সংরক্ষণ' : 'Up to 5 priority emergency contacts'}</span>
             </div>
-            <div className="flex items-center gap-2.5 text-xs text-zinc-300 font-medium">
-              <FiCheckCircle className="text-emerald-400 text-sm flex-shrink-0" />
-              <span>{isBn ? 'সার্বক্ষণিক জিপিএস ব্রডকাস্টিং ব্যবস্থা' : 'Free 24/7 Geolocation Broadcasting'}</span>
+            <div className="flex items-center gap-2.5">
+              <FiCheckCircle className="w-4 h-4 text-[#4cc38a] dispatch-icon shrink-0" />
+              <span>{isBn ? 'সার্বক্ষণিক জিপিএস ব্রডকাস্ট সুবিধা' : 'Live hardware GPS dispatch'}</span>
             </div>
-            <div className="flex items-center gap-2.5 text-xs text-zinc-300 font-medium">
-              <FiCheckCircle className="text-emerald-400 text-sm flex-shrink-0" />
-              <span>{isBn ? 'এনক্রিপ্টেড ডিজিটাল এভিডেন্স ভল্ট' : 'Encrypted Evidence Locker Vault'}</span>
+            <div className="flex items-center gap-2.5">
+              <FiCheckCircle className="w-4 h-4 text-[#4cc38a] dispatch-icon shrink-0" />
+              <span>{isBn ? 'এনক্রিপ্টেড ডিজিটাল এভিডেন্স লকার' : 'SHA-256 verifiable evidence locker'}</span>
             </div>
           </div>
         </div>
 
-        {/* Right Side: Registration Form */}
+        {/* Right: Registration Form */}
         <div className="lg:col-span-7 p-6 sm:p-10 space-y-6 flex flex-col justify-center">
-          
-          <div className="text-center sm:text-left space-y-1.5">
-            <div className="w-10 h-10 rounded-2xl bg-rose-600 text-white flex items-center justify-center text-xl shadow-lg shadow-rose-600/30 mb-3 sm:mb-2 inline-flex lg:flex">
-              <FiShield />
+          <div className="space-y-1.5">
+            <div className="lg:hidden mb-3">
+              <BrandMark name={t('nav.brandName')} />
             </div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold font-heading text-zinc-900 dark:text-white tracking-tight">
+            <h1 className="text-2xl font-medium tracking-[-0.02em] text-[#171717] dark:text-[#ededed]">
               {t('auth.registerTitle')}
-            </h2>
-            <p className="text-xs text-zinc-500 dark:text-zinc-400">
+            </h1>
+            <p className="text-sm text-[#525252] dark:text-[#a1a1a6]">
               {t('auth.registerSub')}
             </p>
           </div>
@@ -98,15 +95,16 @@ const Register = () => {
             type="button"
             onClick={handleGoogleSignIn}
             disabled={loading}
-            className="w-full py-2.5 px-4 rounded-xl bg-zinc-50 dark:bg-zinc-900/90 border border-zinc-200 dark:border-zinc-700/80 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 font-semibold text-xs flex items-center justify-center gap-3 transition-all duration-200 shadow-xs min-h-[44px] active:scale-[0.99]"
+            className="w-full btn-outline h-11 text-sm"
           >
-            <FcGoogle className="text-lg flex-shrink-0" /> {t('auth.googleContinue')}
+            <FcGoogle className="text-base shrink-0" />
+            <span>{t('auth.googleContinue')}</span>
           </button>
 
           <div className="relative flex items-center justify-center">
-            <div className="border-t border-zinc-200 dark:border-zinc-800 w-full"></div>
-            <span className="absolute bg-white dark:bg-[#121215] px-3 text-[10px] text-zinc-400 uppercase tracking-widest font-mono font-bold">
-              {isBn ? 'অথবা তথ্য দিয়ে অ্যাকাউন্ট খুলুন' : 'Or fill registration details'}
+            <div className="border-t border-zinc-900/[0.08] dark:border-white/[0.08] w-full"></div>
+            <span className="absolute bg-[#ffffff] dark:bg-[#19191b] px-3 text-xs text-[#737373] dark:text-[#85858b]">
+              {isBn ? 'অথবা তথ্য দিয়ে তৈরি করুন' : 'Or register with email'}
             </span>
           </div>
 
@@ -114,7 +112,7 @@ const Register = () => {
             <div>
               <label className="human-label">{t('auth.fullNameLabel')}</label>
               <div className="relative">
-                <FiUser className="absolute left-3.5 top-3.5 text-zinc-400 text-sm" />
+                <FiUser className="w-4 h-4 absolute left-3 top-3 text-[#737373] dark:text-[#85858b] dispatch-icon" />
                 <input
                   type="text"
                   placeholder={t('auth.fullNamePlaceholder')}
@@ -122,13 +120,13 @@ const Register = () => {
                   className={`human-input human-input-has-icon ${errors.fullName ? 'human-input-error' : ''}`}
                 />
               </div>
-              {errors.fullName && <p className="text-[11px] font-medium text-rose-500 mt-1">{errors.fullName.message}</p>}
+              {errors.fullName && <p className="text-xs text-[#dc2626] dark:text-[#e5484d] mt-1">{errors.fullName.message}</p>}
             </div>
 
             <div>
               <label className="human-label">{t('auth.emailLabel')}</label>
               <div className="relative">
-                <FiMail className="absolute left-3.5 top-3.5 text-zinc-400 text-sm" />
+                <FiMail className="w-4 h-4 absolute left-3 top-3 text-[#737373] dark:text-[#85858b] dispatch-icon" />
                 <input
                   type="email"
                   placeholder={t('auth.emailPlaceholder')}
@@ -136,39 +134,42 @@ const Register = () => {
                   className={`human-input human-input-has-icon ${errors.email ? 'human-input-error' : ''}`}
                 />
               </div>
-              {errors.email && <p className="text-[11px] font-medium text-rose-500 mt-1">{errors.email.message}</p>}
+              {errors.email && <p className="text-xs text-[#dc2626] dark:text-[#e5484d] mt-1">{errors.email.message}</p>}
             </div>
 
             <div>
               <label className="human-label">{t('auth.passwordLabel')}</label>
               <div className="relative">
-                <FiLock className="absolute left-3.5 top-3.5 text-zinc-400 text-sm" />
+                <FiLock className="w-4 h-4 absolute left-3 top-3 text-[#737373] dark:text-[#85858b] dispatch-icon" />
                 <input
-                  type={showPassword ? "text" : "password"}
+                  type={showPassword ? 'text' : 'password'}
                   placeholder={isBn ? 'কমপক্ষে ৬ অক্ষরের পাসওয়ার্ড' : 'Minimum 6 characters'}
-                  {...register('password', { required: isBn ? 'পাসওয়ার্ড আবশ্যক' : 'Password is required', minLength: { value: 6, message: isBn ? 'কমপক্ষে ৬ অক্ষর হতে হবে' : 'Min 6 chars' } })}
+                  {...register('password', {
+                    required: isBn ? 'পাসওয়ার্ড আবশ্যক' : 'Password is required',
+                    minLength: { value: 6, message: isBn ? 'কমপক্ষে ৬ অক্ষর হতে হবে' : 'Minimum 6 characters' }
+                  })}
                   className={`human-input human-input-has-icon pr-10 ${errors.password ? 'human-input-error' : ''}`}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3.5 top-3.5 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 text-sm transition"
+                  className="absolute right-3 top-3 text-[#737373] dark:text-[#85858b] hover:text-[#171717] dark:hover:text-[#ededed] transition-colors cursor-pointer"
                   title={showPassword ? (isBn ? 'লুকান' : 'Hide password') : (isBn ? 'দেখুন' : 'Show password')}
                 >
-                  {showPassword ? <FiEyeOff /> : <FiEye />}
+                  {showPassword ? <FiEyeOff className="w-4 h-4 dispatch-icon" /> : <FiEye className="w-4 h-4 dispatch-icon" />}
                 </button>
               </div>
-              {errors.password && <p className="text-[11px] font-medium text-rose-500 mt-1">{errors.password.message}</p>}
+              {errors.password && <p className="text-xs text-[#dc2626] dark:text-[#e5484d] mt-1">{errors.password.message}</p>}
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full btn-danger py-3 text-xs font-mono font-bold uppercase tracking-wider shadow-lg shadow-rose-600/25 active:scale-[0.99] transition-all"
+              className="w-full btn-solid h-11 text-sm"
             >
               {loading ? (
                 <span className="flex items-center justify-center gap-2">
-                  <FiActivity className="animate-spin text-sm" /> {t('auth.creatingAccount')}
+                  <FiActivity className="w-4 h-4 animate-spin dispatch-icon" /> {t('auth.creatingAccount')}
                 </span>
               ) : (
                 t('auth.registerBtn')
@@ -176,13 +177,12 @@ const Register = () => {
             </button>
           </form>
 
-          <p className="text-center text-xs text-zinc-500 dark:text-zinc-400">
+          <p className="text-center text-xs text-[#525252] dark:text-[#a1a1a6]">
             {t('auth.alreadyRegistered')}{' '}
-            <Link to="/login" className="font-bold text-rose-600 dark:text-rose-400 hover:underline">
+            <Link to="/login" className="font-medium text-[#e11d48] dark:text-[#fb7185] hover:underline">
               {t('auth.signInHere')}
             </Link>
           </p>
-
         </div>
       </div>
     </div>

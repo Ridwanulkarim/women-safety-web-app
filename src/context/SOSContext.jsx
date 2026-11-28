@@ -232,9 +232,9 @@ export const SOSProvider = ({ children }) => {
 
       const count = Array.isArray(sosRecord.contactsAlerted) ? sosRecord.contactsAlerted.length : savedContacts.length;
       if (count > 0) {
-        toast.error(`🚨 SOS EMERGENCY BROADCAST SENT! ${count} saved emergency contact(s) notified.`, { duration: 6000 });
+        toast.error(`SOS broadcast sent. ${count} saved emergency contact(s) notified.`, { duration: 6000 });
       } else {
-        toast.error('🚨 SOS EMERGENCY BROADCAST SENT! (No emergency contacts saved yet).', { duration: 6000 });
+        toast.error('SOS broadcast sent.', { duration: 6000 });
       }
 
       return sosRecord;
@@ -256,7 +256,7 @@ export const SOSProvider = ({ children }) => {
       setActiveSOSData(fallbackRecord);
       setSosHistory(prev => [fallbackRecord, ...(Array.isArray(prev) ? prev : [])]);
       await saveGlobalSOSAlert(fallbackRecord);
-      toast.error('🚨 SOS EMERGENCY BROADCAST SAVED TO CLOUD FIRESTORE!', { duration: 6000 });
+      toast.error('SOS broadcast saved to Firestore.', { duration: 6000 });
       return fallbackRecord;
     }
   };

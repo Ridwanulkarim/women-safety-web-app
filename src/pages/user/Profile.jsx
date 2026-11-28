@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
-import { FiUser, FiMail, FiPhone, FiMapPin, FiSave, FiCheckCircle, FiCalendar, FiLogOut } from 'react-icons/fi';
+import { FiUser, FiMail, FiPhone, FiSave, FiCheckCircle, FiCalendar, FiLogOut } from 'react-icons/fi';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
 import ProfilePictureUpload from '../../components/profile/ProfilePictureUpload';
@@ -65,42 +65,37 @@ const Profile = () => {
       const res = await api.put('/users/profile', data);
       const updated = res.data?.data || data;
       updateUserProfile(updated);
-      toast.success(isBn ? 'প্রোফাইল সফলভাবে আপডেট হয়েছে!' : 'Profile updated successfully!');
+      toast.success(isBn ? 'প্রোফাইল আপডেট হয়েছে' : 'Profile updated');
     } catch (error) {
       updateUserProfile(data);
-      toast.success(isBn ? 'প্রোফাইল লোকাল স্টোরেজে সংরক্ষিত হয়েছে!' : 'Profile updated locally!');
+      toast.success(isBn ? 'প্রোফাইল স্থানীয়ভাবে সংরক্ষিত হয়েছে' : 'Profile saved locally');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6 font-sans relative overflow-hidden">
-      {/* Ambient background glow */}
-      <div className="absolute top-0 right-1/4 w-80 h-80 bg-rose-600/10 rounded-full blur-3xl pointer-events-none"></div>
-
-      <div className="glass-card-xl p-6 sm:p-8 flex items-center justify-between gap-4 relative z-10">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <h1 className="text-xl sm:text-2xl font-extrabold font-heading text-zinc-900 dark:text-white">
-              {isBn ? 'প্রোফাইল সেটিংস' : 'Profile Settings'}
+    <div className="max-w-3xl mx-auto space-y-6">
+      <div className="surface-panel p-6 flex items-center justify-between gap-4">
+        <div className="space-y-1">
+          <div className="flex items-center gap-2.5">
+            <h1 className="text-2xl font-medium text-[#171717] dark:text-[#ededed]">
+              {isBn ? 'প্রোফাইল সেটিংস' : 'Profile'}
             </h1>
-            <span className="mono-tag mono-tag-emerald text-[10px]">
-              <FiCheckCircle /> {isBn ? 'যাচাইকৃত আইডি' : 'Verified ID'}
+            <span className="status-tag mono-tag-emerald">
+              <FiCheckCircle className="w-3.5 h-3.5 dispatch-icon" /> {isBn ? 'যাচাইকৃত' : 'Verified'}
             </span>
           </div>
-          <p className="text-xs text-zinc-500 dark:text-zinc-400">
-            {isBn ? 'আপনার জরুরি মেডিকেল তথ্য ও ব্যক্তিগত প্রোফাইল পরিচালনা করুন' : 'Manage your emergency medical identification & cloud avatar'}
+          <p className="text-sm text-[#525252] dark:text-[#a1a1a6]">
+            {isBn ? 'ব্যক্তিগত প্রোফাইল ও জরুরি পরিচিতি তথ্য পরিচালনা করুন' : 'Manage your personal profile and health details'}
           </p>
         </div>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="glass-card-xl p-6 sm:p-8 space-y-6 relative z-10">
-        
-        {/* Profile Picture Upload Component */}
-        <div className="border-b border-zinc-200/80 dark:border-zinc-800/80 pb-6">
+      <form onSubmit={handleSubmit(onSubmit)} className="surface-panel p-6 sm:p-8 space-y-6">
+        <div className="border-b border-zinc-900/[0.08] dark:border-white/[0.08] pb-6">
           <label className="human-label text-center mb-3">
-            {isBn ? 'প্রোফাইল ছবি' : 'Profile Picture (Firebase Storage)'}
+            {isBn ? 'প্রোফাইল ছবি' : 'Profile photo'}
           </label>
           <ProfilePictureUpload
             currentUrl={user?.profilePictureUrl || user?.profileImage}
@@ -111,12 +106,12 @@ const Profile = () => {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="human-label">{isBn ? 'পুরো নাম' : 'Full Name'}</label>
+            <label className="human-label">{isBn ? 'পুরো নাম' : 'Full name'}</label>
             <div className="relative">
-              <FiUser className="absolute left-3.5 top-3.5 text-zinc-400" />
+              <FiUser className="w-4 h-4 absolute left-3 top-3 text-[#737373] dark:text-[#85858b] dispatch-icon" />
               <input
                 type="text"
-                placeholder={isBn ? 'যেমন: আয়েশা রহমান' : 'Jane Doe'}
+                placeholder={isBn ? 'আয়েশা রহমান' : 'Ayesha Rahman'}
                 {...register('fullName', { required: isBn ? 'পুরো নাম আবশ্যক' : 'Full name is required' })}
                 className="human-input human-input-has-icon"
               />
@@ -124,33 +119,33 @@ const Profile = () => {
           </div>
 
           <div>
-            <label className="human-label">{isBn ? 'ইমেইল ঠিকানা (পরিবর্তনযোগ্য নয়)' : 'Email Address (Read-only)'}</label>
+            <label className="human-label">{isBn ? 'ইমেইল ঠিকানা (অপরিবর্তনীয়)' : 'Email address'}</label>
             <div className="relative">
-              <FiMail className="absolute left-3.5 top-3.5 text-zinc-400" />
+              <FiMail className="w-4 h-4 absolute left-3 top-3 text-[#737373] dark:text-[#85858b] dispatch-icon" />
               <input
                 type="email"
                 disabled
                 {...register('email')}
-                className="human-input human-input-has-icon opacity-60 bg-zinc-100 dark:bg-zinc-900 cursor-not-allowed font-mono"
+                className="human-input human-input-has-icon opacity-60 cursor-not-allowed font-mono"
               />
             </div>
           </div>
 
           <div>
-            <label className="human-label">{isBn ? 'ফোন নম্বর' : 'Phone Number'}</label>
+            <label className="human-label">{isBn ? 'ফোন নম্বর' : 'Phone number'}</label>
             <div className="relative">
-              <FiPhone className="absolute left-3.5 top-3.5 text-zinc-400" />
+              <FiPhone className="w-4 h-4 absolute left-3 top-3 text-[#737373] dark:text-[#85858b] dispatch-icon" />
               <input
                 type="tel"
                 placeholder="+880 1700000000"
                 {...register('phone')}
-                className="human-input human-input-has-icon font-mono"
+                className="human-input human-input-has-icon font-mono tabular-nums"
               />
             </div>
           </div>
 
           <div>
-            <label className="human-label">{isBn ? 'জন্ম তারিখ' : 'Date of Birth'}</label>
+            <label className="human-label">{isBn ? 'জন্ম তারিখ' : 'Date of birth'}</label>
             <div className="relative">
               <input
                 type="date"
@@ -159,7 +154,7 @@ const Profile = () => {
                   dobRef(e);
                   dateInputRef.current = e;
                 }}
-                className="human-input pr-10"
+                className="human-input pr-10 font-mono tabular-nums"
               />
               <button
                 type="button"
@@ -170,10 +165,10 @@ const Profile = () => {
                     dateInputRef.current.focus();
                   }
                 }}
-                className="absolute right-3 top-2.5 p-1 rounded-md text-zinc-500 dark:text-zinc-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition"
-                title={isBn ? 'ক্যালেন্ডার খুলুন' : 'Open Calendar Picker'}
+                className="absolute right-2.5 top-2 p-1 rounded-md text-[#737373] dark:text-[#85858b] hover:text-[#171717] dark:hover:text-[#ededed] transition-colors cursor-pointer"
+                title={isBn ? 'ক্যালেন্ডার খুলুন' : 'Open calendar'}
               >
-                <FiCalendar className="w-4 h-4 text-rose-600 dark:text-rose-400" />
+                <FiCalendar className="w-4 h-4 dispatch-icon" />
               </button>
             </div>
           </div>
@@ -181,7 +176,7 @@ const Profile = () => {
           <div>
             <label className="human-label">{isBn ? 'লিঙ্গ' : 'Gender'}</label>
             <select {...register('gender')} className="human-input">
-              <option value="">{isBn ? 'লিঙ্গ নির্বাচন করুন' : 'Select Gender'}</option>
+              <option value="">{isBn ? 'নির্বাচন করুন' : 'Select gender'}</option>
               <option value="Female">{isBn ? 'নারী (Female)' : 'Female'}</option>
               <option value="Male">{isBn ? 'পুরুষ (Male)' : 'Male'}</option>
               <option value="Other">{isBn ? 'অন্যান্য (Other)' : 'Other'}</option>
@@ -190,9 +185,9 @@ const Profile = () => {
           </div>
 
           <div>
-            <label className="human-label">{isBn ? 'রক্তের গ্রুপ' : 'Blood Group'}</label>
-            <select {...register('bloodGroup')} className="human-input">
-              <option value="">{isBn ? 'রক্তের গ্রুপ নির্বাচন করুন' : 'Select Blood Group'}</option>
+            <label className="human-label">{isBn ? 'রক্তের গ্রুপ' : 'Blood group'}</label>
+            <select {...register('bloodGroup')} className="human-input font-mono">
+              <option value="">{isBn ? 'নির্বাচন করুন' : 'Select blood group'}</option>
               <option value="A+">A+</option>
               <option value="A-">A-</option>
               <option value="B+">B+</option>
@@ -208,7 +203,7 @@ const Profile = () => {
             <label className="human-label">{isBn ? 'শহর' : 'City'}</label>
             <input
               type="text"
-              placeholder={isBn ? 'যেমন: ঢাকা / চট্টগ্রাম' : 'e.g. Dhaka'}
+              placeholder={isBn ? 'ঢাকা / চট্টগ্রাম' : 'Dhaka'}
               {...register('city')}
               className="human-input"
             />
@@ -218,7 +213,7 @@ const Profile = () => {
             <label className="human-label">{isBn ? 'দেশ' : 'Country'}</label>
             <input
               type="text"
-              placeholder={isBn ? 'যেমন: বাংলাদেশ' : 'e.g. Bangladesh'}
+              placeholder={isBn ? 'বাংলাদেশ' : 'Bangladesh'}
               {...register('country')}
               className="human-input"
             />
@@ -226,37 +221,32 @@ const Profile = () => {
         </div>
 
         <div>
-          <label className="human-label">{isBn ? 'স্থায়ী ঠিকানা' : 'Residential Address'}</label>
+          <label className="human-label">{isBn ? 'স্থায়ী ঠিকানা' : 'Address'}</label>
           <textarea
             rows="3"
-            placeholder={isBn ? 'আপনার বিস্তারিত ঠিকানা লিখুন...' : 'Enter your street address...'}
+            placeholder={isBn ? 'বিস্তারিত ঠিকানা' : 'Street address'}
             {...register('address')}
             className="human-input"
           ></textarea>
         </div>
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full btn-danger py-3.5 font-mono uppercase font-bold text-xs"
-        >
-          <FiSave /> {loading ? (isBn ? 'সংরক্ষণ করা হচ্ছে...' : 'Saving Profile...') : (isBn ? 'প্রোফাইল পরিবর্তন সংরক্ষণ করুন' : 'Save Profile Changes')}
-        </button>
+        <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">
+          <button type="submit" disabled={loading} className="w-full sm:flex-1 btn-solid h-11 text-sm">
+            <FiSave className="w-4 h-4 dispatch-icon" />
+            {loading ? (isBn ? 'সংরক্ষণ হচ্ছে' : 'Saving changes') : (isBn ? 'পরিবর্তন সংরক্ষণ করুন' : 'Save changes')}
+          </button>
 
-        {/* Prominent Mobile & Desktop Logout Button */}
-        <div className="pt-4 border-t border-zinc-200 dark:border-zinc-800">
           <button
             type="button"
             onClick={() => {
               logoutUser();
               navigate('/login');
             }}
-            className="w-full py-3 rounded-xl border border-rose-500/30 text-rose-600 dark:text-rose-400 bg-rose-500/10 hover:bg-rose-500/20 font-mono text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition cursor-pointer active:scale-95"
+            className="w-full sm:w-auto btn-outline h-11 px-5 text-sm text-[#dc2626] dark:text-[#e5484d]"
           >
-            <FiLogOut className="w-4 h-4 text-rose-600" /> {isBn ? 'সেফহ্যাভেন অ্যাকাউন্ট থেকে লগআউট' : 'LOGOUT OF SAFEHAVEN ACCOUNT'}
+            <FiLogOut className="w-4 h-4 dispatch-icon" /> {isBn ? 'লগআউট' : 'Log out'}
           </button>
         </div>
-
       </form>
     </div>
   );

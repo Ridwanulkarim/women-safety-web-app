@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { FiPieChart, FiActivity, FiShield, FiCheckCircle, FiCpu } from 'react-icons/fi';
-import { UserGrowthChart, SeverityPieChart, SOSChart } from '../../components/charts/DashboardCharts';
+import { FiCpu } from 'react-icons/fi';
+import { UserGrowthChart, SeverityPieChart } from '../../components/charts/DashboardCharts';
 import { getGlobalSOSAlerts, getRegisteredUsers } from '../../utils/adminDataRegistry';
 import AdminAIAgentDrawer from '../../components/admin/AdminAIAgentDrawer';
 
@@ -26,10 +26,9 @@ const AdminAnalytics = () => {
     };
   }, []);
 
-  // Compute real category breakdown from actual alerts
   const categoriesMap = {};
   alerts.forEach((a) => {
-    const cat = a.category || 'Direct SOS Distress';
+    const cat = a.category || 'Direct SOS distress';
     categoriesMap[cat] = (categoriesMap[cat] || 0) + 1;
   });
 
@@ -43,80 +42,75 @@ const AdminAnalytics = () => {
   const resolutionRate = totalAlerts > 0 ? Math.round((resolvedAlerts / totalAlerts) * 100) : 100;
 
   return (
-    <div className="space-y-8 font-sans">
+    <div className="space-y-6">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="mono-tag mono-tag-rose text-[10px]">
-              <span className="w-1.5 h-1.5 rounded-full bg-rose-500 telemetry-dot"></span> PLATFORM METRICS
-            </span>
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold font-heading text-zinc-900 dark:text-white tracking-tight">
-            Emergency System <span className="gradient-text-rose">Analytics</span>
+        <div className="space-y-1">
+          <span className="text-xs font-mono text-[#737373] dark:text-[#85858b]">Platform metrics</span>
+          <h1 className="text-2xl sm:text-3xl font-medium tracking-[-0.02em] text-[#171717] dark:text-[#ededed]">
+            System analytics
           </h1>
-          <p className="text-xs text-zinc-500 dark:text-zinc-400">
-            Statistical telemetry distribution of emergency distress alerts, resolution efficacy, and user growth.
+          <p className="text-sm text-[#525252] dark:text-[#a1a1a6]">
+            Distress incident distribution, resolution rate, and registered account growth
           </p>
         </div>
 
-        <button
-          onClick={() => setIsAIAgentOpen(true)}
-          className="px-5 py-3 rounded-2xl font-bold text-xs uppercase tracking-wider flex items-center gap-2 font-mono transition shadow-lg bg-gradient-to-r from-indigo-600 via-purple-600 to-rose-600 hover:from-indigo-500 hover:to-rose-500 text-white shadow-indigo-600/30"
-        >
-          <FiCpu className="text-base" /> AI Analytics Agent (Voice & Q&A)
+        <button onClick={() => setIsAIAgentOpen(true)} className="btn-solid h-10 px-4 text-xs shrink-0">
+          <FiCpu className="w-4 h-4 dispatch-icon" /> AI analytics copilot
         </button>
       </div>
 
-      {/* LangGraph-Style Analytics AI Copilot Drawer */}
       <AdminAIAgentDrawer
         defaultMode="ANALYTICS"
         isOpen={isAIAgentOpen}
         onClose={() => setIsAIAgentOpen(false)}
       />
 
-      {/* KPI Overview */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-        <div className="glass-card-xl p-6 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 space-y-2">
-          <span className="text-[10px] font-bold text-zinc-500 dark:text-zinc-400 font-mono uppercase">Incident Resolution Rate</span>
+      {/* KPI Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="surface-card p-5 space-y-2">
+          <span className="text-xs text-[#737373] dark:text-[#85858b] block">Resolution rate</span>
           <div className="flex items-baseline gap-2">
-            <span className="text-3xl font-black font-heading text-emerald-600 dark:text-emerald-400">{resolutionRate}%</span>
-            <span className="text-xs text-zinc-500 font-mono">({resolvedAlerts}/{totalAlerts || 0})</span>
+            <span className="text-3xl font-medium font-mono tabular-nums text-[#16a34a] dark:text-[#4cc38a]">{resolutionRate}%</span>
+            <span className="text-xs text-[#737373] dark:text-[#85858b] font-mono tabular-nums">
+              {resolvedAlerts} of {totalAlerts} cases
+            </span>
           </div>
-          <p className="text-[11px] text-zinc-600 dark:text-zinc-400">Resolution efficacy of handled distress signals.</p>
+          <p className="text-xs text-[#737373] dark:text-[#85858b]">Completed dispatches vs total alerts</p>
         </div>
 
-        <div className="glass-card-xl p-6 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 space-y-2">
-          <span className="text-[10px] font-bold text-zinc-500 dark:text-zinc-400 font-mono uppercase">Gateway Readiness</span>
+        <div className="surface-card p-5 space-y-2">
+          <span className="text-xs text-[#737373] dark:text-[#85858b] block">Dispatch gateway readiness</span>
           <div className="flex items-baseline gap-2">
-            <span className="text-3xl font-black font-heading text-rose-600 dark:text-rose-500">100%</span>
-            <span className="text-xs text-emerald-600 dark:text-emerald-400 font-mono font-bold">ONLINE</span>
+            <span className="text-3xl font-medium font-mono tabular-nums text-[#171717] dark:text-[#ededed]">100%</span>
+            <span className="status-tag mono-tag-emerald">Online</span>
           </div>
-          <p className="text-[11px] text-zinc-600 dark:text-zinc-400">National 999 & Emergency Hotlines active.</p>
+          <p className="text-xs text-[#737373] dark:text-[#85858b]">National 999 and helpline relays ready</p>
         </div>
 
-        <div className="glass-card-xl p-6 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 space-y-2">
-          <span className="text-[10px] font-bold text-zinc-500 dark:text-zinc-400 font-mono uppercase">Total Verified Accounts</span>
+        <div className="surface-card p-5 space-y-2">
+          <span className="text-xs text-[#737373] dark:text-[#85858b] block">Verified accounts</span>
           <div className="flex items-baseline gap-2">
-            <span className="text-3xl font-black font-heading text-zinc-900 dark:text-white">{users.length}</span>
-            <span className="text-xs text-zinc-500 font-mono font-bold">CITIZENS</span>
+            <span className="text-3xl font-medium font-mono tabular-nums text-[#171717] dark:text-[#ededed]">{users.length}</span>
+            <span className="text-xs text-[#737373] dark:text-[#85858b]">registered users</span>
           </div>
-          <p className="text-[11px] text-zinc-600 dark:text-zinc-400">Registered platform user base.</p>
+          <p className="text-xs text-[#737373] dark:text-[#85858b]">Active citizens synced in Firestore</p>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 glass-card-xl p-6 sm:p-8 rounded-3xl space-y-4 border border-zinc-200/80 dark:border-zinc-800">
-          <div>
-            <h3 className="text-base font-bold font-heading text-zinc-900 dark:text-zinc-100">User Growth Adoption Curve</h3>
-            <p className="text-xs text-zinc-500 dark:text-zinc-400">Verified platform member progression</p>
+      {/* Main Chart + Ranked Share Breakdown */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div className="lg:col-span-8 surface-panel p-6 space-y-4">
+          <div className="border-b border-zinc-900/[0.08] dark:border-white/[0.08] pb-3">
+            <h2 className="text-base font-medium text-[#171717] dark:text-[#ededed]">Verified account adoption</h2>
+            <p className="text-xs text-[#737373] dark:text-[#85858b]">Monthly account registration trend</p>
           </div>
           <UserGrowthChart usersCount={users.length} />
         </div>
 
-        <div className="glass-card-xl p-6 sm:p-8 rounded-3xl space-y-4 border border-zinc-200/80 dark:border-zinc-800">
-          <div>
-            <h3 className="text-base font-bold font-heading text-zinc-900 dark:text-zinc-100">Distress Category Breakdown</h3>
-            <p className="text-xs text-zinc-500 dark:text-zinc-400">Categorical incident distribution</p>
+        <div className="lg:col-span-4 surface-panel p-6 space-y-4">
+          <div className="border-b border-zinc-900/[0.08] dark:border-white/[0.08] pb-3">
+            <h2 className="text-base font-medium text-[#171717] dark:text-[#ededed]">Category share</h2>
+            <p className="text-xs text-[#737373] dark:text-[#85858b]">Distress triggers by source category</p>
           </div>
           <SeverityPieChart data={categoryData} />
         </div>

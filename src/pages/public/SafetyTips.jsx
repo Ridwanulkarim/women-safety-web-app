@@ -318,34 +318,33 @@ const SafetyTips = () => {
   });
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-10 relative overflow-hidden font-sans">
-      {/* Ambient background glow */}
-      <div className="absolute top-10 left-1/2 -translate-x-1/2 w-96 h-96 bg-rose-600/10 rounded-full blur-3xl pointer-events-none"></div>
-
+    <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-10">
       {/* Header */}
-      <div className="text-center max-w-3xl mx-auto space-y-3 relative z-10">
-        <span className="mono-tag mono-tag-rose">
-          <span className="w-1.5 h-1.5 rounded-full bg-rose-500 telemetry-dot"></span> {isBn ? 'জ্ঞানভাণ্ডার ও আইনি অধিকার' : 'Knowledge Vault & Legal Rights'}
-        </span>
-        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold font-heading text-zinc-900 dark:text-white tracking-tight">
-          {isBn ? 'নিরাপত্তা টিপস ও ' : 'Safety Tips & '}<span className="gradient-text-rose">{isBn ? 'আত্মরক্ষা নির্দেশিকা' : 'Survival Guidelines'}</span>
+      <div className="max-w-2xl space-y-3">
+        <p className="text-xs font-mono text-[#737373] dark:text-[#85858b]">
+          {isBn ? 'জ্ঞানভাণ্ডার ও আইনি অধিকার' : 'Knowledge vault and legal rights'}
+        </p>
+        <h1 className="text-3xl sm:text-4xl font-medium tracking-[-0.02em] text-[#171717] dark:text-[#ededed]">
+          {isBn ? 'নিরাপত্তা টিপস ও আত্মরক্ষা নির্দেশিকা' : 'Safety tips and legal guidelines'}
         </h1>
-        <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed font-normal">
-          {isBn ? 'বাস্তবধর্মী আত্মরক্ষা কৌশল, সাইবার নিরাপত্তা প্রোটোকল এবং বাংলাদেশে নারী সুরক্ষার আইনি অধিকার গাইড।' : "Field-tested deterrence tactics, digital hygiene protocols, and Bangladesh women's legal protection rights."}
+        <p className="text-base text-[#525252] dark:text-[#a1a1a6] leading-relaxed">
+          {isBn
+            ? 'বাস্তবধর্মী আত্মরক্ষা কৌশল, সাইবার নিরাপত্তা প্রোটোকল এবং বাংলাদেশে নারী সুরক্ষার আইনি অধিকার'
+            : "Practical deterrence routines, digital privacy checks, and Bangladesh women's legal rights"}
         </p>
       </div>
 
       {/* Filter & Search Bar */}
-      <div className="glass-card-xl p-4 sm:p-6 flex flex-col md:flex-row gap-4 items-center justify-between relative z-10">
-        <div className="flex flex-wrap gap-2 w-full md:w-auto">
-          {TIP_CATEGORIES.map(cat => (
+      <div className="surface-panel p-4 flex flex-col md:flex-row gap-4 items-center justify-between">
+        <div className="flex flex-wrap gap-1.5 w-full md:w-auto">
+          {TIP_CATEGORIES.map((cat) => (
             <button
               key={cat}
               onClick={() => setCategory(cat)}
-              className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition-all duration-200 ${
+              className={`h-9 px-3 rounded-lg text-xs font-medium transition-colors cursor-pointer ${
                 category === cat
-                  ? 'bg-rose-600 text-white shadow-md shadow-rose-600/25'
-                  : 'bg-zinc-100 dark:bg-zinc-800/80 text-zinc-700 dark:text-zinc-300 hover:bg-rose-500/10 hover:text-rose-500'
+                  ? 'bg-[#171717] dark:bg-[#ededed] text-[#ffffff] dark:text-[#141415]'
+                  : 'bg-[#f4f4f5] dark:bg-[#232325] text-[#525252] dark:text-[#a1a1a6] hover:text-[#171717] dark:hover:text-[#ededed]'
               }`}
             >
               {isBn ? (categoryTranslations[cat] || cat) : cat}
@@ -353,47 +352,48 @@ const SafetyTips = () => {
           ))}
         </div>
 
-        <div className="relative w-full md:w-80">
-          <FiSearch className="absolute left-3.5 top-3.5 text-zinc-400" />
+        <div className="relative w-full md:w-72">
+          <FiSearch className="w-4 h-4 absolute left-3 top-3 text-[#737373] dark:text-[#85858b] dispatch-icon" />
           <input
             type="text"
-            placeholder={isBn ? 'টিপস বা আইনি অধিকার খুঁজুন...' : 'Search safety tips or legal rights...'}
+            placeholder={isBn ? 'খুঁজুন' : 'Search'}
             value={search}
-            onChange={e => setSearch(e.target.value)}
-            className="human-input pl-10 text-xs"
+            onChange={(e) => setSearch(e.target.value)}
+            className="human-input human-input-has-icon text-sm"
           />
         </div>
       </div>
 
       {/* Tips Grid */}
       {loading ? (
-        <div className="p-16 text-center text-xs text-zinc-400 font-mono">
-          {isBn ? 'নিরাপত্তা নির্দেশিকা লোড হচ্ছে...' : 'Loading safety guidelines...'}
+        <div className="p-16 text-center text-sm text-[#737373] dark:text-[#85858b]">
+          {isBn ? 'লোড হচ্ছে' : 'Loading safety guidelines'}
         </div>
       ) : filteredTips.length === 0 ? (
-        <div className="glass-card-xl p-12 text-center space-y-3">
-          <p className="text-sm font-bold text-zinc-700 dark:text-zinc-300">
-            {isBn ? `"${search}" এর সাথে মিলে এমন কোনো টিপস পাওয়া যায়নি` : `No safety tips found matching "${search}"`}
+        <div className="surface-panel p-12 text-center space-y-3">
+          <p className="text-sm font-medium text-[#171717] dark:text-[#ededed]">
+            {isBn ? `"${search}" এর সাথে কোনো নির্দেশিকা মেলেনি` : `No guidelines match "${search}"`}
           </p>
-          <button onClick={() => { setSearch(''); setCategory('All'); }} className="btn-outline text-xs">
-            {isBn ? 'ফিল্টার রিসেট করুন' : 'Reset Category Filter'}
+          <button onClick={() => { setSearch(''); setCategory('All'); }} className="btn-outline h-9 px-4 text-xs">
+            {isBn ? 'ফিল্টার মুছুন' : 'Reset filter'}
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 relative z-10">
-          {filteredTips.map(tip => (
-            <div key={tip.id} className="product-card product-card-hover p-6 sm:p-7 space-y-3 flex flex-col justify-between">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredTips.map((tip) => (
+            <div key={tip.id} className="surface-card product-card-hover p-6 space-y-3 flex flex-col justify-between">
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="mono-tag mono-tag-rose">
-                    <FiTag /> {getTipCategory(tip.category)}
+                  <span className="status-tag">
+                    <FiTag className="w-3.5 h-3.5 text-[#737373] dark:text-[#85858b] dispatch-icon" />
+                    {getTipCategory(tip.category)}
                   </span>
-                  <FiBookOpen className="text-zinc-400" />
+                  <FiBookOpen className="w-4 h-4 text-[#737373] dark:text-[#85858b] dispatch-icon" />
                 </div>
-                <h3 className="text-base font-extrabold font-heading text-zinc-900 dark:text-white leading-snug">
+                <h2 className="text-base font-medium text-[#171717] dark:text-[#ededed] leading-snug">
                   {getTipTitle(tip)}
-                </h3>
-                <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed font-normal">
+                </h2>
+                <p className="text-sm text-[#525252] dark:text-[#a1a1a6] leading-relaxed">
                   {getTipContent(tip)}
                 </p>
               </div>

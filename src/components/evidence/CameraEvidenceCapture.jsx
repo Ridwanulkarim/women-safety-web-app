@@ -1,5 +1,5 @@
-import React, { useState, useRef } from 'react';
-import { FiCamera, FiVideo, FiSquare, FiDownload, FiTrash2, FiEye, FiX, FiCheck, FiFileText } from 'react-icons/fi';
+import React, { useState, useRef, useEffect } from 'react';
+import { FiCamera, FiVideo, FiSquare, FiDownload, FiTrash2, FiX, FiFileText, FiEye } from 'react-icons/fi';
 import LegalEvidenceExporterModal from './LegalEvidenceExporterModal';
 import { useLanguage } from '../../context/LanguageContext';
 import { toBengaliDigits } from '../../utils/helpers';
@@ -11,7 +11,7 @@ const CameraEvidenceCapture = () => {
   const [previewImage, setPreviewImage] = useState(null);
   const [selectedExportItem, setSelectedExportItem] = useState(null);
   const [exporterOpen, setExporterOpen] = useState(false);
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
   const isBn = language === 'bn';
 
   const [evidenceList, setEvidenceList] = useState(() => {
@@ -28,18 +28,27 @@ const CameraEvidenceCapture = () => {
   const mediaRecorderRef = useRef(null);
   const videoChunksRef = useRef([]);
 
+  useEffect(() => {
+    return () => {
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((track) => track.stop());
+      }
+    };
+  }, []);
+
   const startCamera = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: true });
       streamRef.current = stream;
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-      }
       setCameraActive(true);
-      toast.success(isBn ? '📷 ক্যামেরা ফিড চালু হয়েছে!' : '📷 Camera Feed Activated!');
+      setTimeout(() => {
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+        }
+      }, 100);
     } catch (err) {
-      console.warn('Camera Access Error:', err.message);
-      toast.error(isBn ? 'প্রমাণ ধারণের জন্য ক্যামেরা পারমিশন প্রয়োজন' : 'Camera permission required to capture evidence');
+      console.warn('Camera access failed:', err.message);
+      toast.error(isBn ? 'ক্যামেরা পারমিশন প্রয়োজন' : 'Camera access permission denied');
     }
   };
 
@@ -55,30 +64,22 @@ const CameraEvidenceCapture = () => {
   const capturePhoto = () => {
     if (!videoRef.current) return;
     const canvas = document.createElement('canvas');
-    canvas.width = videoRef.current.videoWidth || 640;
-    canvas.height = videoRef.current.videoHeight || 480;
+    canvas.width = videoRef.current.videoWidth;
+    canvas.height = videoRef.current.videoHeight;
     const ctx = canvas.getContext('2d');
-    ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
-
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
-    ctx.fillRect(10, canvas.height - 40, 360, 30);
-    ctx.fillStyle = '#ffffff';
-    ctx.font = '12px monospace';
-    ctx.fillText(`SAFEHAVEN EVIDENCE • ${new Date().toLocaleString()}`, 20, canvas.height - 20);
-
-    const base64Data = canvas.toDataURL('image/jpeg');
+    ctx.drawImage(videoRef.current, 0, 0);
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
 
     const newEvidence = {
       id: 'photo_' + Date.now(),
       type: 'photo',
       date: new Date().toLocaleString(),
-      dataUrl: base64Data
+      dataUrl
     };
-
     const updated = [newEvidence, ...evidenceList];
     setEvidenceList(updated);
     localStorage.setItem('safehaven_camera_evidence', JSON.stringify(updated));
-    toast.success(isBn ? '📸 ছবির প্রমাণ সংরক্ষিত হয়েছে!' : '📸 Photo Evidence Captured & Saved!');
+    toast.success(isBn ? 'ছবির প্রমাণ ভল্টে সংরক্ষিত হয়েছে' : 'Photo evidence saved');
   };
 
   const startVideoRecording = () => {
@@ -88,9 +89,7 @@ const CameraEvidenceCapture = () => {
       videoChunksRef.current = [];
 
       mediaRecorderRef.current.ondataavailable = (e) => {
-        if (e.data.size > 0) {
-          videoChunksRef.current.push(e.data);
-        }
+        if (e.data.size > 0) videoChunksRef.current.push(e.data);
       };
 
       mediaRecorderRef.current.onstop = () => {
@@ -107,13 +106,13 @@ const CameraEvidenceCapture = () => {
           const updated = [newEvidence, ...evidenceList];
           setEvidenceList(updated);
           localStorage.setItem('safehaven_camera_evidence', JSON.stringify(updated));
-          toast.success(isBn ? '🎥 জরুরি ভিডিও রেকর্ডিং সংরক্ষিত হয়েছে!' : '🎥 Emergency Video Recording Saved!');
+          toast.success(isBn ? 'ভিডিও প্রমাণ ভল্টে সংরক্ষিত হয়েছে' : 'Video recording saved');
         };
       };
 
       mediaRecorderRef.current.start();
       setIsVideoRecording(true);
-      toast.error(isBn ? '🎥 জরুরি ভিডিও রেকর্ডিং শুরু হয়েছে!' : '🎥 Emergency Video Recording Started!');
+      toast.error(isBn ? 'জরুরি ভিডিও রেকর্ডিং শুরু হয়েছে' : 'Video recording started');
     } catch (e) {
       toast.error(isBn ? 'ভিডিও রেকর্ডিং ব্যর্থ হয়েছে' : 'Video recording failed');
     }
@@ -139,129 +138,113 @@ const CameraEvidenceCapture = () => {
   };
 
   return (
-    <div className="product-card p-6 space-y-6 font-sans">
-      <div className="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 pb-3">
-        <div className="flex items-center gap-2">
-          <FiCamera className="text-rose-600 dark:text-rose-400 text-lg" />
+    <div className="surface-card p-6 space-y-5">
+      <div className="flex items-center justify-between border-b border-zinc-900/[0.08] dark:border-white/[0.08] pb-4">
+        <div className="flex items-center gap-3">
+          <FiCamera className="w-5 h-5 text-[#525252] dark:text-[#a1a1a6] dispatch-icon" />
           <div>
-            <h3 className="text-sm font-bold uppercase tracking-wider text-zinc-900 dark:text-white font-heading">
-              {isBn ? 'ক্যামেরা প্রমাণাদি ক্যাপচার' : 'Camera Evidence Capture'}
-            </h3>
-            <p className="text-xs text-zinc-500">
-              {isBn ? 'বিপদকালীন পরিস্থিতিতে তাৎক্ষণিক ছবি ও ভিডিও ক্লিপ ধারণ করুন' : 'Record video clips & snapshot evidence during emergencies'}
-            </p>
+            <h2 className="text-base font-medium text-[#171717] dark:text-[#ededed]">
+              {t('safetyTools.cameraEvidence')}
+            </h2>
+            <p className="text-xs text-[#737373] dark:text-[#85858b]">{t('safetyTools.cameraSub')}</p>
           </div>
         </div>
-        {cameraActive ? (
-          <span className="mono-tag mono-tag-rose">{isBn ? 'ক্যামেরা চালু' : 'Camera Feed Live'}</span>
-        ) : (
-          <span className="mono-tag mono-tag-zinc">{isBn ? 'ক্যামেরা বন্ধ' : 'Camera Off'}</span>
-        )}
+        <span className={`status-tag ${cameraActive ? 'mono-tag-rose' : ''}`}>
+          {cameraActive ? (isBn ? 'চালু' : 'Live') : (isBn ? 'বন্ধ' : 'Standby')}
+        </span>
       </div>
 
-      {/* Live Stream Viewfinder */}
       {cameraActive ? (
-        <div className="relative rounded-xl overflow-hidden bg-black aspect-video border border-zinc-800">
+        <div className="relative rounded-xl overflow-hidden bg-black aspect-video border border-zinc-900/15 dark:border-white/15">
           <video ref={videoRef} autoPlay playsInline muted className="w-full h-full object-cover" />
 
-          {/* Action Bar Overlay */}
-          <div className="absolute bottom-4 left-4 right-4 flex items-center justify-center gap-3 bg-zinc-950/80 backdrop-blur-sm p-3 rounded-xl">
-            <button
-              onClick={capturePhoto}
-              className="btn-solid !py-2 !px-4 text-xs font-mono font-bold"
-            >
-              <FiCamera /> {isBn ? 'ছবি তুলুন' : 'TAKE PHOTO'}
+          <div className="absolute bottom-3 left-3 right-3 flex flex-wrap items-center justify-center gap-2 bg-[#141415]/90 p-2.5 rounded-lg border border-white/10">
+            <button onClick={capturePhoto} className="btn-solid h-9 px-3 text-xs">
+              <FiCamera className="w-4 h-4 dispatch-icon" /> {t('safetyTools.takePhoto')}
             </button>
 
             {isVideoRecording ? (
-              <button
-                onClick={stopVideoRecording}
-                className="btn-danger !py-2 !px-4 text-xs font-mono font-bold animate-pulse"
-              >
-                <FiSquare /> {isBn ? 'ভিডিও থামান' : 'STOP VIDEO'}
+              <button onClick={stopVideoRecording} className="btn-danger h-9 px-3 text-xs">
+                <FiSquare className="w-4 h-4 dispatch-icon" /> {t('safetyTools.stopVideo')}
               </button>
             ) : (
-              <button
-                onClick={startVideoRecording}
-                className="btn-danger !py-2 !px-4 text-xs font-mono font-bold"
-              >
-                <FiVideo /> {isBn ? 'ভিডিও রেকর্ড' : 'RECORD VIDEO'}
+              <button onClick={startVideoRecording} className="btn-danger h-9 px-3 text-xs">
+                <FiVideo className="w-4 h-4 dispatch-icon" /> {t('safetyTools.recordVideo')}
               </button>
             )}
 
-            <button
-              onClick={stopCamera}
-              className="btn-outline !py-2 !px-3 text-xs"
-            >
-              <FiX /> {isBn ? 'বন্ধ করুন' : 'Close Camera'}
+            <button onClick={stopCamera} className="btn-outline h-9 px-3 text-xs">
+              <FiX className="w-4 h-4 dispatch-icon" /> {t('common.close')}
             </button>
           </div>
         </div>
       ) : (
         <button
           onClick={startCamera}
-          className="w-full py-8 rounded-xl border-2 border-dashed border-zinc-300 dark:border-zinc-800 hover:border-rose-500/50 bg-zinc-50 dark:bg-zinc-900/40 text-center space-y-2 transition cursor-pointer"
+          className="w-full py-8 rounded-xl border border-dashed border-zinc-900/15 dark:border-white/15 hover:border-zinc-900/30 dark:hover:border-white/30 bg-[#fafafa] dark:bg-[#141415] text-center space-y-2 transition-colors cursor-pointer"
         >
-          <FiCamera className="w-8 h-8 mx-auto text-rose-500" />
-          <span className="block font-bold text-xs text-zinc-800 dark:text-zinc-200">
-            {isBn ? 'লাইভ ক্যামেরা ফিড চালু করতে ক্লিক করুন' : 'Click to Launch Live Camera Feed'}
+          <FiCamera className="w-6 h-6 mx-auto text-[#525252] dark:text-[#a1a1a6] dispatch-icon" />
+          <span className="block text-sm font-medium text-[#171717] dark:text-[#ededed]">
+            {t('safetyTools.launchCamera')}
           </span>
-          <span className="block text-[11px] text-zinc-500 font-mono">
-            {isBn ? 'টাইমস্ট্যাম্পযুক্ত ছবি ও ভিডিও প্রমাণাদি জমা রাখে' : 'Captures timestamped photo snapshots & video evidence'}
+          <span className="block text-xs text-[#737373] dark:text-[#85858b]">
+            {t('safetyTools.cameraDesc')}
           </span>
         </button>
       )}
 
-      {/* Camera Evidence Vault List */}
-      <div className="space-y-3 pt-2">
-        <h4 className="text-xs font-mono font-bold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">
-          {isBn ? `সংরক্ষিত মিডিয়া ভল্ট (${toBengaliDigits(evidenceList.length)})` : `Saved Media Vault (${evidenceList.length})`}
-        </h4>
+      <div className="space-y-3 pt-1">
+        <h3 className="text-xs font-medium text-[#737373] dark:text-[#85858b]">
+          {isBn
+            ? `সংরক্ষিত মিডিয়া (${toBengaliDigits(evidenceList.length)})`
+            : `Saved media (${evidenceList.length})`}
+        </h3>
 
         {evidenceList.length === 0 ? (
-          <p className="text-xs text-zinc-400 italic py-2">
-            {isBn ? 'কোনো ছবি বা ভিডিও প্রমাণ এখনো জমা নেই।' : 'No photo or video evidence stored yet.'}
-          </p>
+          <p className="text-xs text-[#737373] dark:text-[#85858b] py-2">{t('safetyTools.noMedia')}</p>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             {evidenceList.map((item) => (
-              <div key={item.id} className="relative group rounded-lg overflow-hidden border border-zinc-200 dark:border-zinc-800 bg-zinc-900">
+              <div
+                key={item.id}
+                className="relative group rounded-lg overflow-hidden border border-zinc-900/[0.08] dark:border-white/[0.08] bg-[#141415]"
+              >
                 {item.type === 'photo' ? (
                   <img src={item.dataUrl} alt="Evidence" className="w-full h-24 object-cover" />
                 ) : (
                   <video src={item.dataUrl} className="w-full h-24 object-cover" />
                 )}
-                <div className="absolute inset-0 bg-zinc-950/80 opacity-0 group-hover:opacity-100 transition p-2 flex flex-col justify-between text-white">
-                  <span className="text-[9px] font-mono truncate">{item.date}</span>
-                  <div className="flex items-center justify-between">
+                <div className="absolute inset-0 bg-[#141415]/85 opacity-0 group-hover:opacity-100 transition-opacity p-2 flex flex-col justify-between text-white">
+                  <span className="text-[11px] font-mono tabular-nums truncate">{item.date}</span>
+                  <div className="flex items-center justify-between gap-1">
                     <button
                       onClick={() => handleOpenExporter(item)}
-                      className="p-1 rounded bg-rose-600 hover:bg-rose-700 text-xs text-white"
-                      title={isBn ? 'আইনি প্রমাণপত্র ডাউনলোড' : 'Export Chain-of-Custody PDF Docket'}
+                      className="p-1.5 rounded bg-[#dc2626] hover:bg-[#b91c1c] text-white cursor-pointer"
+                      title={isBn ? 'আইনি ডকেট' : 'Export legal docket'}
                     >
-                      <FiFileText />
+                      <FiFileText className="w-3.5 h-3.5 dispatch-icon" />
                     </button>
                     <button
                       onClick={() => setPreviewImage(item.dataUrl)}
-                      className="p-1 rounded bg-zinc-800 hover:bg-zinc-700 text-xs"
-                      title={isBn ? 'বড় করে দেখুন' : 'View Full'}
+                      className="p-1.5 rounded bg-[#232325] hover:bg-zinc-700 cursor-pointer"
+                      title={isBn ? 'দেখুন' : 'Preview'}
                     >
-                      <FiEye />
+                      <FiEye className="w-3.5 h-3.5 dispatch-icon" />
                     </button>
                     <a
                       href={item.dataUrl}
                       download={`Evidence_${item.id}.${item.type === 'photo' ? 'jpg' : 'webm'}`}
-                      className="p-1 rounded bg-zinc-800 hover:bg-zinc-700 text-xs"
+                      className="p-1.5 rounded bg-[#232325] hover:bg-zinc-700"
                       title={isBn ? 'ডাউনলোড' : 'Download'}
                     >
-                      <FiDownload />
+                      <FiDownload className="w-3.5 h-3.5 dispatch-icon" />
                     </a>
                     <button
                       onClick={() => deleteEvidence(item.id)}
-                      className="p-1 rounded bg-rose-600/50 hover:bg-rose-700 text-xs text-white"
+                      className="p-1.5 rounded bg-[#232325] hover:bg-[#dc2626] cursor-pointer"
                       title={isBn ? 'মুছুন' : 'Delete'}
                     >
-                      <FiTrash2 />
+                      <FiTrash2 className="w-3.5 h-3.5 dispatch-icon" />
                     </button>
                   </div>
                 </div>
@@ -271,18 +254,17 @@ const CameraEvidenceCapture = () => {
         )}
       </div>
 
-      {/* Fullscreen Media Preview Modal */}
       {previewImage && (
-        <div className="fixed inset-0 z-50 bg-zinc-950/90 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="relative max-w-2xl w-full product-card p-4 space-y-4">
+        <div className="fixed inset-0 z-50 bg-black/85 flex items-center justify-center p-4">
+          <div className="relative max-w-2xl w-full surface-panel p-4 space-y-4">
             <button
               onClick={() => setPreviewImage(null)}
-              className="absolute top-2 right-2 p-2 rounded-lg bg-zinc-800 text-white"
-              title={isBn ? 'বন্ধ করুন' : 'Close'}
+              className="absolute top-3 right-3 h-8 w-8 rounded-lg bg-[#232325] text-[#ededed] flex items-center justify-center cursor-pointer"
+              title={t('common.close')}
             >
-              <FiX />
+              <FiX className="w-4 h-4 dispatch-icon" />
             </button>
-            <img src={previewImage} alt="Evidence Full Preview" className="w-full rounded-lg max-h-[70vh] object-contain" />
+            <img src={previewImage} alt="Evidence preview" className="w-full rounded-lg max-h-[70vh] object-contain" />
           </div>
         </div>
       )}

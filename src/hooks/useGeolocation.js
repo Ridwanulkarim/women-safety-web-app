@@ -198,7 +198,7 @@ export const useGeolocation = (enableWatch = false) => {
             loading: false,
             permissionDenied: true,
             isApproximate: true,
-            error: 'ব্রাউজারে লোকেশন পারমিশন ব্লক করা আছে। সঠিক জিপিএস পেতে অ্যাড্রেস বারের লক (🔒) আইকনে ক্লিক করে Location চালু করুন।'
+            error: 'ব্রাউজারে লোকেশন পারমিশন ব্লক করা আছে। সঠিক জিপিএস পেতে অ্যাড্রেস বার থেকে Location Allow করুন।'
           }));
           fetchIpGeolocation();
           return;
@@ -225,7 +225,7 @@ export const useGeolocation = (enableWatch = false) => {
               permissionDenied: isDenied,
               isApproximate: true,
               error: isDenied 
-                ? 'ব্রাউজারে লোকেশন পারমিশন ব্লক করা আছে। অ্যাড্রেস বারের লক (🔒) আইকনে ক্লিক করে Location Allow করুন।' 
+                ? 'ব্রাউজারে লোকেশন পারমিশন ব্লক করা আছে। অ্যাড্রেস বার থেকে Location Allow করুন।' 
                 : 'ডিভাইস থেকে জিপিএস সংকেত পাওয়া যায়নি। নেটওয়ার্কের মাধ্যমে আনুমানিক অবস্থান নির্ধারণ করা হয়েছে।'
             }));
           },

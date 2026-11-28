@@ -53,16 +53,16 @@ const Blog = () => {
   }, []);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12 font-sans">
-      <div className="text-center max-w-2xl mx-auto space-y-3">
-        <span className="mono-tag mono-tag-rose">
-          {isBn ? 'নিরাপত্তা বিষয়ক জার্নাল' : 'Safety Intelligence Journal'}
-        </span>
-        <h1 className="text-3xl sm:text-4xl font-extrabold font-heading text-zinc-900 dark:text-white">
-          {isBn ? 'নিরাপত্তা ও আত্মরক্ষা বিষয়ক ' : 'Safety & Protection '}<span className="gradient-text-rose">{isBn ? 'ব্লগ' : 'Journal'}</span>
+    <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-10">
+      <div className="max-w-2xl space-y-3">
+        <p className="text-xs font-mono text-[#737373] dark:text-[#85858b]">
+          {isBn ? 'নিরাপত্তা জার্নাল' : 'Safety journal'}
+        </p>
+        <h1 className="text-3xl sm:text-4xl font-medium tracking-[-0.02em] text-[#171717] dark:text-[#ededed]">
+          {isBn ? 'নিরাপত্তা ও আত্মরক্ষা বিষয়ক প্রবন্ধ' : 'Field guides and legal updates'}
         </h1>
-        <p className="text-xs text-zinc-500 dark:text-zinc-400">
-          {isBn ? 'বিশেষজ্ঞদের পরামর্শ, আইনি আপডেট এবং বাস্তব জীবনের জরুরি নিরাপত্তা গাইডলাইন।' : 'Insights, legal updates, and tactical survival tips from security professionals.'}
+        <p className="text-base text-[#525252] dark:text-[#a1a1a6]">
+          {isBn ? 'বিশেষজ্ঞদের পরামর্শ, আইনি তথ্য এবং বাস্তব জীবনের নিরাপত্তা গাইডলাইন' : 'Practical survival guides, legal handbooks, and privacy practices'}
         </p>
       </div>
 
@@ -78,35 +78,37 @@ const Blog = () => {
             <Link
               key={blog.id}
               to={`/blog/${blog.id}`}
-              className="product-card rounded-xl overflow-hidden flex flex-col justify-between group hover:border-rose-500/50 transition duration-300 block"
+              className="surface-card product-card-hover overflow-hidden flex flex-col justify-between group"
             >
-              <div className="relative h-52 overflow-hidden">
+              <div className="relative h-52 overflow-hidden bg-[#141415]">
                 <img
                   src={blog.imageUrl}
                   alt={displayTitle}
-                  className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+                  className="w-full h-full object-cover"
                 />
-                <span className="absolute top-4 left-4 mono-tag mono-tag-rose shadow-md bg-zinc-950/80 text-white">
-                  {displayCategory}
-                </span>
               </div>
 
               <div className="p-6 space-y-4 flex-1 flex flex-col justify-between">
-                <div className="space-y-2">
-                  <div className="flex items-center gap-4 text-[11px] font-mono text-zinc-400">
-                    <span className="flex items-center gap-1"><FiUser /> {displayAuthor}</span>
-                    <span className="flex items-center gap-1"><FiClock /> {formatDate(blog.createdAt, isBn)}</span>
+                <div className="space-y-2.5">
+                  <div className="flex flex-wrap items-center gap-3 text-xs text-[#737373] dark:text-[#85858b]">
+                    <span className="status-tag">{displayCategory}</span>
+                    <span className="flex items-center gap-1.5">
+                      <FiUser className="w-3.5 h-3.5 dispatch-icon" /> {displayAuthor}
+                    </span>
+                    <span className="flex items-center gap-1.5 font-mono tabular-nums">
+                      <FiClock className="w-3.5 h-3.5 dispatch-icon" /> {formatDate(blog.createdAt, isBn)}
+                    </span>
                   </div>
-                  <h3 className="text-lg font-bold font-heading text-zinc-900 dark:text-white group-hover:text-rose-600 transition leading-snug">
+                  <h2 className="text-lg font-medium text-[#171717] dark:text-[#ededed] group-hover:text-[#e11d48] dark:group-hover:text-[#fb7185] transition-colors leading-snug">
                     {displayTitle}
-                  </h3>
-                  <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed font-normal">
+                  </h2>
+                  <p className="text-sm text-[#525252] dark:text-[#a1a1a6] leading-relaxed">
                     {truncateText(displaySummary, 130)}
                   </p>
                 </div>
 
-                <div className="inline-flex items-center gap-2 text-xs font-mono font-bold text-rose-600 dark:text-rose-400 group-hover:underline pt-2">
-                  {isBn ? 'সম্পূর্ণ আর্টিকেল পড়ুন' : 'Read Article'} <FiArrowRight />
+                <div className="inline-flex items-center gap-1.5 text-xs font-medium text-[#e11d48] dark:text-[#fb7185] pt-2">
+                  {isBn ? 'সম্পূর্ণ পড়ুন' : 'Read article'} <FiArrowRight className="w-3.5 h-3.5 dispatch-icon" />
                 </div>
               </div>
             </Link>

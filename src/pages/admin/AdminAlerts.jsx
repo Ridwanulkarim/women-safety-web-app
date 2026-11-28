@@ -106,128 +106,128 @@ const AdminAlerts = () => {
   const activeCount = alerts.filter((a) => a.status === 'ACTIVE').length;
 
   return (
-    <div className="space-y-8 font-sans">
+    <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="mono-tag mono-tag-rose text-[10px]">
-              <span className="w-1.5 h-1.5 rounded-full bg-rose-500 telemetry-dot"></span> LIVE DISPATCH
-            </span>
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold font-heading text-zinc-900 dark:text-white tracking-tight">
-            Emergency <span className="gradient-text-rose">SOS Distress Monitor</span>
+        <div className="space-y-1">
+          <span className="text-xs font-mono text-[#737373] dark:text-[#85858b]">Live dispatch</span>
+          <h1 className="text-2xl sm:text-3xl font-medium tracking-[-0.02em] text-[#171717] dark:text-[#ededed]">
+            Emergency SOS monitor
           </h1>
-          <p className="text-xs text-zinc-500 dark:text-zinc-400">
-            Real-time telemetry and dispatch coordination for emergency citizen distress signals.
+          <p className="text-sm text-[#525252] dark:text-[#a1a1a6]">
+            Real-time location telemetry and status coordination for incoming distress alerts
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-3">
-          {/* Filter Badges */}
-          <div className="flex items-center gap-1 bg-zinc-100 dark:bg-zinc-900/80 p-1 rounded-2xl border border-zinc-200 dark:border-zinc-800">
-            {['ALL', 'ACTIVE', 'ACKNOWLEDGED', 'RESOLVED'].map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setFilter(tab)}
-                className={`px-3 py-1.5 rounded-xl text-[10px] font-mono font-bold uppercase transition ${
-                  filter === tab
-                    ? 'bg-rose-600 text-white shadow-md shadow-rose-600/30'
-                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
-                }`}
-              >
-                {tab} {tab === 'ACTIVE' && activeCount > 0 && `(${activeCount})`}
-              </button>
-            ))}
+        <div className="flex flex-wrap items-center gap-2.5">
+          <div className="flex items-center gap-1 bg-[#f4f4f5] dark:bg-[#19191b] p-1 rounded-lg border border-zinc-900/[0.08] dark:border-white/[0.08]">
+            {['ALL', 'ACTIVE', 'ACKNOWLEDGED', 'RESOLVED'].map((tab) => {
+              const label =
+                tab === 'ALL' ? 'All' : tab === 'ACTIVE' ? 'Active' : tab === 'ACKNOWLEDGED' ? 'Acknowledged' : 'Resolved';
+              return (
+                <button
+                  key={tab}
+                  onClick={() => setFilter(tab)}
+                  className={`h-8 px-3 rounded-md text-xs font-medium transition-colors cursor-pointer ${
+                    filter === tab
+                      ? 'bg-[#171717] dark:bg-[#ededed] text-[#ffffff] dark:text-[#141415]'
+                      : 'text-[#525252] dark:text-[#a1a1a6] hover:text-[#171717] dark:hover:text-[#ededed]'
+                  }`}
+                >
+                  {label}
+                  {tab === 'ACTIVE' && activeCount > 0 && (
+                    <span className="ml-1.5 font-mono tabular-nums">({activeCount})</span>
+                  )}
+                </button>
+              );
+            })}
           </div>
 
           <button
             onClick={handleManualSync}
             disabled={syncing}
-            className="p-2.5 rounded-xl bg-white hover:bg-zinc-100 dark:bg-zinc-900 dark:hover:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition shadow-sm"
+            className="btn-outline h-10 w-10 px-0"
             title="Refresh from Cloud"
           >
-            <FiRefreshCw className={`w-4 h-4 ${syncing ? 'animate-spin text-rose-500' : ''}`} />
+            <FiRefreshCw className={`w-4 h-4 dispatch-icon ${syncing ? 'animate-spin text-[#e11d48]' : ''}`} />
           </button>
         </div>
       </div>
 
-      {/* Alerts Feed */}
       {filteredAlerts.length === 0 ? (
-        <div className="glass-card-xl p-12 sm:p-16 rounded-3xl text-center space-y-4 border border-zinc-200/80 dark:border-zinc-800/80 shadow-xl">
-          <div className="w-16 h-16 mx-auto rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400 text-3xl shadow-lg shadow-emerald-500/10">
-            <FiCheckCircle />
+        <div className="surface-panel p-12 text-center space-y-4">
+          <div className="w-10 h-10 mx-auto rounded-lg bg-[#16a34a]/10 dark:bg-[#4cc38a]/15 text-[#16a34a] dark:text-[#4cc38a] flex items-center justify-center">
+            <FiCheckCircle className="w-5 h-5 dispatch-icon" />
           </div>
           <div className="space-y-1">
-            <h3 className="text-lg font-bold text-zinc-900 dark:text-white">All Clear — No Active Distress Signals</h3>
-            <p className="text-xs text-zinc-500 dark:text-zinc-400 max-w-md mx-auto">
+            <h2 className="text-base font-medium text-[#171717] dark:text-[#ededed]">
+              All clear — no active distress alerts
+            </h2>
+            <p className="text-sm text-[#525252] dark:text-[#a1a1a6] max-w-md mx-auto">
               {filter === 'ALL'
-                ? 'There are currently zero emergency distress beacons triggered. The system is actively listening for incoming user SOS broadcasts.'
-                : `No emergency alerts match the "${filter}" filter status.`}
+                ? 'No emergency distress beacons have been triggered. The dispatch monitor listens continuously.'
+                : `No emergency alerts match the "${filter.toLowerCase()}" filter.`}
             </p>
           </div>
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-[11px] font-mono">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
-            DISPATCH GATEWAY LISTENING
-          </div>
+          <span className="status-tag mono-tag-emerald">Gateway listening</span>
         </div>
       ) : (
         <div className="space-y-6">
           {filteredAlerts.map((alert) => (
             <div
               key={alert.id}
-              className={`glass-card-xl p-6 sm:p-7 rounded-3xl space-y-6 border transition-all duration-300 ${
-                alert.status === 'ACTIVE'
-                  ? 'border-rose-500/50 bg-rose-50/40 dark:bg-rose-950/10 shadow-2xl shadow-rose-900/10 ring-1 ring-rose-500/20'
-                  : 'border-zinc-200/80 dark:border-zinc-800/80'
+              className={`surface-panel p-6 space-y-5 ${
+                alert.status === 'ACTIVE' ? 'border-[#dc2626]/45' : ''
               }`}
             >
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div className="flex items-start sm:items-center gap-3.5">
                   <div
-                    className={`p-3.5 rounded-2xl text-2xl flex-shrink-0 ${
+                    className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${
                       alert.status === 'ACTIVE'
-                        ? 'bg-rose-500/20 text-rose-500 animate-pulse border border-rose-500/40'
+                        ? 'bg-[#dc2626]/10 text-[#dc2626] dark:text-[#e5484d]'
                         : alert.status === 'ACKNOWLEDGED'
-                        ? 'bg-amber-500/20 text-amber-500 dark:text-amber-400 border border-amber-500/30'
-                        : 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30'
+                        ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400'
+                        : 'bg-[#16a34a]/10 dark:bg-[#4cc38a]/15 text-[#16a34a] dark:text-[#4cc38a]'
                     }`}
                   >
-                    <FiAlertTriangle />
+                    <FiAlertTriangle className="w-5 h-5 dispatch-icon" />
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <h3 className="text-lg font-extrabold text-zinc-900 dark:text-zinc-100 font-heading">
-                        {alert.userName || 'Anonymous User'}
-                      </h3>
-                      <span className="text-[10px] font-mono text-zinc-400 dark:text-zinc-500">#{alert.id}</span>
+                      <h2 className="text-base font-medium text-[#171717] dark:text-[#ededed]">
+                        {alert.userName || 'Anonymous user'}
+                      </h2>
+                      <span className="text-xs font-mono tabular-nums text-[#737373] dark:text-[#85858b]">
+                        #{alert.id}
+                      </span>
                     </div>
-                    <p className="text-xs text-zinc-500 dark:text-zinc-400 flex items-center gap-2 mt-0.5 font-mono">
-                      <span>Phone: {alert.userPhone || 'Not Given'}</span>
-                      <span>•</span>
+                    <p className="text-xs text-[#737373] dark:text-[#85858b] flex flex-wrap items-center gap-2 mt-0.5 font-mono tabular-nums">
+                      <span>{alert.userPhone || 'No phone'}</span>
+                      <span>·</span>
                       <span className="flex items-center gap-1">
-                        <FiClock className="text-zinc-400 dark:text-zinc-500" /> {formatDate(alert.timestamp)}
+                        <FiClock className="w-3.5 h-3.5 dispatch-icon" /> {formatDate(alert.timestamp)}
                       </span>
                     </p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+                <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto justify-end">
                   <span
-                    className={`px-3 py-1 rounded-full text-[10px] font-mono font-black uppercase ${
+                    className={`status-tag ${
                       alert.status === 'ACTIVE'
-                        ? 'bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-500/30'
-                        : alert.status === 'ACKNOWLEDGED'
-                        ? 'bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/30'
-                        : 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30'
+                        ? 'mono-tag-rose'
+                        : alert.status === 'RESOLVED'
+                        ? 'mono-tag-emerald'
+                        : ''
                     }`}
                   >
-                    {alert.status}
+                    {alert.status === 'ACTIVE' ? 'Active' : alert.status === 'ACKNOWLEDGED' ? 'Acknowledged' : 'Resolved'}
                   </span>
 
                   {alert.status === 'ACTIVE' && (
                     <button
                       onClick={() => handleUpdateStatus(alert.id, 'ACKNOWLEDGED')}
-                      className="px-3.5 py-1.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-600 dark:text-amber-300 font-bold text-xs uppercase font-mono transition"
+                      className="btn-outline h-8 px-3 text-xs"
                     >
                       Acknowledge
                     </button>
@@ -236,41 +236,39 @@ const AdminAlerts = () => {
                   {alert.status !== 'RESOLVED' && (
                     <button
                       onClick={() => handleUpdateStatus(alert.id, 'RESOLVED')}
-                      className="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase font-mono shadow-md shadow-emerald-600/30 transition"
+                      className="btn-solid h-8 px-3 text-xs"
                     >
-                      Resolve Safe
+                      Resolve safe
                     </button>
                   )}
 
                   <button
                     onClick={() => handleDeleteAlert(alert.id)}
-                    className="p-2 rounded-xl bg-zinc-100 hover:bg-red-500/20 text-zinc-500 hover:text-red-600 dark:bg-zinc-800/80 dark:hover:bg-red-500/20 dark:text-zinc-400 dark:hover:text-red-400 border border-zinc-200 dark:border-zinc-700/50 transition"
-                    title="Delete Alert Record"
+                    className="h-8 w-8 rounded-lg bg-[#f4f4f5] dark:bg-[#232325] text-[#737373] dark:text-[#85858b] hover:text-[#dc2626] dark:hover:text-[#e5484d] border border-zinc-900/[0.08] dark:border-white/[0.08] flex items-center justify-center transition-colors cursor-pointer"
+                    title="Delete alert record"
                   >
-                    <FiTrash2 className="w-3.5 h-3.5" />
+                    <FiTrash2 className="w-3.5 h-3.5 dispatch-icon" />
                   </button>
                 </div>
               </div>
 
-              {/* Location telemetry box */}
-              <div className="p-3.5 rounded-2xl bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800/80 flex items-center justify-between text-xs text-zinc-700 dark:text-zinc-300">
-                <div className="flex items-center gap-2">
-                  <FiMapPin className="text-rose-500 text-sm flex-shrink-0" />
-                  <span className="font-semibold text-zinc-900 dark:text-zinc-200">{alert.address || 'Unknown Location'}</span>
+              <div className="surface-raised px-4 py-2.5 flex items-center justify-between gap-3 text-xs">
+                <div className="flex items-center gap-2 min-w-0">
+                  <FiMapPin className="w-4 h-4 text-[#e11d48] shrink-0 dispatch-icon" />
+                  <span className="font-medium text-[#171717] dark:text-[#ededed] truncate">
+                    {alert.address || 'Unknown location'}
+                  </span>
                 </div>
-                <div className="font-mono text-[11px] text-zinc-500 dark:text-zinc-400">
-                  {alert.latitude?.toFixed(4)}, {alert.longitude?.toFixed(4)}
+                <div className="font-mono tabular-nums text-[#737373] dark:text-[#85858b] shrink-0">
+                  {alert.latitude?.toFixed(4)}° N · {alert.longitude?.toFixed(4)}° E
                 </div>
               </div>
 
-              {/* Live interactive map */}
-              <div className="rounded-2xl overflow-hidden border border-zinc-200 dark:border-zinc-800/80">
-                <LiveMap
-                  latitude={alert.latitude || 23.8103}
-                  longitude={alert.longitude || 90.4125}
-                  title={`Distress Alert: ${alert.userName || 'User'}`}
-                />
-              </div>
+              <LiveMap
+                latitude={alert.latitude || 23.8103}
+                longitude={alert.longitude || 90.4125}
+                title={`Distress alert: ${alert.userName || 'User'}`}
+              />
             </div>
           ))}
         </div>

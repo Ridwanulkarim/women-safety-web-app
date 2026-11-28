@@ -220,10 +220,7 @@ const AdminAIAgentDrawer = ({ defaultMode = 'SOS_REPORTS', isOpen, onClose }) =>
       recognitionRef.current.lang = language === 'bn' ? 'bn-BD' : 'en-US';
       try {
         recognitionRef.current.start();
-        toast(
-          language === 'bn' ? 'বাংলায় কথা বলুন... শুনছি 🎙️' : 'Listening... Speak your query 🎙️', 
-          { icon: '🎙️' }
-        );
+        toast(language === 'bn' ? 'বাংলায় কথা বলুন' : 'Listening for your query');
       } catch (err) {
         console.warn('Mic start error:', err);
       }
@@ -419,71 +416,71 @@ const AdminAIAgentDrawer = ({ defaultMode = 'SOS_REPORTS', isOpen, onClose }) =>
     if (isSummaryQuery) {
       traceNotes.push('ACTION: COMPREHENSIVE_SOS_SUMMARY');
       if (isBengali) {
-        spokenPhrase = `সেফহ্যাভেন সিস্টেমে মোট ${analyticsEngine.total}টি রিপোর্ট এসেছে। বর্তমানে ${analyticsEngine.active}টি সক্রিয় এবং ${analyticsEngine.resolved}টি সমাধান করা হয়েছে। স্টকিং এবং রাস্তায় হয়রানি প্রধান সমস্যা হিসেবে পাওয়া গেছে।`;
-        botResponse = `**📋 জরুরি এসওএস ইনসিডেন্ট সারাংশ:**\n\n` +
-          `• **মোট রিপোর্ট সংখ্যা:** ${toBengaliDigits(analyticsEngine.total)} টি নথিভুক্ত ঘটনা।\n` +
-          `• **বর্তমানে সক্রিয় অ্যালার্ট:** ${toBengaliDigits(analyticsEngine.active)} টি পেন্ডিং।\n` +
-          `• **সফলভাবে সমাধানকৃত:** ${toBengaliDigits(analyticsEngine.resolved)} টি (সমাধানের হার **${toBengaliDigits(analyticsEngine.rate)}%**)।\n\n` +
-          `**🔍 শনাক্তকৃত প্রধান সমস্যা ও কারণসমূহ:**\n` +
+        spokenPhrase = `সেফহ্যাভেন সিস্টেমে মোট ${analyticsEngine.total}টি রিপোর্ট এসেছে। বর্তমানে ${analyticsEngine.active}টি সক্রিয় এবং ${analyticsEngine.resolved}টি সমাধান করা হয়েছে।`;
+        botResponse = `**জরুরি এসওএস ইনসিডেন্ট সারাংশ**\n\n` +
+          `• **মোট রিপোর্ট সংখ্যা:** ${toBengaliDigits(analyticsEngine.total)}টি নথিভুক্ত ঘটনা।\n` +
+          `• **বর্তমানে সক্রিয় অ্যালার্ট:** ${toBengaliDigits(analyticsEngine.active)}টি পেন্ডিং।\n` +
+          `• **সমাধানকৃত:** ${toBengaliDigits(analyticsEngine.resolved)}টি (সমাধানের হার **${toBengaliDigits(analyticsEngine.rate)}%**)।\n\n` +
+          `**প্রধান সমস্যা ও কারণ**\n` +
           `• পিছু নেওয়া বা স্টকিং: **${toBengaliDigits(analyticsEngine.issueCategories.Stalking)}** টি\n` +
           `• রাস্তায় হয়রানি ও হুমকি: **${toBengaliDigits(analyticsEngine.issueCategories.Harassment)}** টি\n` +
-          `• প্রত্যক্ষ আক্রমণ ও শারীরিক আঘাত: **${toBengaliDigits(analyticsEngine.issueCategories.PhysicalAssault)}** টি\n` +
+          `• শারীরিক আক্রমণ: **${toBengaliDigits(analyticsEngine.issueCategories.PhysicalAssault)}** টি\n` +
           `• মেডিকেল ও জরুরি সহায়তা: **${toBengaliDigits(analyticsEngine.issueCategories.MedicalEmergency)}** টি\n\n` +
-          `**সর্বোচ্চ ঝুঁকির এলাকা:** ${Object.keys(analyticsEngine.locationCounts).slice(0, 3).join(', ') || 'প্রধান ট্রানজিট রুটসমূহ'}।`;
+          `**উল্লেখযোগ্য এলাকা:** ${Object.keys(analyticsEngine.locationCounts).slice(0, 3).join(', ') || 'প্রধান রুটসমূহ'}।`;
       } else {
-        spokenPhrase = `Total ${analyticsEngine.total} reports recorded with ${analyticsEngine.resolved} resolved and ${analyticsEngine.active} currently active.`;
-        botResponse = `**📋 Executive SOS Incident Summary:**\n\n` +
-          `• **Total Distress Logs:** ${analyticsEngine.total} reported events.\n` +
-          `• **Current Active Alerts:** ${analyticsEngine.active} pending response.\n` +
-          `• **Resolved Incidents:** ${analyticsEngine.resolved} (${analyticsEngine.rate}% resolution efficacy).\n\n` +
-          `**🔍 Primary Root Issues Diagnosed:**\n` +
-          `• Stalking / Pursuit Incidents: **${analyticsEngine.issueCategories.Stalking}**\n` +
-          `• Harassment & Verbal Threats: **${analyticsEngine.issueCategories.Harassment}**\n` +
-          `• Physical Assault / Immediate Danger: **${analyticsEngine.issueCategories.PhysicalAssault}**\n` +
-          `• Medical Emergencies: **${analyticsEngine.issueCategories.MedicalEmergency}**\n\n` +
-          `**High-Frequency Hotspots:** ${Object.keys(analyticsEngine.locationCounts).slice(0, 3).join(', ') || 'Metropolitan Transit Corridors'}.`;
+        spokenPhrase = `Total ${analyticsEngine.total} reports recorded with ${analyticsEngine.resolved} resolved and ${analyticsEngine.active} active.`;
+        botResponse = `**SOS Incident Summary**\n\n` +
+          `• **Total distress logs:** ${analyticsEngine.total}\n` +
+          `• **Active alerts:** ${analyticsEngine.active}\n` +
+          `• **Resolved incidents:** ${analyticsEngine.resolved} (${analyticsEngine.rate}% resolution rate)\n\n` +
+          `**Diagnosed Categories**\n` +
+          `• Stalking / pursuit: **${analyticsEngine.issueCategories.Stalking}**\n` +
+          `• Harassment & threats: **${analyticsEngine.issueCategories.Harassment}**\n` +
+          `• Physical assault: **${analyticsEngine.issueCategories.PhysicalAssault}**\n` +
+          `• Medical emergency: **${analyticsEngine.issueCategories.MedicalEmergency}**\n\n` +
+          `**Primary locations:** ${Object.keys(analyticsEngine.locationCounts).slice(0, 3).join(', ') || 'Transit corridors'}`;
       }
-    } 
+    }
     else if (isIssueQuery) {
       traceNotes.push('ACTION: ISSUE_DIAGNOSIS');
       if (isBengali) {
-        spokenPhrase = `ফরেনসিক রিপোর্টে দেখা গেছে, স্টকিং বা পিছু নেওয়া এবং রাস্তায় হয়রানি প্রধান কারণ হিসেবে এসেছে। বিশেষ করে রাতের বেলা সতর্কতা বাড়ানো প্রয়োজন।`;
-        botResponse = `**🔬 মূল সমস্যা ও ইনসিডেন্ট কারণ বিশ্লেষণ:**\n\n` +
-          `ব্যবহারকারীদের পাঠানো বার্তা ও ফরেনসিক ডেটা অনুযায়ী প্রধান ৩টি সমস্যা শনাক্ত হয়েছে:\n\n` +
-          `১. **স্টকিং বা পিছু নেওয়া:** রাতের নির্জন রাস্তায় সন্দেহভাজন ব্যক্তি বা গাড়ি ধীরগতিতে পিছু নেওয়ার ঘটনা।\n` +
-          `২. **রাস্তায় ও গণপরিবহনে হয়রানি:** রাতে চলাচলের সময় মৌখিক হুমকি ও পথরোধ।\n` +
-          `৩. **শারীরিক ও জরুরি আক্রমণ:** সরাসরি বিপদের মুহূর্তে জরুরি কন্টাক্টদের কাছে জিপিএস কো-অর্ডিনেট পাঠানো হয়েছে।\n\n` +
-          `**প্রস্তাবিত পদক্ষেপ:** বিশেষ করে **${analyticsEngine.peakHour}** সময়ে কমিউনিটি সতর্কতা ও পেট্রোলিং বাড়ানো প্রয়োজন।`;
+        spokenPhrase = `রিপোর্টে দেখা গেছে, স্টকিং বা পিছু নেওয়া এবং রাস্তায় হয়রানি প্রধান কারণ হিসেবে এসেছে।`;
+        botResponse = `**মূল সমস্যা ও কারণ বিশ্লেষণ**\n\n` +
+          `ব্যবহারকারীদের বার্তা অনুযায়ী প্রধান ৩টি ধরন পাওয়া গেছে:\n\n` +
+          `১. **স্টকিং বা পিছু নেওয়া:** নির্জন রাস্তায় সন্দেহভাজন অনুসরণের ঘটনা।\n` +
+          `২. **গণপরিবহন ও রাস্তায় হয়রানি:** রাতে চলাচলের সময় মৌখিক হুমকি ও পথরোধ।\n` +
+          `৩. **প্রত্যক্ষ বিপদ:** তাৎক্ষণিক জরুরি পরিচিতিদের কাছে জিপিএস পাঠানো হয়েছে।\n\n` +
+          `**পরামর্শ:** বিশেষ করে **${analyticsEngine.peakHour}** সময়ে সতর্কতা জোরদার রাখা উচিত।`;
       } else {
-        spokenPhrase = `Stalking and late night transit harassment were diagnosed as the primary distress causes.`;
-        botResponse = `**🔬 Root Cause & Incident Diagnostics:**\n\n` +
-          `Based on forensic telemetry and user distress dispatches, the top issues encountered are:\n\n` +
-          `1. **Stalking & Suspicious Tracking:** Users reported slow-moving vehicles or unidentified individuals tailing them in dimly lit streets.\n` +
-          `2. **Public Transit & Street Harassment:** Verbal intimidation and route cornering reported during late-night commutes.\n` +
-          `3. **Physical & Domestic Threats:** Immediate panic triggers requiring emergency contact broadcasting.\n\n` +
-          `**Key Mitigation Recommendation:** Prioritize rapid-response dispatches during ${analyticsEngine.peakHour}.`;
+        spokenPhrase = `Stalking and late night transit harassment were diagnosed as primary causes.`;
+        botResponse = `**Incident Root Causes**\n\n` +
+          `Based on logged distress dispatches, the recurring issues are:\n\n` +
+          `1. **Stalking and tailing:** Reports of suspicious vehicles or individuals following users in low-traffic streets.\n` +
+          `2. **Transit and street harassment:** Verbal intimidation during late commutes.\n` +
+          `3. **Direct physical threat:** Immediate panic dispatches triggered to guardians.\n\n` +
+          `**Recommendation:** Prioritize dispatch readiness during ${analyticsEngine.peakHour}.`;
       }
     }
     else if (isCountQuery) {
       traceNotes.push('ACTION: QUANTITATIVE_ANALYTICS_QUERY');
       if (isBengali) {
-        spokenPhrase = `এখন পর্যন্ত মোট ${analyticsEngine.total}টি ইনসিডেন্ট হয়েছে। ইনসিডেন্ট সমাধানের হার ${analyticsEngine.rate} শতাংশ।`;
-        botResponse = `**📊 লাইভ অ্যানালিটিক্স ও সিস্টেম মেট্রিক্স:**\n\n` +
-          `• **মোট নথিভুক্ত ঘটনা:** ${toBengaliDigits(analyticsEngine.total)} টি\n` +
-          `• **বর্তমানে সক্রিয় অ্যালার্ট:** ${toBengaliDigits(analyticsEngine.active)} টি\n` +
-          `• **সফল সমাধান সংখ্যা:** ${toBengaliDigits(analyticsEngine.resolved)} টি\n` +
-          `• **সমাধানের হার (Resolution Rate):** **${toBengaliDigits(analyticsEngine.rate)}%**\n` +
-          `• **মোট সুরক্ষিত অ্যাকাউন্ট:** ${toBengaliDigits(analyticsEngine.totalUsers)} জন\n` +
-          `• **সর্বোচ্চ বিপদের সময়কাল:** ${analyticsEngine.peakHour}`;
+        spokenPhrase = `এখন পর্যন্ত মোট ${analyticsEngine.total}টি ইনসিডেন্ট হয়েছে। সমাধানের হার ${analyticsEngine.rate} শতাংশ।`;
+        botResponse = `**লাইভ অ্যানালিটিক্স মেট্রিক্স**\n\n` +
+          `• **মোট নথিভুক্ত ঘটনা:** ${toBengaliDigits(analyticsEngine.total)}টি\n` +
+          `• **বর্তমানে সক্রিয় অ্যালার্ট:** ${toBengaliDigits(analyticsEngine.active)}টি\n` +
+          `• **সমাধান সংখ্যা:** ${toBengaliDigits(analyticsEngine.resolved)}টি\n` +
+          `• **সমাধানের হার:** **${toBengaliDigits(analyticsEngine.rate)}%**\n` +
+          `• **নিবন্ধিত ব্যবহারকারী:** ${toBengaliDigits(analyticsEngine.totalUsers)} জন\n` +
+          `• **সর্বোচ্চ ঝুঁকির সময়:** ${analyticsEngine.peakHour}`;
       } else {
-        spokenPhrase = `Total ${analyticsEngine.total} incidents recorded with an overall resolution rate of ${analyticsEngine.rate} percent.`;
-        botResponse = `**📊 Live Analytics Telemetry Metrics:**\n\n` +
-          `• **Total Recorded Incidents:** ${analyticsEngine.total}\n` +
-          `• **Active Distress Signals:** ${analyticsEngine.active}\n` +
-          `• **Successfully Resolved:** ${analyticsEngine.resolved}\n` +
-          `• **Resolution Success Rate:** **${analyticsEngine.rate}%**\n` +
-          `• **Total Registered Accounts Protected:** ${analyticsEngine.totalUsers}\n` +
-          `• **Peak Risk Interval:** ${analyticsEngine.peakHour}`;
+        spokenPhrase = `Total ${analyticsEngine.total} incidents recorded with a ${analyticsEngine.rate} percent resolution rate.`;
+        botResponse = `**Live Analytics Metrics**\n\n` +
+          `• **Total incidents:** ${analyticsEngine.total}\n` +
+          `• **Active signals:** ${analyticsEngine.active}\n` +
+          `• **Resolved:** ${analyticsEngine.resolved}\n` +
+          `• **Resolution rate:** **${analyticsEngine.rate}%**\n` +
+          `• **Registered accounts:** ${analyticsEngine.totalUsers}\n` +
+          `• **Peak risk interval:** ${analyticsEngine.peakHour}`;
       }
     }
     else if (isLatestQuery) {
@@ -491,59 +488,59 @@ const AdminAIAgentDrawer = ({ defaultMode = 'SOS_REPORTS', isOpen, onClose }) =>
       const latest = alerts[0];
       if (latest) {
         if (isBengali) {
-          spokenPhrase = `সর্বশেষ রিপোর্টটি ${latest.userName || 'ব্যবহারকারী'} থেকে এসেছে এবং এর স্ট্যাটাস সক্রিয়।`;
-          botResponse = `**🚨 সর্বশেষ রিপোর্টকৃত বিপদের বিবরণ:**\n\n` +
+          spokenPhrase = `সর্বশেষ রিপোর্টটি ${latest.userName || 'ব্যবহারকারী'} থেকে এসেছে।`;
+          botResponse = `**সর্বশেষ জরুরি রিপোর্ট**\n\n` +
             `• **রিপোর্ট আইডি:** \`${latest.id}\`\n` +
-            `• **রিপোর্টার:** **${latest.userName || 'নাম প্রকাশে অনিচ্ছুক'}** (${latest.userPhone || 'সরাসরি জরুরি কল'})\n` +
-            `• **লোকেশন:** ${latest.address || 'জিপিএস কো-অর্ডিনেট সংরক্ষিত'}\n` +
-            `• **কো-অর্ডিনেট:** \`${latest.latitude || 22.3569}° N, ${latest.longitude || 91.7832}° E\`\n` +
-            `• **বর্তমান অবস্থা:** **${latest.status === 'ACTIVE' ? 'সক্রিয় (Active)' : 'সমাধানকৃত (Resolved)'}**\n` +
-            `• **সময়কাল:** ${new Date(latest.timestamp || Date.now()).toLocaleString()}`;
+            `• **ব্যবহারকারী:** **${latest.userName || 'বেনামী'}** (${latest.userPhone || 'সরাসরি কল'})\n` +
+            `• **লোকেশন:** ${latest.address || 'জিপিএস সংরক্ষিত'}\n` +
+            `• **স্থানাঙ্ক:** \`${latest.latitude || 23.8103}° N, ${latest.longitude || 90.4125}° E\`\n` +
+            `• **অবস্থা:** **${latest.status === 'ACTIVE' ? 'সক্রিয়' : 'সমাধানকৃত'}**\n` +
+            `• **সময়:** ${new Date(latest.timestamp || Date.now()).toLocaleString()}`;
         } else {
-          spokenPhrase = `The most recent distress alert was logged from ${latest.userName || 'a registered user'} and is currently ${latest.status}.`;
-          botResponse = `**🚨 Most Recent Distress Report Details:**\n\n` +
+          spokenPhrase = `The latest distress alert was sent by ${latest.userName || 'a user'} and is currently ${latest.status}.`;
+          botResponse = `**Latest Distress Report**\n\n` +
             `• **Report ID:** \`${latest.id}\`\n` +
-            `• **Reporter:** **${latest.userName || 'Anonymous User'}** (${latest.userPhone || 'Emergency Direct'})\n` +
-            `• **Reported Location:** ${latest.address || 'GPS Coordinates Registered'}\n` +
-            `• **Coordinates:** \`${latest.latitude || 22.3569}° N, ${latest.longitude || 91.7832}° E\`\n` +
-            `• **Incident Status:** **${latest.status}**\n` +
+            `• **Reporter:** **${latest.userName || 'Anonymous'}** (${latest.userPhone || 'N/A'})\n` +
+            `• **Location:** ${latest.address || 'GPS recorded'}\n` +
+            `• **Coordinates:** \`${latest.latitude || 23.8103}° N, ${latest.longitude || 90.4125}° E\`\n` +
+            `• **Status:** **${latest.status}**\n` +
             `• **Timestamp:** ${new Date(latest.timestamp || Date.now()).toLocaleString()}`;
         }
       } else {
-        spokenPhrase = isBengali ? "আর্কাইভে কোনো রিপোর্ট পাওয়া যায়নি।" : "No recent incident logs found.";
-        botResponse = isBengali ? "আর্কাইভে কোনো রিপোর্ট পাওয়া যায়নি।" : "No recent incident logs found in the archive.";
+        spokenPhrase = isBengali ? 'আর্কাইভে কোনো রিপোর্ট পাওয়া যায়নি।' : 'No recent incident logs found.';
+        botResponse = spokenPhrase;
       }
     }
     else if (isPeakQuery) {
       traceNotes.push('ACTION: TEMPORAL_RISK_ANALYSIS');
       if (isBengali) {
-        spokenPhrase = `বিশ্লেষণে দেখা গেছে, ${analyticsEngine.peakHour} সময়ে সবচেয়ে বেশি বিপদ সংকেত রেকর্ড হয়েছে।`;
-        botResponse = `**⏱️ সর্বোচ্চ ঝুঁকির সময় বিশ্লেষণ:**\n\n` +
-          `• **সবচেয়ে ঝুঁকিপূর্ণ সময়:** **${analyticsEngine.peakHour}** সময়ে সর্বাধিক বিপদ সংকেত এসেছে।\n` +
-          `• **মূল কারণ:** রাতে মানুষের চলাচল ও খোলা দোকান কমে যাওয়া, পর্যাপ্ত আলোর অভাব।\n` +
-          `• **প্রস্তাবিত পদক্ষেপ:** এই সময়ে ট্রাভেলরত ব্যবহারকারীদের কাছে স্বয়ংক্রিয় সেফটি চেক-ইন অ্যালার্ট পাঠানো।`;
+        spokenPhrase = `${analyticsEngine.peakHour} সময়ে সবচেয়ে বেশি বিপদ সংকেত রেকর্ড হয়েছে।`;
+        botResponse = `**ঝুঁকিপূর্ণ সময় বিশ্লেষণ**\n\n` +
+          `• **সর্বোচ্চ ঝুঁকির সময়:** **${analyticsEngine.peakHour}**\n` +
+          `• **কারণ:** রাতে যাতায়াতের ঘনত্ব ও আলোর স্বল্পতা।\n` +
+          `• **করণীয়:** এই সময়ে ব্যবহারকারীদের জন্য দ্রুত চেক-ইন সতর্কতা চালু রাখা।`;
       } else {
         spokenPhrase = `Peak distress alerts occurred during ${analyticsEngine.peakHour}.`;
-        botResponse = `**⏱️ Temporal Risk & Peak Hour Analysis:**\n\n` +
-          `• **Critical Incident Interval:** **${analyticsEngine.peakHour}** represents the highest frequency window for distress triggers.\n` +
-          `• **Contributing Factors:** Decreased street transit density and low lighting.\n` +
-          `• **Administrative Action:** Recommend automated safety check-in push notifications to vulnerable commuters during this window.`;
+        botResponse = `**Temporal Risk Analysis**\n\n` +
+          `• **Peak interval:** **${analyticsEngine.peakHour}** shows the highest SOS frequency.\n` +
+          `• **Factors:** Lower street activity and lighting.\n` +
+          `• **Action:** Maintain elevated response readiness during these hours.`;
       }
     }
     else {
       traceNotes.push('ACTION: GENERAL_QNA_SYNTHESIS');
       if (isBengali) {
-        spokenPhrase = `সেফহ্যাভেনে বর্তমানে ${analyticsEngine.total}টি রিপোর্ট সংরক্ষিত আছে। আপনি সামারি বা মেট্রিক্স জানতে চাইতে পারেন।`;
-        botResponse = `**💡 সেফহ্যাভেন এআই বিশ্লেষণ:**\n\n` +
-          `আপনার প্রশ্ন "${userPrompt}" সম্পর্কে:\n` +
-          `সেফহ্যাভেন সিস্টেমে বর্তমানে **${toBengaliDigits(analyticsEngine.total)}টি রিপোর্ট** এবং **${toBengaliDigits(analyticsEngine.totalUsers)} জন নিবন্ধিত ব্যবহারকারী** সুরক্ষিত রয়েছেন।\n\n` +
-          `আপনি আমাকে বলতে পারেন: **সব রিপোর্ট সামারি করো**, **কী কী সমস্যা হয়েছিল**, **কয়টি ইনসিডেন্ট হয়েছে** অথবা **সর্বশেষ ঘটনার বিবরণ দাও**।`;
+        spokenPhrase = `সেফহ্যাভেনে বর্তমানে ${analyticsEngine.total}টি রিপোর্ট সংরক্ষিত আছে।`;
+        botResponse = `**সেফহ্যাভেন এআই বিশ্লেষণ**\n\n` +
+          `প্রশ্ন: "${userPrompt}"\n` +
+          `সিস্টেমে বর্তমানে **${toBengaliDigits(analyticsEngine.total)}টি রিপোর্ট** এবং **${toBengaliDigits(analyticsEngine.totalUsers)} জন ব্যবহারকারী** নিবন্ধিত রয়েছেন।\n\n` +
+          `জিজ্ঞাসা করতে পারেন: **সব রিপোর্ট সামারি করো**, **কী কী সমস্যা হয়েছিল**, **কয়টি ইনসিডেন্ট হয়েছে** বা **সর্বশেষ ঘটনার বিবরণ**।`;
       } else {
-        spokenPhrase = `SafeHaven is monitoring ${analyticsEngine.total} total incident logs.`;
-        botResponse = `**💡 SafeHaven Agent Analysis:**\n\n` +
+        spokenPhrase = `SafeHaven monitors ${analyticsEngine.total} logged incidents.`;
+        botResponse = `**SafeHaven Copilot Analysis**\n\n` +
           `Regarding "${userPrompt}":\n` +
-          `The SafeHaven system currently monitors **${analyticsEngine.total} total incident logs** across **${analyticsEngine.totalUsers} registered users**.\n\n` +
-          `You can ask me to: **summarize all reports**, **break down root causes**, **show peak danger hours**, or **inspect the latest incident**.`;
+          `SafeHaven currently tracks **${analyticsEngine.total} incident logs** across **${analyticsEngine.totalUsers} registered users**.\n\n` +
+          `Try asking to **summarize all reports**, **list root causes**, **check peak hours**, or **inspect the latest incident**.`;
       }
     }
 
@@ -595,146 +592,147 @@ const AdminAIAgentDrawer = ({ defaultMode = 'SOS_REPORTS', isOpen, onClose }) =>
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-y-0 right-0 z-50 w-full max-w-lg bg-white dark:bg-[#0b0f19] border-l border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col font-sans backdrop-blur-2xl transition-colors duration-200">
+    <div className="fixed inset-y-0 right-0 z-50 w-full max-w-lg bg-[#ffffff] dark:bg-[#141415] border-l border-zinc-900/[0.08] dark:border-white/[0.08] shadow-2xl flex flex-col">
       {/* Top Header */}
-      <div className="p-4 border-b border-zinc-200/80 dark:border-zinc-800/80 bg-zinc-50/80 dark:bg-slate-900/50 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-rose-600 to-indigo-600 flex items-center justify-center text-white text-lg shadow-lg shadow-rose-600/30">
-            <FiCpu />
+      <div className="p-4 border-b border-zinc-900/[0.08] dark:border-white/[0.08] bg-[#fafafa] dark:bg-[#0f0f10] flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="w-9 h-9 rounded-lg bg-[#f4f4f5] dark:bg-[#232325] border border-zinc-900/[0.08] dark:border-white/[0.08] flex items-center justify-center text-[#171717] dark:text-[#ededed] shrink-0">
+            <FiCpu className="w-4 h-4 text-[#e11d48] dispatch-icon" />
           </div>
-          <div>
+          <div className="min-w-0">
             <div className="flex items-center gap-2">
-              <h2 className="text-sm font-bold text-zinc-900 dark:text-white tracking-tight">SafeHaven AI Copilot</h2>
-              <span className="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-indigo-500/15 text-indigo-600 dark:text-indigo-300 border border-indigo-500/30">
-                LangGraph State Machine
-              </span>
+              <h2 className="text-sm font-medium text-[#171717] dark:text-[#ededed] truncate">SafeHaven copilot</h2>
+              <span className="status-tag shrink-0">LangGraph</span>
             </div>
-            <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
-              {mode === 'SOS_REPORTS' 
-                ? (language === 'bn' ? 'এসওএস রিপোর্ট ডায়াগনস্টিকস ও প্রশ্নোত্তর' : 'SOS Reports Diagnostics & Q&A')
-                : (language === 'bn' ? 'ভয়েস ও রিয়েল-টাইম অ্যানালিটিক্স ইন্টেলিজেন্স' : 'Conversational Analytics Intelligence')}
+            <p className="text-xs text-[#737373] dark:text-[#85858b] truncate">
+              {mode === 'SOS_REPORTS'
+                ? (language === 'bn' ? 'এসওএস রিপোর্ট বিশ্লেষণ' : 'SOS report diagnostics')
+                : (language === 'bn' ? 'অ্যানালিটিক্স প্রশ্নোত্তর' : 'Analytics intelligence')}
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          {/* Bilingual Toggle Button (বাংলা / English) */}
+        <div className="flex items-center gap-1.5 shrink-0">
           <button
             onClick={() => {
               stopSpeaking();
               const newLang = language === 'bn' ? 'en' : 'bn';
               setLanguage(newLang);
-              toast.success(newLang === 'bn' ? 'বাংলা ভয়েস ও টেক্সট মোড চালু হয়েছে 🇧🇩' : 'Switched to English Voice & Text 🇬🇧');
+              toast.success(newLang === 'bn' ? 'বাংলা মোড চালু হয়েছে' : 'Switched to English');
             }}
-            className="px-2.5 py-1.5 rounded-lg text-xs font-mono font-bold border transition bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800/90 dark:hover:bg-zinc-700 border-zinc-300 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 flex items-center gap-1.5 shadow-sm"
-            title="Toggle Voice & Text Language (বাংলা / English)"
+            className="btn-outline h-8 px-2.5 text-xs"
+            title="Toggle language"
           >
-            <FiGlobe className="text-rose-500 dark:text-rose-400" />
+            <FiGlobe className="w-3.5 h-3.5 dispatch-icon" />
             <span>{language === 'bn' ? 'বাংলা' : 'EN'}</span>
           </button>
 
-          {/* Fresh Voice Toggle */}
           <button
             onClick={() => {
               if (isSpeaking) stopSpeaking();
               setVoiceEnabled(!voiceEnabled);
             }}
-            className={`p-2 rounded-lg text-xs border transition ${
-              voiceEnabled 
-                ? 'bg-rose-500/15 border-rose-500/30 text-rose-600 dark:text-rose-400' 
-                : 'bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 border-zinc-300 dark:border-zinc-700 text-zinc-500 dark:text-zinc-500'
+            className={`h-8 w-8 rounded-lg border flex items-center justify-center transition-colors cursor-pointer ${
+              voiceEnabled
+                ? 'bg-[#e11d48]/10 border-[#e11d48]/25 text-[#e11d48]'
+                : 'bg-[#f4f4f5] dark:bg-[#232325] border-zinc-900/10 dark:border-white/10 text-[#737373] dark:text-[#85858b]'
             }`}
-            title={voiceEnabled ? 'Natural Voice ON (Click to Mute)' : 'Natural Voice OFF'}
+            title={voiceEnabled ? 'Mute voice output' : 'Enable voice output'}
           >
-            {isSpeaking ? <FiVolume2 className="animate-pulse text-rose-500 dark:text-rose-400" /> : voiceEnabled ? <FiVolume2 /> : <FiVolumeX />}
+            {voiceEnabled ? <FiVolume2 className="w-4 h-4 dispatch-icon" /> : <FiVolumeX className="w-4 h-4 dispatch-icon" />}
           </button>
 
           <button
             onClick={onClose}
-            className="p-2 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800/80 dark:hover:bg-zinc-700 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition"
+            className="h-8 w-8 rounded-lg bg-[#f4f4f5] dark:bg-[#232325] border border-zinc-900/10 dark:border-white/10 text-[#737373] dark:text-[#85858b] hover:text-[#171717] dark:hover:text-[#ededed] flex items-center justify-center transition-colors cursor-pointer"
           >
-            <FiX />
+            <FiX className="w-4 h-4 dispatch-icon" />
           </button>
         </div>
       </div>
 
       {/* Mode Switcher Tabs */}
-      <div className="flex border-b border-zinc-200 dark:border-zinc-800 text-xs font-semibold bg-zinc-100/60 dark:bg-slate-950/40">
+      <div className="flex border-b border-zinc-900/[0.08] dark:border-white/[0.08] text-xs font-medium bg-[#fafafa] dark:bg-[#19191b]">
         <button
           onClick={() => setMode('SOS_REPORTS')}
-          className={`flex-1 py-2.5 px-3 flex items-center justify-center gap-1.5 border-b-2 transition ${
+          className={`flex-1 py-2.5 px-3 flex items-center justify-center gap-1.5 border-b-2 transition-colors cursor-pointer ${
             mode === 'SOS_REPORTS'
-              ? 'border-rose-500 text-rose-600 dark:text-rose-400 bg-rose-500/5 font-bold'
-              : 'border-transparent text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
+              ? 'border-[#e11d48] text-[#171717] dark:text-[#ededed]'
+              : 'border-transparent text-[#737373] dark:text-[#85858b] hover:text-[#171717] dark:hover:text-[#ededed]'
           }`}
         >
-          <FiFileText /> {language === 'bn' ? 'এসওএস রিপোর্ট কোপাইলট' : 'SOS Reports Copilot'}
+          <FiFileText className="w-3.5 h-3.5 dispatch-icon" />
+          {language === 'bn' ? 'এসওএস রিপোর্ট' : 'SOS reports'}
         </button>
         <button
           onClick={() => setMode('ANALYTICS')}
-          className={`flex-1 py-2.5 px-3 flex items-center justify-center gap-1.5 border-b-2 transition ${
+          className={`flex-1 py-2.5 px-3 flex items-center justify-center gap-1.5 border-b-2 transition-colors cursor-pointer ${
             mode === 'ANALYTICS'
-              ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400 bg-indigo-500/5 font-bold'
-              : 'border-transparent text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
+              ? 'border-[#e11d48] text-[#171717] dark:text-[#ededed]'
+              : 'border-transparent text-[#737373] dark:text-[#85858b] hover:text-[#171717] dark:hover:text-[#ededed]'
           }`}
         >
-          <FiPieChart /> {language === 'bn' ? 'অ্যানালিটিক্স কিউএনএ এজেন্ট' : 'Analytics Q&A Agent'}
+          <FiPieChart className="w-3.5 h-3.5 dispatch-icon" />
+          {language === 'bn' ? 'অ্যানালিটিক্স' : 'Analytics'}
         </button>
       </div>
 
-      {/* Execution Trace Bar (Shows LangGraph active node) */}
+      {/* Execution Trace Bar */}
       {agentState !== AGENT_NODES.IDLE && (
-        <div className="px-4 py-2 bg-indigo-50 dark:bg-indigo-950/40 border-b border-indigo-200 dark:border-indigo-900/50 flex items-center gap-2 text-[11px] text-indigo-700 dark:text-indigo-300 font-mono animate-pulse">
-          <FiZap className="text-indigo-600 dark:text-indigo-400 shrink-0" />
-          <span className="truncate">{activeStepTrace.join(' ➔ ')}</span>
+        <div className="px-4 py-2 bg-[#f4f4f5] dark:bg-[#232325] border-b border-zinc-900/[0.08] dark:border-white/[0.08] flex items-center gap-2 text-xs text-[#525252] dark:text-[#a1a1a6] font-mono">
+          <FiZap className="w-3.5 h-3.5 text-[#e11d48] shrink-0 dispatch-icon" />
+          <span className="truncate">{activeStepTrace.join(' → ')}</span>
         </div>
       )}
 
-      {/* Chat Messages Log */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 text-xs bg-zinc-50/40 dark:bg-transparent">
+      {/* Messages Log */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 text-xs">
         {chatHistory.map((msg, index) => (
           <div
             key={index}
             className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}
           >
             <div
-              className={`max-w-[88%] rounded-2xl p-4 space-y-1.5 leading-relaxed shadow-sm ${
+              className={`max-w-[88%] rounded-xl p-4 space-y-2 leading-relaxed ${
                 msg.role === 'user'
-                  ? 'bg-gradient-to-r from-rose-600 to-rose-700 text-white rounded-br-none shadow-md shadow-rose-600/20'
-                  : 'bg-white dark:bg-slate-900/90 border border-zinc-200 dark:border-zinc-800/80 text-zinc-800 dark:text-zinc-200 rounded-bl-none'
+                  ? 'bg-[#e11d48] text-white'
+                  : 'bg-[#fafafa] dark:bg-[#19191b] border border-zinc-900/[0.08] dark:border-white/[0.08] text-[#171717] dark:text-[#ededed]'
               }`}
             >
-              {/* Message Header */}
-              <div className="flex items-center justify-between gap-3 text-[10px] text-zinc-500 dark:text-zinc-400 pb-1 border-b border-zinc-200/80 dark:border-white/5 font-mono">
-                <span className="font-semibold text-zinc-700 dark:text-zinc-300">
-                  {msg.role === 'user' ? 'Admin' : 'SafeHaven Intelligence Copilot'}
+              <div
+                className={`flex items-center justify-between gap-3 text-[11px] pb-1.5 border-b font-mono ${
+                  msg.role === 'user'
+                    ? 'border-white/20 text-white/80'
+                    : 'border-zinc-900/[0.08] dark:border-white/[0.08] text-[#737373] dark:text-[#85858b]'
+                }`}
+              >
+                <span className="font-medium">
+                  {msg.role === 'user' ? 'Admin' : 'SafeHaven Copilot'}
                 </span>
                 <div className="flex items-center gap-2">
                   {msg.role === 'assistant' && (
                     <button
                       onClick={() => speakText(msg.text, msg.spokenPhrase)}
-                      className="text-zinc-500 dark:text-zinc-400 hover:text-rose-600 dark:hover:text-rose-400 transition flex items-center gap-1"
-                      title="Play / Replay Voice"
+                      className="hover:text-[#171717] dark:hover:text-[#ededed] transition-colors flex items-center gap-1 cursor-pointer"
+                      title="Play audio"
                     >
-                      <FiVolume2 className="text-xs" />
-                      <span className="text-[9px]">Replay</span>
+                      <FiVolume2 className="w-3.5 h-3.5 dispatch-icon" />
+                      <span>Play</span>
                     </button>
                   )}
-                  <span>{msg.timestamp}</span>
+                  <span className="tabular-nums">{msg.timestamp}</span>
                 </div>
               </div>
 
-              {/* Message Body */}
-              <div className="whitespace-pre-line text-[12px]">
+              <div className="whitespace-pre-line text-[13px] leading-relaxed">
                 {msg.text}
               </div>
 
-              {/* Agentic Trace Tags */}
               {msg.trace && msg.trace.length > 0 && (
-                <div className="pt-2 flex flex-wrap gap-1">
+                <div className="pt-1.5 flex flex-wrap gap-1.5">
                   {msg.trace.map((tr, i) => (
-                    <span key={i} className="text-[9px] px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-indigo-700 dark:text-indigo-400 font-mono border border-indigo-200 dark:border-indigo-500/20">
-                      ⚡ {tr}
+                    <span key={i} className="text-[11px] px-2 py-0.5 rounded bg-[#f4f4f5] dark:bg-[#232325] text-[#525252] dark:text-[#a1a1a6] font-mono border border-zinc-900/[0.08] dark:border-white/[0.08]">
+                      {tr}
                     </span>
                   ))}
                 </div>
@@ -744,26 +742,26 @@ const AdminAIAgentDrawer = ({ defaultMode = 'SOS_REPORTS', isOpen, onClose }) =>
         ))}
 
         {agentState !== AGENT_NODES.IDLE && (
-          <div className="flex items-center gap-2 text-zinc-500 text-xs italic p-2 font-mono">
-            <FiRefreshCw className="animate-spin text-rose-500" />
-            <span>{language === 'bn' ? 'এজেন্ট ল্যাংগ্রাফ ওয়ার্কফ্লো এক্সিকিউট করছে...' : 'Agent executing LangGraph workflow...'}</span>
+          <div className="flex items-center gap-2 text-[#737373] dark:text-[#85858b] text-xs p-2 font-mono">
+            <FiRefreshCw className="w-3.5 h-3.5 animate-spin text-[#e11d48] dispatch-icon" />
+            <span>{language === 'bn' ? 'ল্যাংগ্রাফ ওয়ার্কফ্লো চলছে' : 'Running LangGraph workflow'}</span>
           </div>
         )}
 
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Quick Demonstration Prompts */}
-      <div className="p-2.5 bg-zinc-100/70 dark:bg-slate-950/60 border-t border-zinc-200 dark:border-zinc-800/60 overflow-x-auto">
-        <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider block mb-1.5 px-1">
-          {language === 'bn' ? 'কুইক প্রশ্নাবলি (Quick Prompts):' : 'Quick Q&A Prompts:'}
+      {/* Quick Prompts */}
+      <div className="p-3 bg-[#fafafa] dark:bg-[#0f0f10] border-t border-zinc-900/[0.08] dark:border-white/[0.08]">
+        <span className="text-xs text-[#737373] dark:text-[#85858b] block mb-2">
+          {language === 'bn' ? 'প্রস্তাবিত প্রশ্ন' : 'Suggested prompts'}
         </span>
         <div className="flex gap-1.5 overflow-x-auto pb-1">
           {quickPrompts.map((p, idx) => (
             <button
               key={idx}
               onClick={() => handleProcessQuery(p)}
-              className="text-[11px] px-2.5 py-1 rounded-full bg-white hover:bg-zinc-200 dark:bg-zinc-900/90 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-300 dark:border-zinc-700/60 whitespace-nowrap transition shrink-0 shadow-sm"
+              className="text-xs px-2.5 py-1.5 rounded-md bg-[#ffffff] hover:bg-[#f4f4f5] dark:bg-[#19191b] dark:hover:bg-[#232325] text-[#525252] dark:text-[#a1a1a6] hover:text-[#171717] dark:hover:text-[#ededed] border border-zinc-900/[0.08] dark:border-white/[0.08] whitespace-nowrap transition-colors shrink-0 cursor-pointer"
             >
               {p}
             </button>
@@ -771,8 +769,8 @@ const AdminAIAgentDrawer = ({ defaultMode = 'SOS_REPORTS', isOpen, onClose }) =>
         </div>
       </div>
 
-      {/* Input Box & Voice STT Bar */}
-      <div className="p-3 bg-white dark:bg-slate-900/90 border-t border-zinc-200 dark:border-zinc-800">
+      {/* Input Bar */}
+      <div className="p-3 bg-[#ffffff] dark:bg-[#141415] border-t border-zinc-900/[0.08] dark:border-white/[0.08]">
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -780,18 +778,17 @@ const AdminAIAgentDrawer = ({ defaultMode = 'SOS_REPORTS', isOpen, onClose }) =>
           }}
           className="flex items-center gap-2"
         >
-          {/* Voice to Text (STT) Button */}
           <button
             type="button"
             onClick={toggleMic}
-            className={`p-3 rounded-xl transition flex items-center justify-center shrink-0 ${
+            className={`h-10 w-10 rounded-lg transition-colors flex items-center justify-center shrink-0 cursor-pointer ${
               isListening
-                ? 'bg-rose-600 text-white animate-bounce shadow-lg shadow-rose-600/50'
-                : 'bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 border border-zinc-300 dark:border-zinc-700 shadow-sm'
+                ? 'bg-[#dc2626] text-white'
+                : 'bg-[#f4f4f5] hover:bg-zinc-200 dark:bg-[#232325] dark:hover:bg-zinc-700 text-[#525252] dark:text-[#a1a1a6] border border-zinc-900/10 dark:border-white/10'
             }`}
-            title={language === 'bn' ? 'মুখে বাংলায় প্রশ্ন বলুন (ভয়েস-টু-টেক্সট)' : 'Speak query in English (Voice-to-Text)'}
+            title={language === 'bn' ? 'ভয়েস প্রশ্ন' : 'Voice query'}
           >
-            {isListening ? <FiMicOff /> : <FiMic />}
+            {isListening ? <FiMicOff className="w-4 h-4 dispatch-icon" /> : <FiMic className="w-4 h-4 dispatch-icon" />}
           </button>
 
           <input
@@ -799,35 +796,34 @@ const AdminAIAgentDrawer = ({ defaultMode = 'SOS_REPORTS', isOpen, onClose }) =>
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder={
-              isListening 
-                ? (language === 'bn' ? 'শুনছি... আপনার প্রশ্নটি মুখে বলুন' : 'Listening to your voice...') 
-                : mode === 'SOS_REPORTS' 
-                  ? (language === 'bn' ? 'ইনসিডেন্ট, সমস্যা বা সামারি সম্পর্কে বাংলায় জিজ্ঞাসা করুন...' : 'Ask about incidents, issues, or summarize reports...') 
-                  : (language === 'bn' ? 'মোট ইনসিডেন্ট, সমাধানের হার বা সময় সম্পর্কে বাংলায় জিজ্ঞাসা করুন...' : 'Ask about incident counts, resolution rates, peak times...')
+              isListening
+                ? (language === 'bn' ? 'শুনছি' : 'Listening')
+                : mode === 'SOS_REPORTS'
+                  ? (language === 'bn' ? 'এসওএস রিপোর্ট সম্পর্কে জিজ্ঞাসা করুন' : 'Ask about SOS reports')
+                  : (language === 'bn' ? 'অ্যানালিটিক্স সম্পর্কে জিজ্ঞাসা করুন' : 'Ask about analytics metrics')
             }
-            className="flex-1 bg-zinc-50 dark:bg-zinc-950/80 border border-zinc-300 dark:border-zinc-800 focus:border-rose-500 rounded-xl px-4 py-2.5 text-xs text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none transition shadow-sm"
+            className="human-input h-10 text-xs"
           />
 
           <button
             type="submit"
             disabled={!query.trim() || agentState !== AGENT_NODES.IDLE}
-            className="btn-danger p-3 rounded-xl disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
+            className="btn-danger h-10 w-10 px-0 shrink-0"
           >
-            <FiSend />
+            <FiSend className="w-4 h-4 dispatch-icon" />
           </button>
         </form>
 
         {isSpeaking && (
-          <div className="mt-2 flex items-center justify-between text-[11px] text-rose-600 dark:text-rose-400 bg-rose-500/10 px-3 py-1.5 rounded-lg border border-rose-500/20">
-            <span className="flex items-center gap-1.5 font-mono">
-              <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-ping"></span> 
-              {language === 'bn' ? 'স্টুডিও-কোয়ালিটি ন্যাচারাল বাংলা অডিও বাজছে...' : 'Speaking via Natural Voice Engine...'}
+          <div className="mt-2 flex items-center justify-between text-xs text-[#e11d48] bg-[#e11d48]/10 px-3 py-1.5 rounded-lg border border-[#e11d48]/20">
+            <span className="font-mono">
+              {language === 'bn' ? 'ভয়েস অডিও চলছে' : 'Playing voice audio'}
             </span>
             <button
               onClick={stopSpeaking}
-              className="text-[10px] uppercase font-bold text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
+              className="font-medium text-[#171717] dark:text-[#ededed] hover:underline cursor-pointer"
             >
-              {language === 'bn' ? 'অডিও থামান' : 'Stop Audio'}
+              {language === 'bn' ? 'থামান' : 'Stop'}
             </button>
           </div>
         )}

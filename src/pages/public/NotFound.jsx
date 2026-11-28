@@ -8,28 +8,27 @@ const NotFound = () => {
   const isBn = language === 'bn';
 
   return (
-    <div className="min-h-[70vh] flex items-center justify-center p-4 font-sans">
-      <div className="max-w-md w-full glass-card p-8 rounded-3xl text-center space-y-6">
-        <div className="w-16 h-16 mx-auto bg-pink-500/20 text-pink-500 rounded-full flex items-center justify-center text-4xl">
-          <FiAlertOctagon />
+    <div className="min-h-[70vh] flex items-center justify-center p-4">
+      <div className="max-w-md w-full surface-panel p-8 text-center space-y-5">
+        <div className="w-10 h-10 mx-auto rounded-lg bg-[#e11d48]/10 text-[#e11d48] flex items-center justify-center">
+          <FiAlertOctagon className="w-5 h-5 dispatch-icon" />
         </div>
         <div className="space-y-2">
-          <h1 className="text-4xl font-extrabold font-heading text-rose-600">{isBn ? '৪০৪' : '404'}</h1>
-          <h2 className="text-xl font-bold font-heading text-zinc-900 dark:text-white">
-            {isBn ? 'পৃষ্ঠাটি খুঁজে পাওয়া যায়নি' : 'Page Not Found'}
-          </h2>
-          <p className="text-xs text-zinc-500 dark:text-zinc-400">
-            {isBn 
-              ? 'আপনার কাঙ্ক্ষিত পৃষ্ঠাটি বিদ্যমান নেই অথবা অন্য কোনো লিঙ্কে স্থানান্তর করা হয়েছে।' 
-              : 'The requested page does not exist or has been moved.'}
+          <span className="font-mono tabular-nums text-xs text-[#737373] dark:text-[#85858b] block">
+            {isBn ? 'ত্রুটি ৪০৪' : 'Error 404'}
+          </span>
+          <h1 className="text-xl font-medium text-[#171717] dark:text-[#ededed]">
+            {isBn ? 'পৃষ্ঠাটি খুঁজে পাওয়া যায়নি' : 'Page not found'}
+          </h1>
+          <p className="text-sm text-[#525252] dark:text-[#a1a1a6]">
+            {isBn
+              ? 'আপনার অনুরোধ করা পৃষ্ঠাটি পাওয়া যায়নি অথবা স্থানান্তরিত হয়েছে।'
+              : 'The page you requested does not exist or has been moved.'}
           </p>
         </div>
 
-        <Link
-          to="/"
-          className="inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs uppercase tracking-wider shadow-lg shadow-rose-600/30 transition hover:scale-105"
-        >
-          <FiHome /> {isBn ? 'হোম পেজে ফিরে যান' : 'Return to Home'}
+        <Link to="/" className="btn-solid h-11 px-5 text-sm inline-flex">
+          <FiHome className="w-4 h-4 dispatch-icon" /> {isBn ? 'হোম পেজে ফিরুন' : 'Return home'}
         </Link>
       </div>
     </div>

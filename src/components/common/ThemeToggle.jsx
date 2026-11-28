@@ -8,10 +8,11 @@ const ThemeToggle = () => {
   return (
     <button
       onClick={toggleDarkMode}
+      type="button"
       aria-label="Toggle dark mode"
-      className="p-1.5 sm:p-2.5 rounded-lg bg-zinc-100 dark:bg-zinc-800/80 text-zinc-700 dark:text-zinc-200 hover:text-rose-600 dark:hover:text-rose-400 transition min-h-[36px] sm:min-h-[40px] flex items-center justify-center border border-zinc-200 dark:border-zinc-700"
+      className="h-9 w-9 rounded-lg bg-[#f4f4f5] dark:bg-[#232325] text-[#525252] dark:text-[#a1a1a6] hover:text-[#171717] dark:hover:text-[#ededed] border border-zinc-900/10 dark:border-white/10 hover:border-zinc-900/20 dark:hover:border-white/20 flex items-center justify-center cursor-pointer transition-colors duration-150"
     >
-      {darkMode ? <FiSun className="w-4 h-4 text-amber-400" /> : <FiMoon className="w-4 h-4 text-zinc-700 dark:text-zinc-200" />}
+      {darkMode ? <FiSun className="w-4 h-4 dispatch-icon" /> : <FiMoon className="w-4 h-4 dispatch-icon" />}
     </button>
   );
 };

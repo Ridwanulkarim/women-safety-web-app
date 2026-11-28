@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import AudioEvidenceRecorder from '../../components/evidence/AudioEvidenceRecorder';
 import CameraEvidenceCapture from '../../components/evidence/CameraEvidenceCapture';
 import LegalEvidenceExporterModal from '../../components/evidence/LegalEvidenceExporterModal';
-import { FiShield, FiLock, FiHardDrive, FiFileText } from 'react-icons/fi';
+import { FiLock, FiFileText } from 'react-icons/fi';
 import { useLanguage } from '../../context/LanguageContext';
 
 const EvidenceVaultPage = () => {
@@ -13,48 +13,42 @@ const EvidenceVaultPage = () => {
   const bulkExportItem = {
     id: 'bulk_package_' + Date.now(),
     date: new Date().toLocaleString(),
-    type: isBn ? 'সম্পূর্ণ প্রমাণাদি প্যাকেজ' : 'Full Evidence Package',
+    type: isBn ? 'সম্পূর্ণ প্রমাণাদি প্যাকেজ' : 'Full evidence package',
     lat: 23.8103,
     lng: 90.4125,
     address: 'Dhaka / Chittagong, Bangladesh'
   };
 
   return (
-    <div className="space-y-6 relative overflow-hidden font-sans">
-      {/* Ambient corner glow */}
-      <div className="absolute top-0 right-0 w-80 h-80 bg-rose-600/10 rounded-full blur-3xl pointer-events-none"></div>
-
-      {/* Header */}
-      <div className="glass-card-xl p-6 sm:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative overflow-hidden">
-        <div className="space-y-2 relative z-10">
+    <div className="space-y-6">
+      <div className="surface-panel p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+        <div className="space-y-1.5">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="mono-tag mono-tag-rose">
-              <FiLock className="w-3 h-3 text-rose-500" /> {isBn ? 'নিরাপদ প্রমাণ সংরক্ষণাগার' : 'SECURE EVIDENCE VAULT'}
+            <span className="status-tag">
+              <FiLock className="w-3.5 h-3.5 text-[#e11d48] dispatch-icon" />
+              {isBn ? 'প্রমাণ সংরক্ষণাগার' : 'Evidence vault'}
             </span>
-            <span className="mono-tag mono-tag-emerald">
-              {isBn ? 'এসএইচএ-২৫৬ আইনি যাচাইকরণ' : 'SHA-256 Chain-of-Custody'}
+            <span className="status-tag mono-tag-emerald">
+              {isBn ? 'SHA-256 চেইন-অব-কাস্টডি' : 'SHA-256 chain of custody'}
             </span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold font-heading text-zinc-900 dark:text-white tracking-tight">
-            {isBn ? 'জরুরি ' : 'Emergency '}<span className="gradient-text-rose">{isBn ? 'প্রমাণাদি ভল্ট' : 'Evidence Locker'}</span>
+          <h1 className="text-2xl sm:text-3xl font-medium text-[#171717] dark:text-[#ededed]">
+            {isBn ? 'জরুরি প্রমাণাদি ভল্ট' : 'Emergency evidence locker'}
           </h1>
-          <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 max-w-2xl">
+          <p className="text-sm text-[#525252] dark:text-[#a1a1a6] max-w-2xl">
             {isBn
-              ? 'রেকর্ড করা অডিও, টাইমস্ট্যাম্পসহ তোলা ছবি এবং জরুরি নোটসমূহ আপনার ডিভাইসে SHA-256 ক্রিপ্টোগ্রাফিক চেইনে সুরক্ষিত থাকে যা আদালতে প্রমাণ হিসেবে গ্রহণযোগ্য।'
-              : 'Captured audio recordings, timestamped camera photos, and distress notes are encrypted locally with SHA-256 cryptographic chain-of-custody verification.'}
+              ? 'ধারণকৃত অডিও, টাইমস্ট্যাম্পযুক্ত ছবি এবং ভিডিও প্রমাণাদি ডিভাইসে SHA-256 চেকসামসহ সংরক্ষিত থাকে।'
+              : 'Recorded audio clips, timestamped photos, and video evidence are preserved locally with SHA-256 verification digests.'}
           </p>
         </div>
 
-        <button
-          onClick={() => setExporterOpen(true)}
-          className="btn-danger py-3 px-5 text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-2 shadow-lg shadow-rose-600/25 relative z-10"
-        >
-          <FiFileText className="text-base" /> {isBn ? 'আইনি প্রমাণপত্র ডাউনলোড (PDF)' : 'EXPORT LEGAL DOCKET (PDF)'}
+        <button onClick={() => setExporterOpen(true)} className="btn-solid h-10 px-4 text-xs shrink-0">
+          <FiFileText className="w-4 h-4 dispatch-icon" />
+          {isBn ? 'আইনি ডকেট এক্সপোর্ট (PDF)' : 'Export legal docket'}
         </button>
       </div>
 
-      {/* Grid: Voice Recorder & Camera Capture */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 relative z-10">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <AudioEvidenceRecorder />
         <CameraEvidenceCapture />
       </div>

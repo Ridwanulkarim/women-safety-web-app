@@ -59,7 +59,7 @@ const AudioEvidenceRecorder = ({ autoStart = false }) => {
           const updated = [newRecording, ...recordings];
           setRecordings(updated);
           localStorage.setItem('safehaven_audio_evidence', JSON.stringify(updated));
-          toast.success(isBn ? '🎙️ জরুরি ভয়েস রেকর্ডিং ভল্টে সংরক্ষিত হয়েছে!' : '🎙️ Emergency Voice Recording Saved to Evidence Vault!');
+          toast.success(isBn ? 'অডিও প্রমাণ ভল্টে সংরক্ষিত হয়েছে' : 'Audio recording saved to vault');
         };
 
         stream.getTracks().forEach((t) => t.stop());
@@ -68,7 +68,7 @@ const AudioEvidenceRecorder = ({ autoStart = false }) => {
       mediaRecorderRef.current.start();
       setIsRecording(true);
       setRecordingTime(0);
-      toast.error(isBn ? '🎙️ জরুরি অডিও রেকর্ডিং শুরু হয়েছে!' : '🎙️ Emergency Audio Recording Started!');
+      toast.error(isBn ? 'অডিও রেকর্ডিং শুরু হয়েছে' : 'Emergency audio recording started');
 
       timerRef.current = setInterval(() => {
         setRecordingTime((prev) => prev + 1);
@@ -106,90 +106,84 @@ const AudioEvidenceRecorder = ({ autoStart = false }) => {
   };
 
   return (
-    <div className="product-card p-6 space-y-6 font-sans">
-      <div className="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 pb-3">
-        <div className="flex items-center gap-2">
-          <FiMic className="text-rose-600 dark:text-rose-400 text-lg" />
+    <div className="surface-card p-6 space-y-5">
+      <div className="flex items-center justify-between border-b border-zinc-900/[0.08] dark:border-white/[0.08] pb-4">
+        <div className="flex items-center gap-3">
+          <FiMic className="w-5 h-5 text-[#525252] dark:text-[#a1a1a6] dispatch-icon" />
           <div>
-            <h3 className="text-sm font-bold uppercase tracking-wider text-zinc-900 dark:text-white font-heading">
-              {isBn ? 'জরুরি ভয়েস রেকর্ডার' : 'Emergency Voice Recorder'}
-            </h3>
-            <p className="text-xs text-zinc-500">
-              {isBn ? 'আইনি প্রমাণের জন্য ব্যাকগ্রাউন্ড অডিও রেকর্ড করে' : 'Captures background audio telemetry for legal evidence'}
+            <h2 className="text-base font-medium text-[#171717] dark:text-[#ededed]">
+              {isBn ? 'জরুরি ভয়েস রেকর্ডার' : 'Emergency voice recorder'}
+            </h2>
+            <p className="text-xs text-[#737373] dark:text-[#85858b]">
+              {isBn ? 'আইনি প্রমাণের জন্য অডিও রেকর্ড সংরক্ষণ করে' : 'Records ambient audio locally for evidence'}
             </p>
           </div>
         </div>
         {isRecording ? (
-          <span className="mono-tag mono-tag-rose animate-pulse">
-            <span className="w-2 h-2 rounded-full bg-rose-600 telemetry-dot"></span> {isBn ? `রেকর্ডিং চলছে (${toBengaliDigits(formatTime(recordingTime))})` : `RECORDING (${formatTime(recordingTime)})`}
+          <span className="status-tag mono-tag-rose font-mono tabular-nums">
+            {isBn ? `রেকর্ডিং (${toBengaliDigits(formatTime(recordingTime))})` : `Recording ${formatTime(recordingTime)}`}
           </span>
         ) : (
-          <span className="mono-tag mono-tag-emerald">{isBn ? 'প্রস্তুত' : 'Ready'}</span>
+          <span className="status-tag mono-tag-emerald">{isBn ? 'প্রস্তুত' : 'Ready'}</span>
         )}
       </div>
 
-      {/* Recording Controls */}
-      <div className="flex items-center gap-3">
+      <div>
         {isRecording ? (
-          <button
-            onClick={stopRecording}
-            className="w-full btn-danger py-3 text-xs font-mono font-bold uppercase tracking-wider flex items-center justify-center gap-2 animate-pulse"
-          >
-            <FiSquare /> {isBn ? `রেকর্ড বন্ধ করুন (${toBengaliDigits(formatTime(recordingTime))})` : `STOP RECORDING (${formatTime(recordingTime)})`}
+          <button onClick={stopRecording} className="w-full btn-danger h-10 text-xs">
+            <FiSquare className="w-4 h-4 dispatch-icon" />
+            {isBn ? `রেকর্ড বন্ধ করুন (${toBengaliDigits(formatTime(recordingTime))})` : `Stop recording (${formatTime(recordingTime)})`}
           </button>
         ) : (
-          <button
-            onClick={startRecording}
-            className="w-full btn-solid py-3 text-xs font-mono font-bold uppercase tracking-wider flex items-center justify-center gap-2"
-          >
-            <FiMic /> {isBn ? 'জরুরি অডিও রেকর্ড শুরু করুন' : 'START EMERGENCY RECORDING'}
+          <button onClick={startRecording} className="w-full btn-solid h-10 text-xs">
+            <FiMic className="w-4 h-4 dispatch-icon" />
+            {isBn ? 'জরুরি অডিও রেকর্ড শুরু করুন' : 'Start emergency recording'}
           </button>
         )}
       </div>
 
-      {/* Audio Evidence Locker List */}
-      <div className="space-y-3 pt-2">
-        <h4 className="text-xs font-mono font-bold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">
-          {isBn ? `সংরক্ষিত অডিও ভল্ট (${toBengaliDigits(recordings.length)})` : `Saved Audio Vault (${recordings.length})`}
-        </h4>
+      <div className="space-y-3 pt-1">
+        <h3 className="text-xs font-medium text-[#737373] dark:text-[#85858b]">
+          {isBn ? `সংরক্ষিত অডিও (${toBengaliDigits(recordings.length)})` : `Saved audio (${recordings.length})`}
+        </h3>
 
         {recordings.length === 0 ? (
-          <p className="text-xs text-zinc-400 italic py-2">
-            {isBn ? 'কোনো অডিও প্রমাণ এখনো ধারণ করা হয়নি।' : 'No audio evidence captured yet.'}
+          <p className="text-xs text-[#737373] dark:text-[#85858b] py-2">
+            {isBn ? 'কোনো অডিও প্রমাণ এখনো ধারণ করা হয়নি' : 'No audio recordings captured'}
           </p>
         ) : (
           <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
             {recordings.map((rec) => (
               <div
                 key={rec.id}
-                className="p-3 rounded-lg bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs"
+                className="p-3 rounded-lg bg-[#fafafa] dark:bg-[#141415] border border-zinc-900/[0.08] dark:border-white/[0.08] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs"
               >
                 <div>
-                  <span className="font-mono text-zinc-500 text-[10px] block">{rec.date}</span>
-                  <audio controls src={rec.dataUrl} className="h-8 max-w-[220px] mt-1" />
+                  <span className="font-mono tabular-nums text-[#737373] dark:text-[#85858b] block">{rec.date}</span>
+                  <audio controls src={rec.dataUrl} className="h-8 max-w-[220px] mt-1.5" />
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5">
                   <button
                     onClick={() => handleOpenExporter(rec)}
-                    className="p-2 rounded-lg bg-rose-500/10 text-rose-600 dark:text-rose-400 hover:bg-rose-500/20 transition flex items-center gap-1 font-mono text-[10px] font-bold"
-                    title={isBn ? 'আইনি প্রমাণপত্র ডাউনলোড' : 'Export Chain-of-Custody PDF Docket'}
+                    className="btn-outline h-8 px-2.5 text-xs"
+                    title={isBn ? 'আইনি ডকেট' : 'Export legal docket'}
                   >
-                    <FiFileText /> {isBn ? 'আইনি PDF' : 'Legal PDF'}
+                    <FiFileText className="w-3.5 h-3.5 text-[#e11d48] dispatch-icon" /> {isBn ? 'আইনি PDF' : 'Legal PDF'}
                   </button>
                   <a
                     href={rec.dataUrl}
                     download={`Evidence_Audio_${rec.id}.webm`}
-                    className="p-2 rounded-lg bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200 hover:text-rose-600 transition"
-                    title={isBn ? 'ডাউনলোড' : 'Download Evidence'}
+                    className="h-8 w-8 rounded-lg bg-[#f4f4f5] dark:bg-[#232325] text-[#525252] dark:text-[#a1a1a6] hover:text-[#171717] dark:hover:text-[#ededed] border border-zinc-900/[0.08] dark:border-white/[0.08] flex items-center justify-center transition-colors"
+                    title={isBn ? 'ডাউনলোড' : 'Download'}
                   >
-                    <FiDownload />
+                    <FiDownload className="w-3.5 h-3.5 dispatch-icon" />
                   </a>
                   <button
                     onClick={() => deleteRecording(rec.id)}
-                    className="p-2 rounded-lg bg-rose-500/10 text-rose-600 hover:bg-rose-500/20 transition"
-                    title={isBn ? 'মুছুন' : 'Delete Evidence'}
+                    className="h-8 w-8 rounded-lg bg-[#f4f4f5] dark:bg-[#232325] text-[#737373] dark:text-[#85858b] hover:text-[#dc2626] dark:hover:text-[#e5484d] border border-zinc-900/[0.08] dark:border-white/[0.08] flex items-center justify-center transition-colors cursor-pointer"
+                    title={isBn ? 'মুছুন' : 'Delete'}
                   >
-                    <FiTrash2 />
+                    <FiTrash2 className="w-3.5 h-3.5 dispatch-icon" />
                   </button>
                 </div>
               </div>

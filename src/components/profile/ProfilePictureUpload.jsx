@@ -24,10 +24,10 @@ const ProfilePictureUpload = ({ currentUrl, onUploadSuccess, userId = 'guest' })
   const validateFile = (file) => {
     if (!file) return isBn ? 'কোনো ফাইল নির্বাচন করা হয়নি।' : 'No file selected.';
     if (!file.type || !file.type.startsWith('image/')) {
-      return isBn ? 'অসমর্থিত ফাইল ফরম্যাট। একটি ছবি (JPEG, PNG, WEBP, GIF) নির্বাচন করুন।' : 'Invalid file type. Please select a valid image file (JPEG, PNG, WEBP, GIF).';
+      return isBn ? 'ছবির ফরম্যাট সঠিক নয় (JPEG, PNG, WEBP)।' : 'Select a valid image file (JPEG, PNG, WEBP, GIF).';
     }
     if (file.size > 5 * 1024 * 1024) {
-      return isBn ? 'ছবির সাইজ ৫ মেগাবাইটের বেশি। ছোট সাইজের ছবি নির্বাচন করুন।' : 'File size exceeds 5MB limit. Please select a smaller photo.';
+      return isBn ? 'ছবির আকার ৫ মেগাবাইটের কম হতে হবে।' : 'File size must be under 5 MB.';
     }
     return null;
   };
@@ -42,26 +42,22 @@ const ProfilePictureUpload = ({ currentUrl, onUploadSuccess, userId = 'guest' })
     setErrorMessage(null);
     setUploading(true);
 
-    // 1. Convert file to Data URL instantly for 0-lag preview & profile update
     const reader = new FileReader();
     reader.onloadend = async () => {
       const dataUrl = reader.result;
       setPreviewUrl(dataUrl);
 
-      // Save image immediately to form & AuthContext
       if (onUploadSuccess) {
         onUploadSuccess(dataUrl);
       }
       setUploading(false);
-      toast.success(isBn ? 'প্রোফাইল ছবি সফলভাবে আপডেট করা হয়েছে!' : 'Profile picture updated successfully!');
+      toast.success(isBn ? 'প্রোফাইল ছবি আপডেট হয়েছে' : 'Profile photo updated');
 
-      // 2. Attempt background upload to Firebase Storage (if bucket is active)
       try {
         const cleanFileName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
         const storagePath = `profilePictures/${userId}/${Date.now()}_${cleanFileName}`;
         const storageRef = ref(storage, storagePath);
 
-        // Delete old image if it exists in Firebase Storage
         if (currentUrl && currentUrl.includes('firebasestorage.googleapis.com')) {
           try {
             await deleteObject(ref(storage, currentUrl));
@@ -69,8 +65,6 @@ const ProfilePictureUpload = ({ currentUrl, onUploadSuccess, userId = 'guest' })
         }
 
         const uploadTask = uploadBytesResumable(storageRef, file);
-
-        // 3-second safety timeout for Firebase Storage background sync
         const timeoutId = setTimeout(() => {
           uploadTask.cancel();
         }, 3000);
@@ -101,32 +95,11 @@ const ProfilePictureUpload = ({ currentUrl, onUploadSuccess, userId = 'guest' })
 
   const handleFileSelect = (e) => {
     const file = e.target.files?.[0];
-    if (file) {
-      processAndUploadFile(file);
-    }
-  };
-
-  const handleDragOver = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragging(true);
-  };
-
-  const handleDragLeave = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragging(false);
-  };
-
-  const handleDrop = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragging(false);
+    if (file) processAndUploadFile(file);
   };
 
   return (
-    <div className="flex flex-col items-center gap-3 font-sans">
-      {/* Hidden File Input for Native Camera / Gallery Picker */}
+    <div className="flex flex-col items-center gap-3">
       <input
         type="file"
         ref={fileInputRef}
@@ -135,76 +108,80 @@ const ProfilePictureUpload = ({ currentUrl, onUploadSuccess, userId = 'guest' })
         className="hidden"
       />
 
-      {/* Circular Avatar Upload Area */}
       <div
         onClick={() => !uploading && fileInputRef.current?.click()}
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
-        onDrop={handleDrop}
-        className={`relative w-28 h-28 sm:w-32 sm:h-32 rounded-full overflow-hidden border-4 transition-all duration-200 cursor-pointer group flex items-center justify-center bg-zinc-100 dark:bg-zinc-900 shadow-xl ${
+        onDragOver={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          setIsDragging(true);
+        }}
+        onDragLeave={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          setIsDragging(false);
+        }}
+        onDrop={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          setIsDragging(false);
+        }}
+        className={`relative w-28 h-28 rounded-full overflow-hidden border transition-colors cursor-pointer group flex items-center justify-center bg-[#f4f4f5] dark:bg-[#141415] ${
           isDragging
-            ? 'border-rose-500 scale-105 ring-4 ring-rose-500/30'
+            ? 'border-[#e11d48]'
             : errorMessage
-            ? 'border-rose-500/80'
-            : 'border-rose-500/40 hover:border-rose-500'
+            ? 'border-[#dc2626]'
+            : 'border-zinc-900/15 dark:border-white/15 hover:border-zinc-900/30 dark:hover:border-white/30'
         }`}
       >
         {previewUrl ? (
           <img
             src={previewUrl}
-            alt="Profile Preview"
-            className={`w-full h-full object-cover transition duration-300 ${uploading ? 'opacity-40 blur-xs' : 'group-hover:scale-105'}`}
+            alt="Profile preview"
+            className={`w-full h-full object-cover transition-opacity duration-150 ${uploading ? 'opacity-40' : ''}`}
           />
         ) : (
-          <div className="flex flex-col items-center justify-center text-zinc-400 dark:text-zinc-500 space-y-1">
-            <FiUser className="w-10 h-10" />
-            <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-rose-500">
-              {isBn ? 'ছবি যোগ করুন' : 'Add Photo'}
-            </span>
+          <div className="flex flex-col items-center justify-center text-[#737373] dark:text-[#85858b] space-y-1">
+            <FiUser className="w-8 h-8 dispatch-icon" />
+            <span className="text-xs font-medium">{isBn ? 'ছবি যোগ করুন' : 'Add photo'}</span>
           </div>
         )}
 
-        {/* Hover / Drag Overlay for Desktop */}
-        <div className={`absolute inset-0 bg-zinc-950/60 flex flex-col items-center justify-center text-white transition-opacity duration-200 ${
-          isDragging ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
-        }`}>
+        <div
+          className={`absolute inset-0 bg-black/60 flex flex-col items-center justify-center text-white transition-opacity duration-150 ${
+            isDragging ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+          }`}
+        >
           {isDragging ? (
             <>
-              <FiUploadCloud className="w-8 h-8 text-rose-400 animate-bounce" />
-              <span className="text-[10px] font-mono font-bold uppercase tracking-wider mt-1 text-rose-300">
-                {isBn ? 'এখানে ছবি ড্রপ করুন' : 'Drop Image Here'}
-              </span>
+              <FiUploadCloud className="w-6 h-6 dispatch-icon" />
+              <span className="text-xs mt-1">{isBn ? 'এখানে ছাড়ুন' : 'Drop image'}</span>
             </>
           ) : (
             <>
-              <FiCamera className="w-7 h-7 text-white mb-1" />
-              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-zinc-200">
-                {previewUrl ? (isBn ? 'ছবি পরিবর্তন' : 'Change Photo') : (isBn ? 'ছবি আপলোড' : 'Upload Photo')}
+              <FiCamera className="w-5 h-5 mb-1 dispatch-icon" />
+              <span className="text-xs">
+                {previewUrl ? (isBn ? 'পরিবর্তন' : 'Change') : (isBn ? 'আপলোড' : 'Upload')}
               </span>
             </>
           )}
         </div>
 
-        {/* Upload Loading Spinner */}
         {uploading && (
-          <div className="absolute inset-0 bg-zinc-950/70 flex flex-col items-center justify-center text-white z-10 space-y-1">
-            <FiLoader className="w-8 h-8 text-rose-500 animate-spin" />
-            <span className="text-[10px] font-mono font-bold text-rose-400">
-              {isBn ? 'প্রসেসিং হচ্ছে...' : 'Processing...'}
-            </span>
+          <div className="absolute inset-0 bg-black/70 flex flex-col items-center justify-center text-white z-10 space-y-1">
+            <FiLoader className="w-6 h-6 animate-spin dispatch-icon" />
+            <span className="text-xs">{isBn ? 'আপলোড হচ্ছে' : 'Uploading'}</span>
           </div>
         )}
       </div>
 
-      {/* Helper & Validation Error Messages */}
-      <div className="text-center space-y-1">
+      <div className="text-center">
         {errorMessage ? (
-          <p className="text-xs font-semibold text-rose-500 flex items-center justify-center gap-1.5 animate-pulse">
-            <FiAlertCircle className="flex-shrink-0" /> {errorMessage}
+          <p className="text-xs text-[#dc2626] dark:text-[#e5484d] flex items-center justify-center gap-1.5">
+            <FiAlertCircle className="w-3.5 h-3.5 shrink-0 dispatch-icon" /> {errorMessage}
           </p>
         ) : (
-          <p className="text-[11px] text-zinc-500 dark:text-zinc-400 font-mono">
-            {isBn ? 'ছবি আপলোড করতে ট্যাপ করুন বা ড্রপ করুন (সর্বোচ্চ ৫MB: JPG, PNG, WEBP)' : 'Click, tap, or drag & drop to upload (Max 5MB: JPG, PNG, WEBP)'}
+          <p className="text-xs text-[#737373] dark:text-[#85858b]">
+            {isBn ? 'সর্বোচ্চ ৫ মেগাবাইট (JPG, PNG, WEBP)' : 'Max 5 MB · JPG, PNG, or WEBP'}
           </p>
         )}
       </div>

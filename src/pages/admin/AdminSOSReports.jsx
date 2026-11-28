@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FiFileText, FiDownload, FiMapPin, FiCheckCircle, FiClock, FiAlertTriangle, FiCpu } from 'react-icons/fi';
+import { FiFileText, FiDownload, FiMapPin, FiCpu } from 'react-icons/fi';
 import { formatDate } from '../../utils/helpers';
 import toast from 'react-hot-toast';
 import { getGlobalSOSAlerts } from '../../utils/adminDataRegistry';
@@ -10,13 +10,9 @@ const AdminSOSReports = () => {
   const [isAIAgentOpen, setIsAIAgentOpen] = useState(false);
 
   useEffect(() => {
-    const handleUpdate = () => {
-      setReports(getGlobalSOSAlerts());
-    };
-
+    const handleUpdate = () => setReports(getGlobalSOSAlerts());
     window.addEventListener('safehaven_sos_updated', handleUpdate);
     window.addEventListener('storage', handleUpdate);
-
     return () => {
       window.removeEventListener('safehaven_sos_updated', handleUpdate);
       window.removeEventListener('storage', handleUpdate);
@@ -25,7 +21,7 @@ const AdminSOSReports = () => {
 
   const handleExportCSV = () => {
     if (reports.length === 0) {
-      toast.error('No incident reports available to export.');
+      toast.error('No incident reports to export');
       return;
     }
 
@@ -51,121 +47,99 @@ const AdminSOSReports = () => {
     link.click();
     document.body.removeChild(link);
 
-    toast.success('SOS Incident Report exported to CSV file.');
+    toast.success('Incident report exported to CSV');
   };
 
   return (
-    <div className="space-y-8 max-w-6xl mx-auto font-sans">
+    <div className="space-y-6">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="mono-tag mono-tag-rose text-[10px]">
-              <span className="w-1.5 h-1.5 rounded-full bg-rose-500 telemetry-dot"></span> AUDIT ARCHIVE
-            </span>
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold font-heading text-zinc-900 dark:text-white tracking-tight">
-            SOS Incident <span className="gradient-text-rose">Reports</span>
+        <div className="space-y-1">
+          <span className="text-xs font-mono text-[#737373] dark:text-[#85858b]">Audit archive</span>
+          <h1 className="text-2xl sm:text-3xl font-medium tracking-[-0.02em] text-[#171717] dark:text-[#ededed]">
+            SOS incident reports
           </h1>
-          <p className="text-xs text-zinc-500 dark:text-zinc-400">
-            Official archival record of emergency distress signals, dispatch coordination, and resolution logs.
+          <p className="text-sm text-[#525252] dark:text-[#a1a1a6]">
+            Archival record of distress broadcasts, dispatch coordination, and resolutions
           </p>
         </div>
 
-        <div className="flex items-center gap-3 w-full sm:w-auto">
-          <button
-            onClick={() => setIsAIAgentOpen(true)}
-            className="flex-1 sm:flex-initial px-5 py-3 rounded-2xl font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 font-mono transition shadow-lg bg-gradient-to-r from-indigo-600 via-purple-600 to-rose-600 hover:from-indigo-500 hover:to-rose-500 text-white shadow-indigo-600/30"
-          >
-            <FiCpu className="text-base" /> AI Incident Copilot
+        <div className="flex items-center gap-2.5 w-full sm:w-auto">
+          <button onClick={() => setIsAIAgentOpen(true)} className="flex-1 sm:flex-initial btn-solid h-10 px-4 text-xs">
+            <FiCpu className="w-4 h-4 dispatch-icon" /> AI incident copilot
           </button>
 
           <button
             onClick={handleExportCSV}
             disabled={reports.length === 0}
-            className={`flex-1 sm:flex-initial px-5 py-3 rounded-2xl font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 font-mono transition shadow-lg ${
-              reports.length === 0
-                ? 'bg-zinc-100 text-zinc-400 dark:bg-zinc-800 dark:text-zinc-500 cursor-not-allowed border border-zinc-200 dark:border-zinc-700/50'
-                : 'bg-white hover:bg-zinc-100 dark:bg-zinc-800 dark:hover:bg-zinc-700 border border-zinc-300 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 shadow-sm'
-            }`}
+            className="flex-1 sm:flex-initial btn-outline h-10 px-4 text-xs"
           >
-            <FiDownload /> Export CSV
+            <FiDownload className="w-4 h-4 dispatch-icon" /> Export CSV
           </button>
         </div>
       </div>
 
-      {/* LangGraph-Style AI Copilot Drawer */}
       <AdminAIAgentDrawer
         defaultMode="SOS_REPORTS"
         isOpen={isAIAgentOpen}
         onClose={() => setIsAIAgentOpen(false)}
       />
 
-      <div className="glass-card-xl rounded-3xl overflow-hidden border border-zinc-200/80 dark:border-zinc-800/80 shadow-xl">
-        <div className="p-4 sm:p-5 border-b border-zinc-200/80 dark:border-zinc-800/80 flex items-center justify-between bg-zinc-50/80 dark:bg-zinc-900/40">
+      <div className="surface-panel overflow-hidden">
+        <div className="px-5 py-3.5 border-b border-zinc-900/[0.08] dark:border-white/[0.08] flex items-center justify-between bg-[#fafafa] dark:bg-[#141415]">
           <div className="flex items-center gap-2">
-            <FiFileText className="text-rose-500" />
-            <h3 className="text-xs font-bold text-zinc-800 dark:text-zinc-200 uppercase tracking-wider font-mono">
-              Distress Incident Log ({reports.length})
-            </h3>
+            <FiFileText className="w-4 h-4 text-[#e11d48] dispatch-icon" />
+            <h2 className="text-xs font-medium text-[#171717] dark:text-[#ededed]">
+              Distress incident log ({reports.length})
+            </h2>
           </div>
         </div>
 
         {reports.length === 0 ? (
-          <div className="py-16 px-6 text-center space-y-4">
-            <div className="w-14 h-14 mx-auto rounded-2xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 flex items-center justify-center text-zinc-400 dark:text-zinc-500 text-2xl">
-              <FiFileText />
-            </div>
+          <div className="py-16 px-6 text-center space-y-3">
+            <FiFileText className="w-6 h-6 mx-auto text-[#737373] dark:text-[#85858b] dispatch-icon" />
             <div className="space-y-1">
-              <h3 className="text-base font-bold text-zinc-800 dark:text-zinc-200">No Incident Reports</h3>
-              <p className="text-xs text-zinc-500 dark:text-zinc-400 max-w-md mx-auto">
-                No emergency distress beacons or incidents have been logged yet. When an emergency SOS signal is sent, an immutable dispatch record will be generated here.
+              <h3 className="text-sm font-medium text-[#171717] dark:text-[#ededed]">No incident reports</h3>
+              <p className="text-xs text-[#737373] dark:text-[#85858b] max-w-md mx-auto">
+                No emergency distress signals have been logged yet. Incoming broadcasts appear here automatically.
               </p>
             </div>
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs text-zinc-700 dark:text-zinc-300">
-              <thead className="bg-zinc-100/90 dark:bg-zinc-900/80 text-zinc-600 dark:text-zinc-400 font-bold uppercase tracking-wider border-b border-zinc-200 dark:border-zinc-800 text-[10px] font-mono">
+            <table className="w-full text-left text-xs">
+              <thead className="bg-[#fafafa] dark:bg-[#141415] text-[#737373] dark:text-[#85858b] font-medium border-b border-zinc-900/[0.08] dark:border-white/[0.08]">
                 <tr>
-                  <th className="p-4 sm:px-6">Report ID</th>
-                  <th className="p-4">User / Citizen</th>
-                  <th className="p-4">Location Telemetry</th>
-                  <th className="p-4">Timestamp</th>
-                  <th className="p-4 sm:px-6 text-right">Dispatch Status</th>
+                  <th className="py-3 px-5">Report ID</th>
+                  <th className="py-3 px-4">Reporter</th>
+                  <th className="py-3 px-4">Location telemetry</th>
+                  <th className="py-3 px-4">Timestamp</th>
+                  <th className="py-3 px-5 text-right">Status</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800/80">
+              <tbody className="divide-y divide-zinc-900/[0.08] dark:divide-white/[0.08]">
                 {reports.map((r) => (
-                  <tr key={r.id} className="hover:bg-zinc-50 dark:hover:bg-zinc-900/40 transition">
-                    <td className="p-4 sm:px-6 font-mono text-rose-600 dark:text-rose-400 font-bold">
-                      {r.id}
+                  <tr key={r.id} className="hover:bg-[#fafafa] dark:hover:bg-[#141415] transition-colors">
+                    <td className="py-3.5 px-5 font-mono tabular-nums text-[#e11d48] font-medium">{r.id}</td>
+                    <td className="py-3.5 px-4">
+                      <p className="font-medium text-[#171717] dark:text-[#ededed]">{r.userName || 'Anonymous'}</p>
+                      <p className="text-[#737373] dark:text-[#85858b] font-mono tabular-nums">{r.userPhone || '—'}</p>
                     </td>
-                    <td className="p-4 font-semibold text-zinc-900 dark:text-zinc-100">
-                      <div>
-                        <p className="font-bold text-zinc-900 dark:text-zinc-100">{r.userName}</p>
-                        <p className="text-[11px] text-zinc-500 dark:text-zinc-400 font-normal font-mono">{r.userPhone}</p>
-                      </div>
-                    </td>
-                    <td className="p-4">
-                      <div className="flex items-center gap-1.5 text-zinc-700 dark:text-zinc-300">
-                        <FiMapPin className="text-rose-500 flex-shrink-0" />
+                    <td className="py-3.5 px-4">
+                      <div className="flex items-center gap-1.5 text-[#525252] dark:text-[#a1a1a6]">
+                        <FiMapPin className="w-3.5 h-3.5 text-[#e11d48] shrink-0 dispatch-icon" />
                         <span className="truncate max-w-xs">{r.address}</span>
                       </div>
                     </td>
-                    <td className="p-4 font-mono text-zinc-500 dark:text-zinc-400 text-[11px]">
+                    <td className="py-3.5 px-4 font-mono tabular-nums text-[#737373] dark:text-[#85858b]">
                       {formatDate(r.timestamp)}
                     </td>
-                    <td className="p-4 sm:px-6 text-right">
+                    <td className="py-3.5 px-5 text-right">
                       <span
-                        className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase font-mono ${
-                          r.status === 'ACTIVE'
-                            ? 'bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/30'
-                            : r.status === 'ACKNOWLEDGED'
-                            ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30'
-                            : 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30'
+                        className={`status-tag ${
+                          r.status === 'ACTIVE' ? 'mono-tag-rose' : r.status === 'RESOLVED' ? 'mono-tag-emerald' : ''
                         }`}
                       >
-                        {r.status}
+                        {r.status === 'ACTIVE' ? 'Active' : r.status === 'ACKNOWLEDGED' ? 'Acknowledged' : 'Resolved'}
                       </span>
                     </td>
                   </tr>

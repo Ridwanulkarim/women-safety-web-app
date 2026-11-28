@@ -7,47 +7,52 @@ const ContactCard = ({ contact, onDelete }) => {
   const isBn = language === 'bn';
 
   return (
-    <div className="glass-card p-5 rounded-2xl flex items-center justify-between gap-4 transition hover:scale-[1.02]">
-      <div className="flex items-center gap-4">
-        <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-pink-500 to-purple-600 flex items-center justify-center text-white text-xl shadow-md">
-          <FiUser />
+    <div className="surface-card product-card-hover p-4 flex items-center justify-between gap-4">
+      <div className="flex items-center gap-3.5 min-w-0">
+        <div className="w-10 h-10 rounded-lg bg-[#f4f4f5] dark:bg-[#232325] border border-zinc-900/[0.08] dark:border-white/[0.08] flex items-center justify-center text-[#525252] dark:text-[#a1a1a6] shrink-0">
+          <FiUser className="w-4 h-4 dispatch-icon" />
         </div>
 
-        <div>
+        <div className="min-w-0">
           <div className="flex items-center gap-2">
-            <h4 className="font-bold text-slate-800 dark:text-slate-100">{contact.name}</h4>
+            <h3 className="text-sm font-medium text-[#171717] dark:text-[#ededed] truncate">
+              {contact.name}
+            </h3>
             {contact.isPrimary && (
-              <span className="flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-500 uppercase">
-                <FiStar /> {isBn ? 'প্রধান' : 'Primary'}
+              <span className="status-tag mono-tag-rose shrink-0">
+                <FiStar className="w-3 h-3 dispatch-icon" /> {isBn ? 'প্রধান' : 'Primary'}
               </span>
             )}
           </div>
-          <p className="text-xs text-slate-500 dark:text-slate-400">{contact.relationship}</p>
-          <a
-            href={`tel:${contact.phone}`}
-            className="text-sm font-semibold text-pink-600 dark:text-pink-400 hover:underline inline-block mt-0.5 font-mono"
-          >
-            {contact.phone}
-          </a>
+          <div className="flex flex-wrap items-center gap-2 mt-0.5 text-xs">
+            <span className="text-[#737373] dark:text-[#85858b]">{contact.relationship}</span>
+            <span className="text-[#737373] dark:text-[#85858b]">·</span>
+            <a
+              href={`tel:${contact.phone}`}
+              className="font-mono tabular-nums font-medium text-[#171717] dark:text-[#ededed] hover:text-[#e11d48] dark:hover:text-[#fb7185] transition-colors"
+            >
+              {contact.phone}
+            </a>
+          </div>
         </div>
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 shrink-0">
         <a
           href={`tel:${contact.phone}`}
-          className="p-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-base shadow-md transition"
-          title={isBn ? 'সরাসরি কল করুন' : 'Direct Speed Dial'}
+          className="h-9 w-9 rounded-lg bg-[#16a34a] hover:bg-[#15803d] text-white flex items-center justify-center transition-colors"
+          title={isBn ? 'সরাসরি কল করুন' : 'Call contact'}
         >
-          <FiPhoneCall />
+          <FiPhoneCall className="w-4 h-4 dispatch-icon" />
         </a>
 
         {onDelete && (
           <button
             onClick={() => onDelete(contact.id)}
-            className="p-3 rounded-xl bg-red-500/10 text-red-500 hover:bg-red-500/20 text-base transition"
-            title={isBn ? 'পরিচিতি মুছুন' : 'Delete Contact'}
+            className="h-9 w-9 rounded-lg bg-[#f4f4f5] dark:bg-[#232325] text-[#737373] dark:text-[#85858b] hover:text-[#dc2626] dark:hover:text-[#e5484d] border border-zinc-900/[0.08] dark:border-white/[0.08] flex items-center justify-center transition-colors cursor-pointer"
+            title={isBn ? 'পরিচিতি মুছুন' : 'Delete contact'}
           >
-            <FiTrash2 />
+            <FiTrash2 className="w-4 h-4 dispatch-icon" />
           </button>
         )}
       </div>

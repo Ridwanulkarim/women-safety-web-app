@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { FiShield, FiLock, FiMail, FiEye, FiEyeOff, FiActivity, FiAlertCircle } from 'react-icons/fi';
+import { FiLock, FiMail, FiEye, FiEyeOff, FiActivity, FiAlertCircle } from 'react-icons/fi';
 import { FcGoogle } from 'react-icons/fc';
 import { useAuth, isUserAdmin, formatAuthError } from '../../context/AuthContext';
+import BrandMark from '../../components/common/BrandMark';
 import toast from 'react-hot-toast';
 
 const AdminLogin = () => {
@@ -14,9 +15,7 @@ const AdminLogin = () => {
   const [authError, setAuthError] = useState('');
 
   const navigate = useNavigate();
-  const location = useLocation();
 
-  // If user is already logged in as admin, redirect to /admin
   React.useEffect(() => {
     if (user && isAdmin) {
       navigate('/admin', { replace: true });
@@ -29,12 +28,12 @@ const AdminLogin = () => {
     try {
       const loggedIn = await loginWithGoogle();
       if (!isUserAdmin(loggedIn.email)) {
-        setAuthError(`Access Denied: Account (${loggedIn.email}) does not possess administrator clearance.`);
-        toast.error('Unauthorized: Administrator clearance required.');
+        setAuthError(`Access denied: Account (${loggedIn.email}) does not hold administrator clearance.`);
+        toast.error('Administrator clearance required');
         await logoutUser();
         return;
       }
-      toast.success('Administrator clearance verified. Welcome to Command Center.');
+      toast.success('Administrator access verified');
       navigate('/admin', { replace: true });
     } catch (err) {
       setAuthError(formatAuthError(err));
@@ -49,12 +48,12 @@ const AdminLogin = () => {
     try {
       const loggedIn = await loginUser(data.email, data.password);
       if (!isUserAdmin(loggedIn.email)) {
-        setAuthError('Access Denied: This account does not possess administrator clearance.');
-        toast.error('Unauthorized: Administrator clearance required.');
+        setAuthError('Access denied: This account does not hold administrator clearance.');
+        toast.error('Administrator clearance required');
         await logoutUser();
         return;
       }
-      toast.success('Administrator clearance verified. Welcome to Command Center.');
+      toast.success('Administrator access verified');
       navigate('/admin', { replace: true });
     } catch (err) {
       setAuthError(formatAuthError(err));
@@ -64,120 +63,104 @@ const AdminLogin = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-zinc-50 dark:bg-[#08080c] text-zinc-900 dark:text-zinc-100 p-4 font-sans relative overflow-hidden transition-colors duration-200">
-      {/* Ambient background glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] bg-rose-600/10 rounded-full blur-3xl pointer-events-none"></div>
-
-      <div className="max-w-md w-full bg-white/95 dark:bg-[#0e0e14]/95 backdrop-blur-2xl border border-zinc-200/90 dark:border-zinc-800/90 rounded-3xl p-8 sm:p-10 shadow-2xl relative z-10 space-y-6">
-        
-        {/* Header Badge */}
-        <div className="text-center space-y-3">
-          <div className="w-14 h-14 mx-auto rounded-2xl bg-gradient-to-br from-rose-600 to-rose-700 text-white flex items-center justify-center text-2xl font-bold shadow-xl shadow-rose-600/30">
-            <FiShield />
-          </div>
-          <div className="space-y-1">
-            <span className="mono-tag mono-tag-rose text-[10px]">
-              <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse"></span> RESTRICTED ACCESS
-            </span>
-            <h1 className="text-2xl font-extrabold font-heading text-zinc-900 dark:text-white tracking-tight">
-              Admin Command Login
+    <div className="min-h-screen flex items-center justify-center bg-[#fafafa] dark:bg-[#141415] text-[#171717] dark:text-[#ededed] p-4">
+      <div className="max-w-md w-full surface-panel p-8 space-y-6">
+        <div className="space-y-2">
+          <BrandMark name="SafeHaven" subtitle="Restricted dispatch access" />
+          <div className="pt-2 space-y-1">
+            <h1 className="text-2xl font-medium tracking-[-0.02em]">
+              Administrator sign in
             </h1>
-            <p className="text-xs text-zinc-500 dark:text-zinc-400">
-              SafeHaven Security Network • Authorized Personnel Only
+            <p className="text-xs text-[#525252] dark:text-[#a1a1a6]">
+              Authorized emergency dispatch personnel only
             </p>
           </div>
         </div>
 
         {authError && (
-          <div className="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-500 dark:text-rose-400 text-xs flex items-center gap-2.5 font-medium">
-            <FiAlertCircle className="w-4 h-4 flex-shrink-0" />
+          <div className="p-3.5 rounded-lg bg-[#dc2626]/10 border border-[#dc2626]/25 text-[#dc2626] dark:text-[#e5484d] text-xs flex items-center gap-2.5">
+            <FiAlertCircle className="w-4 h-4 shrink-0 dispatch-icon" />
             <span>{authError}</span>
           </div>
         )}
 
-        {/* 1-Click Google Administrator Login */}
         <button
           type="button"
           onClick={handleGoogleSignIn}
           disabled={loading}
-          className="w-full py-3 px-4 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-900/90 border border-zinc-200 dark:border-zinc-700/80 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-100 font-semibold text-xs flex items-center justify-center gap-3 transition-all duration-200 shadow-sm active:scale-[0.99] cursor-pointer"
+          className="w-full btn-outline h-11 text-sm"
         >
-          <FcGoogle className="text-lg flex-shrink-0" /> Authenticate with Google
+          <FcGoogle className="text-base shrink-0" /> Continue with Google
         </button>
 
         <div className="relative flex items-center justify-center">
-          <div className="border-t border-zinc-200 dark:border-zinc-800/80 w-full"></div>
-          <span className="absolute bg-white dark:bg-[#0e0e14] px-3 text-[10px] text-zinc-400 dark:text-zinc-500 uppercase tracking-widest font-mono font-bold">
-            OR SECURITY KEY
+          <div className="border-t border-zinc-900/[0.08] dark:border-white/[0.08] w-full"></div>
+          <span className="absolute bg-[#ffffff] dark:bg-[#19191b] px-3 text-xs text-[#737373] dark:text-[#85858b]">
+            Or credentials
           </span>
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>
-            <label className="block text-xs font-mono font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-400 mb-1.5">
-              Admin Email
-            </label>
+            <label className="human-label">Administrator email</label>
             <div className="relative">
-              <FiMail className="absolute left-3.5 top-3.5 text-zinc-400 dark:text-zinc-500 text-sm" />
+              <FiMail className="w-4 h-4 absolute left-3 top-3 text-[#737373] dark:text-[#85858b] dispatch-icon" />
               <input
                 type="email"
                 placeholder="ridwanulk08@gmail.com"
                 {...register('email', { required: 'Admin email is required' })}
-                className="w-full pl-10 pr-4 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-900/90 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 text-xs focus:outline-none focus:border-rose-500 transition font-sans shadow-sm"
+                className="human-input human-input-has-icon"
               />
             </div>
-            {errors.email && <p className="text-[11px] text-rose-500 mt-1">{errors.email.message}</p>}
+            {errors.email && <p className="text-xs text-[#dc2626] dark:text-[#e5484d] mt-1">{errors.email.message}</p>}
           </div>
 
           <div>
             <div className="flex justify-between items-center mb-1.5">
-              <label className="block text-xs font-mono font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
-                Security Key / Password
-              </label>
-              <Link to="/forgot-password" className="text-[11px] text-rose-500 dark:text-rose-400 hover:text-rose-600 dark:hover:text-rose-300 hover:underline">
-                Forgot password?
+              <label className="human-label mb-0">Password</label>
+              <Link to="/forgot-password" className="text-xs text-[#e11d48] dark:text-[#fb7185] hover:underline">
+                Forgot password
               </Link>
             </div>
             <div className="relative">
-              <FiLock className="absolute left-3.5 top-3.5 text-zinc-400 dark:text-zinc-500 text-sm" />
+              <FiLock className="w-4 h-4 absolute left-3 top-3 text-[#737373] dark:text-[#85858b] dispatch-icon" />
               <input
                 type={showPassword ? 'text' : 'password'}
                 placeholder="••••••••••••"
                 {...register('password', { required: 'Password is required' })}
-                className="w-full pl-10 pr-10 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-900/90 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 text-xs focus:outline-none focus:border-rose-500 transition font-sans shadow-sm"
+                className="human-input human-input-has-icon pr-10"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3.5 top-3.5 text-zinc-400 hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300 text-sm transition"
+                className="absolute right-3 top-3 text-[#737373] dark:text-[#85858b] hover:text-[#171717] dark:hover:text-[#ededed] transition-colors cursor-pointer"
               >
-                {showPassword ? <FiEyeOff /> : <FiEye />}
+                {showPassword ? <FiEyeOff className="w-4 h-4 dispatch-icon" /> : <FiEye className="w-4 h-4 dispatch-icon" />}
               </button>
             </div>
-            {errors.password && <p className="text-[11px] text-rose-500 mt-1">{errors.password.message}</p>}
+            {errors.password && <p className="text-xs text-[#dc2626] dark:text-[#e5484d] mt-1">{errors.password.message}</p>}
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full btn-danger py-3.5 text-xs font-mono font-bold uppercase tracking-wider shadow-lg shadow-rose-600/30 active:scale-[0.99] transition mt-2 cursor-pointer"
+            className="w-full btn-solid h-11 text-sm"
           >
             {loading ? (
               <span className="flex items-center justify-center gap-2">
-                <FiActivity className="animate-spin text-sm" /> VERIFYING CLEARANCE...
+                <FiActivity className="w-4 h-4 animate-spin dispatch-icon" /> Verifying clearance
               </span>
             ) : (
-              'AUTHENTICATE CLEARANCE'
+              'Sign in to command center'
             )}
           </button>
         </form>
 
-        <div className="pt-4 border-t border-zinc-200 dark:border-zinc-800/80 text-center">
-          <p className="text-[11px] text-zinc-500 font-mono">
-            Unlawfully accessing emergency telecommunication systems is strictly audited.
+        <div className="pt-4 border-t border-zinc-900/[0.08] dark:border-white/[0.08] text-center">
+          <p className="text-xs text-[#737373] dark:text-[#85858b]">
+            All administrative access is recorded in the security audit log.
           </p>
         </div>
-
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { FiRadio, FiSend, FiTrash2, FiClock, FiVolume2 } from 'react-icons/fi';
+import { FiRadio, FiSend, FiTrash2, FiClock } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 import { formatDate } from '../../utils/helpers';
 import {
@@ -25,141 +25,112 @@ const AdminAnnouncements = () => {
       createdAt: new Date().toISOString()
     });
     setAnnouncements(updated);
-    toast.success('Security announcement broadcasted successfully!');
+    toast.success('Security advisory published');
     reset();
   };
 
   const handleDelete = (id) => {
     const updated = deleteAdminAnnouncement(id);
     setAnnouncements(updated);
-    toast.success('Announcement removed from system.');
+    toast.success('Announcement deleted');
   };
 
   return (
-    <div className="space-y-8 max-w-4xl mx-auto font-sans">
-      <div>
-        <div className="flex items-center gap-2">
-          <span className="mono-tag mono-tag-rose text-[10px]">
-            <span className="w-1.5 h-1.5 rounded-full bg-rose-500 telemetry-dot"></span> EMERGENCY BROADCAST
-          </span>
-        </div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold font-heading text-zinc-900 dark:text-white tracking-tight">
-          System Announcement <span className="gradient-text-rose">Broadcaster</span>
+    <div className="space-y-6 max-w-4xl mx-auto">
+      <div className="space-y-1">
+        <span className="text-xs font-mono text-[#737373] dark:text-[#85858b]">Emergency broadcast</span>
+        <h1 className="text-2xl sm:text-3xl font-medium tracking-[-0.02em] text-[#171717] dark:text-[#ededed]">
+          System announcements
         </h1>
-        <p className="text-xs text-zinc-500 dark:text-zinc-400">
-          Publish platform security advisories, severe weather notifications, and safety updates to all citizens.
+        <p className="text-sm text-[#525252] dark:text-[#a1a1a6]">
+          Publish platform security advisories, severe weather warnings, and safety notices
         </p>
       </div>
 
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="glass-card-xl p-6 sm:p-8 rounded-3xl space-y-4 border border-zinc-200/80 dark:border-zinc-800 shadow-xl"
-      >
-        <div className="flex items-center gap-2 border-b border-zinc-200 dark:border-zinc-800 pb-3">
-          <FiVolume2 className="text-rose-500 text-lg" />
-          <h3 className="text-base font-bold font-heading text-zinc-900 dark:text-zinc-100">Create New Advisory Broadcast</h3>
+      <form onSubmit={handleSubmit(onSubmit)} className="surface-panel p-6 space-y-4">
+        <div className="flex items-center gap-2 border-b border-zinc-900/[0.08] dark:border-white/[0.08] pb-3">
+          <FiRadio className="w-4 h-4 text-[#e11d48] dispatch-icon" />
+          <h2 className="text-base font-medium text-[#171717] dark:text-[#ededed]">New advisory broadcast</h2>
         </div>
 
-        <div>
-          <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1 font-mono uppercase">
-            Advisory Title
-          </label>
-          <input
-            type="text"
-            required
-            placeholder="e.g. Extreme Monsoon Weather Advisory / Area Alert"
-            {...register('title')}
-            className="w-full px-4 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-800 text-xs text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:border-rose-500 transition shadow-sm"
-          />
-        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="sm:col-span-2">
+            <label className="human-label">Advisory title</label>
+            <input
+              type="text"
+              required
+              placeholder="Extreme monsoon advisory"
+              {...register('title')}
+              className="human-input"
+            />
+          </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1 font-mono uppercase">
-              Priority Level
-            </label>
-            <select
-              {...register('priority')}
-              className="w-full px-4 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-800 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-rose-500 transition shadow-sm"
-            >
-              <option value="normal">Standard Notice (Normal)</option>
-              <option value="high">High Priority (Security Alert)</option>
-              <option value="critical">Critical (Immediate Evacuation / Danger)</option>
+            <label className="human-label">Priority level</label>
+            <select {...register('priority')} className="human-input">
+              <option value="normal">Standard notice</option>
+              <option value="high">High priority</option>
+              <option value="critical">Critical alert</option>
             </select>
           </div>
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1 font-mono uppercase">
-            Advisory Message Body
-          </label>
+          <label className="human-label">Message body</label>
           <textarea
             rows="3"
             required
-            placeholder="Detail the safety advisory, guidance, or operational update..."
+            placeholder="Write the advisory notice or operational update"
             {...register('content')}
-            className="w-full px-4 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-800 text-xs text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:border-rose-500 transition shadow-sm"
+            className="human-input"
           ></textarea>
         </div>
 
-        <button
-          type="submit"
-          className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-500 hover:to-rose-600 text-white font-bold text-xs uppercase tracking-wider font-mono flex items-center justify-center gap-2 shadow-lg shadow-rose-600/30 transition"
-        >
-          <FiSend /> Broadcast Advisory Now
+        <button type="submit" className="btn-solid h-10 px-5 text-xs">
+          <FiSend className="w-4 h-4 dispatch-icon" /> Publish advisory
         </button>
       </form>
 
-      {/* Published Broadcasts */}
-      <div className="space-y-4">
-        <div className="flex items-center gap-2">
-          <FiRadio className="text-rose-500" />
-          <h3 className="text-sm font-bold font-mono text-zinc-800 dark:text-zinc-200 uppercase tracking-wider">
-            Published Advisory History ({announcements.length})
-          </h3>
-        </div>
+      {/* Published History */}
+      <div className="space-y-3">
+        <h2 className="text-sm font-medium text-[#171717] dark:text-[#ededed]">
+          Published advisories ({announcements.length})
+        </h2>
 
         {announcements.length === 0 ? (
-          <div className="glass-card-xl p-10 rounded-2xl text-center space-y-2 border border-zinc-200 dark:border-zinc-800 text-zinc-500 shadow-sm">
-            <FiRadio className="w-10 h-10 mx-auto opacity-30 text-rose-500" />
-            <p className="text-xs font-bold text-zinc-700 dark:text-zinc-400">No Broadcasts Active</p>
-            <p className="text-[11px] text-zinc-500">
-              No platform-wide advisories have been dispatched yet. Use the form above to post one.
+          <div className="surface-panel p-10 text-center space-y-2">
+            <FiRadio className="w-6 h-6 mx-auto text-[#737373] dark:text-[#85858b] dispatch-icon" />
+            <p className="text-sm font-medium text-[#171717] dark:text-[#ededed]">No broadcasts active</p>
+            <p className="text-xs text-[#737373] dark:text-[#85858b]">
+              Use the form above to publish a platform safety advisory.
             </p>
           </div>
         ) : (
           announcements.map((ann) => (
-            <div
-              key={ann.id}
-              className="glass-card-xl p-5 sm:p-6 rounded-2xl flex items-start justify-between gap-4 border border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 transition shadow-sm"
-            >
+            <div key={ann.id} className="surface-card p-5 flex items-start justify-between gap-4">
               <div className="space-y-1.5">
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <span
-                    className={`px-2 py-0.5 rounded-full text-[9px] font-mono font-bold uppercase ${
-                      ann.priority === 'critical'
-                        ? 'bg-red-500/15 text-red-600 dark:text-red-400 border border-red-500/30'
-                        : ann.priority === 'high'
-                        ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30'
-                        : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700'
+                    className={`status-tag ${
+                      ann.priority === 'critical' ? 'mono-tag-rose' : ''
                     }`}
                   >
-                    {ann.priority || 'NORMAL'}
+                    {ann.priority ? ann.priority.charAt(0).toUpperCase() + ann.priority.slice(1) : 'Normal'}
                   </span>
-                  <h4 className="font-bold text-sm text-zinc-900 dark:text-zinc-100">{ann.title}</h4>
+                  <h3 className="font-medium text-sm text-[#171717] dark:text-[#ededed]">{ann.title}</h3>
                 </div>
-                <p className="text-xs text-zinc-600 dark:text-zinc-300 leading-relaxed">{ann.content}</p>
-                <span className="text-[10px] text-zinc-400 dark:text-zinc-500 font-mono flex items-center gap-1">
-                  <FiClock className="text-zinc-400 dark:text-zinc-600" /> {formatDate(ann.createdAt)}
+                <p className="text-xs text-[#525252] dark:text-[#a1a1a6] leading-relaxed">{ann.content}</p>
+                <span className="text-xs text-[#737373] dark:text-[#85858b] font-mono tabular-nums flex items-center gap-1.5">
+                  <FiClock className="w-3.5 h-3.5 dispatch-icon" /> {formatDate(ann.createdAt)}
                 </span>
               </div>
 
               <button
                 onClick={() => handleDelete(ann.id)}
-                className="p-2 rounded-xl bg-zinc-100 hover:bg-red-500/20 text-zinc-500 hover:text-red-600 dark:bg-zinc-800/80 dark:hover:bg-red-500/20 dark:text-zinc-400 dark:hover:text-red-400 border border-zinc-200 dark:border-zinc-700/50 transition flex-shrink-0"
-                title="Remove Broadcast"
+                className="h-8 w-8 rounded-lg bg-[#f4f4f5] dark:bg-[#232325] text-[#737373] dark:text-[#85858b] hover:text-[#dc2626] dark:hover:text-[#e5484d] border border-zinc-900/[0.08] dark:border-white/[0.08] flex items-center justify-center transition-colors shrink-0 cursor-pointer"
+                title="Remove broadcast"
               >
-                <FiTrash2 className="w-3.5 h-3.5" />
+                <FiTrash2 className="w-3.5 h-3.5 dispatch-icon" />
               </button>
             </div>
           ))

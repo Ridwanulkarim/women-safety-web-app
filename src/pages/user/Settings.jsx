@@ -10,69 +10,83 @@ const Settings = () => {
   const isBn = language === 'bn';
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8 font-sans">
-      <div className="flex items-center gap-3 border-b border-slate-200 dark:border-slate-800 pb-4">
-        <div className="w-12 h-12 rounded-2xl bg-purple-600 text-white flex items-center justify-center text-2xl font-bold shadow-md">
-          <FiSettings />
+    <div className="max-w-4xl mx-auto space-y-6">
+      <div className="surface-panel p-6 flex items-center gap-3.5">
+        <div className="w-10 h-10 rounded-lg bg-[#f4f4f5] dark:bg-[#232325] text-[#525252] dark:text-[#a1a1a6] flex items-center justify-center shrink-0">
+          <FiSettings className="w-5 h-5 dispatch-icon" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold font-heading text-zinc-900 dark:text-white">
-            {isBn ? 'অ্যাপ্লিকেশন সেটিংস' : 'App Settings'}
+          <h1 className="text-2xl font-medium text-[#171717] dark:text-[#ededed]">
+            {isBn ? 'অ্যাপ্লিকেশন সেটিংস' : 'Settings'}
           </h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400">
-            {isBn ? 'ইউজার ইন্টারফেস, নোটিফিকেশন ও গোপনীয়তা সম্পর্কিত পছন্দসমূহ নির্ধারণ করুন।' : 'Configure interface preferences, notifications, and privacy options.'}
+          <p className="text-sm text-[#525252] dark:text-[#a1a1a6]">
+            {isBn
+              ? 'ইউজার ইন্টারফেস, নোটিফিকেশন এবং গোপনীয়তার পছন্দ নির্ধারণ করুন'
+              : 'Manage appearance, alerts, and location sharing preferences'}
           </p>
         </div>
       </div>
 
-      <div className="glass-card p-6 sm:p-8 rounded-3xl space-y-6">
-        <div className="flex items-center justify-between py-4 border-b border-slate-200/50 dark:border-slate-800/50">
-          <div>
-            <h3 className="text-sm font-bold font-heading flex items-center gap-2 text-zinc-900 dark:text-white">
-              {darkMode ? <FiMoon className="text-purple-400" /> : <FiSun className="text-amber-500" />} {isBn ? 'ডার্ক মোড থিম' : 'Dark Mode Theme'}
-            </h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
-              {isBn ? 'লাইট ও ডার্ক গ্লাসফরমিক লেআউট পরিবর্তন করুন।' : 'Toggle dark glassmorphic layout theme.'}
+      <div className="surface-panel p-6 divide-y divide-zinc-900/[0.08] dark:divide-white/[0.08]">
+        <div className="flex items-center justify-between py-4 first:pt-0">
+          <div className="space-y-0.5">
+            <h2 className="text-sm font-medium flex items-center gap-2 text-[#171717] dark:text-[#ededed]">
+              {darkMode ? <FiMoon className="w-4 h-4 text-[#737373] dark:text-[#a1a1a6] dispatch-icon" /> : <FiSun className="w-4 h-4 text-[#737373] dispatch-icon" />}
+              {isBn ? 'ডার্ক মোড থিম' : 'Appearance mode'}
+            </h2>
+            <p className="text-xs text-[#525252] dark:text-[#a1a1a6]">
+              {isBn ? 'লাইট ও ডার্ক গ্রাফাইট থিম পরিবর্তন করুন।' : 'Switch between dark and light Graphite interface themes.'}
             </p>
           </div>
           <button
+            type="button"
             onClick={toggleDarkMode}
-            className={`w-14 h-8 flex items-center rounded-full p-1 transition duration-300 ${
-              darkMode ? 'bg-pink-600 justify-end' : 'bg-slate-300 justify-start'
+            role="switch"
+            aria-checked={darkMode}
+            className={`relative inline-flex h-7 w-12 items-center rounded-full p-0.5 transition-colors duration-150 cursor-pointer ${
+              darkMode ? 'bg-[#e11d48]' : 'bg-zinc-300 dark:bg-[#232325]'
             }`}
           >
-            <div className="w-6 h-6 rounded-full bg-white shadow-md"></div>
+            <div
+              className={`w-6 h-6 rounded-full bg-white shadow transition-transform duration-150 ${
+                darkMode ? 'translate-x-5' : 'translate-x-0'
+              }`}
+            ></div>
           </button>
         </div>
 
-        <div className="flex items-center justify-between py-4 border-b border-slate-200/50 dark:border-slate-800/50">
-          <div>
-            <h3 className="text-sm font-bold font-heading flex items-center gap-2 text-zinc-900 dark:text-white">
-              <FiBell className="text-pink-500" /> {isBn ? 'জরুরি পুশ নোটিফিকেশন' : 'Emergency Push Alerts'}
-            </h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
-              {isBn ? 'আশেপাশের যেকোনো বিপদকালীন সতর্কবার্তার তাৎক্ষণিক নোটিফিকেশন পান।' : 'Receive instant push notifications for nearby distress signals.'}
+        <div className="flex items-center justify-between py-4">
+          <div className="space-y-0.5">
+            <h2 className="text-sm font-medium flex items-center gap-2 text-[#171717] dark:text-[#ededed]">
+              <FiBell className="w-4 h-4 text-[#737373] dark:text-[#a1a1a6] dispatch-icon" />
+              {isBn ? 'জরুরি পুশ নোটিফিকেশন' : 'Emergency push notifications'}
+            </h2>
+            <p className="text-xs text-[#525252] dark:text-[#a1a1a6]">
+              {isBn ? 'জরুরি সতর্কবার্তার তাৎক্ষণিক নোটিফিকেশন পান।' : 'Receive immediate alerts when distress beacons fire.'}
             </p>
           </div>
           <button
-            onClick={() => toast.success(isBn ? 'পুশ নোটিফিকেশন সক্রিয় রয়েছে!' : 'Push notification preferences saved!')}
-            className="px-4 py-2 rounded-xl bg-pink-500/10 text-pink-600 dark:text-pink-400 text-xs font-bold font-mono"
+            onClick={() => toast.success(isBn ? 'নোটিফিকেশন সেটিংস সংরক্ষিত' : 'Notification preferences saved')}
+            className="btn-outline h-9 px-3 text-xs"
           >
             {isBn ? 'সক্রিয়' : 'Enabled'}
           </button>
         </div>
 
-        <div className="flex items-center justify-between py-4">
-          <div>
-            <h3 className="text-sm font-bold font-heading flex items-center gap-2 text-zinc-900 dark:text-white">
-              <FiLock className="text-emerald-500" /> {isBn ? 'গোপনীয়তা ও লোকেশন ট্র্যাকিং' : 'Privacy & Location Tracking'}
-            </h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
-              {isBn ? 'কেবলমাত্র সক্রিয় এসওএস বিপদকালীন সময়ে জিপিএস লোকেশন শেয়ার করার অনুমোদন দিন।' : 'Allow location polling strictly during active SOS distress broadcasts.'}
+        <div className="flex items-center justify-between py-4 last:pb-0">
+          <div className="space-y-0.5">
+            <h2 className="text-sm font-medium flex items-center gap-2 text-[#171717] dark:text-[#ededed]">
+              <FiLock className="w-4 h-4 text-[#737373] dark:text-[#a1a1a6] dispatch-icon" />
+              {isBn ? 'গোপনীয়তা ও লোকেশন ট্র্যাকিং' : 'Privacy and GPS sharing'}
+            </h2>
+            <p className="text-xs text-[#525252] dark:text-[#a1a1a6]">
+              {isBn
+                ? 'কেবল সক্রিয় এসওএস বিপদকালীন সময়ে লোকেশন শেয়ারের অনুমোদন থাকে।'
+                : 'Coordinates are shared strictly during active SOS distress broadcasts.'}
             </p>
           </div>
-          <span className="px-3 py-1 rounded-lg bg-emerald-500/10 text-emerald-500 text-xs font-mono font-bold">
-            {isBn ? 'সুরক্ষিত' : 'SECURE'}
+          <span className="status-tag mono-tag-emerald">
+            {isBn ? 'সুরক্ষিত' : 'Enforced'}
           </span>
         </div>
       </div>

@@ -18,18 +18,20 @@ class ErrorBoundary extends Component {
   render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen flex items-center justify-center p-6 bg-slate-900 text-white">
-          <div className="max-w-lg w-full glass-card p-8 rounded-3xl text-center space-y-6">
-            <div className="w-16 h-16 mx-auto bg-pink-500/20 text-pink-500 rounded-full flex items-center justify-center text-3xl">
-              <FiAlertTriangle />
+        <div className="min-h-screen flex items-center justify-center p-6 bg-[#fafafa] dark:bg-[#141415] text-[#171717] dark:text-[#ededed]">
+          <div className="max-w-lg w-full surface-panel p-8 text-center space-y-5">
+            <div className="w-10 h-10 mx-auto rounded-lg bg-[#e11d48]/10 text-[#e11d48] flex items-center justify-center">
+              <FiAlertTriangle className="w-5 h-5 dispatch-icon" />
             </div>
-            <h2 className="text-2xl font-bold font-heading">Something went wrong</h2>
-            <p className="text-sm text-slate-400">
-              An unexpected interface error occurred. Don't worry, your safety features remain operational.
-            </p>
+            <div className="space-y-2">
+              <h2 className="text-xl font-medium">Something went wrong</h2>
+              <p className="text-sm text-[#525252] dark:text-[#a1a1a6]">
+                An unexpected interface error occurred. Your core emergency dispatch routes remain active.
+              </p>
+            </div>
 
             {this.state.error && (
-              <div className="text-left bg-black/50 p-4 rounded-xl text-xs font-mono text-rose-300 overflow-auto max-h-36 border border-rose-500/20">
+              <div className="text-left bg-[#f4f4f5] dark:bg-[#0f0f10] p-4 rounded-lg text-xs font-mono text-[#dc2626] dark:text-[#e5484d] overflow-auto max-h-36 border border-zinc-900/10 dark:border-white/10">
                 {this.state.error.toString()}
               </div>
             )}
@@ -39,9 +41,9 @@ class ErrorBoundary extends Component {
                 this.setState({ hasError: false, error: null });
                 window.location.reload();
               }}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-pink-600 hover:bg-pink-700 rounded-xl font-semibold transition text-white"
+              className="btn-solid px-5"
             >
-              <FiRefreshCw /> Reload Application
+              <FiRefreshCw className="w-4 h-4 dispatch-icon" /> Reload application
             </button>
           </div>
         </div>
