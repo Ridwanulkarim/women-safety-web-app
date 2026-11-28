@@ -12,7 +12,7 @@ const PublicLayout = () => {
 
   if (isAuthPage) {
     return (
-      <div className="min-h-screen flex flex-col justify-center items-center bg-[#f8fafc] dark:bg-[#141415] text-[#171717] dark:text-[#ededed] p-4 sm:p-6">
+      <div className="min-h-screen flex flex-col justify-center items-center bg-[#f9f8ff] dark:bg-[#141415] text-[#171717] dark:text-[#ededed] p-4 sm:p-6">
         <ScrollToTop />
         <main className="w-full flex items-center justify-center">
           <Outlet />
@@ -22,7 +22,7 @@ const PublicLayout = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#ffffff] dark:bg-[#141415] text-[#171717] dark:text-[#ededed]">
+    <div className="min-h-screen flex flex-col bg-[#f9f8ff] dark:bg-[#141415] text-[#171717] dark:text-[#ededed]">
       <ScrollToTop />
       <Navbar />
       <main className="flex-grow">

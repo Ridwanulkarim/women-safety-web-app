@@ -8,9 +8,9 @@
     --font-heading: 'IBM Plex Sans', 'Inter', 'Hind Siliguri', -apple-system, BlinkMacSystemFont, sans-serif;
     --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
 
-    /* Clean White / Graphite neutral ramp — Light */
-    --bg-deep: #f8fafc;
-    --bg-page: #ffffff;
+    /* Clean White + Subtle Lavender Tint — Light */
+    --bg-deep: #f9f8ff;
+    --bg-page: #f9f8ff;
     --bg-card: #ffffff;
     --bg-raised: #f4f4f5;
     --border-hairline: rgba(15, 23, 42, 0.08);

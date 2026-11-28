@@ -37,7 +37,7 @@ const AdminLayout = () => {
   const isActive = (path) => location.pathname === path;
 
   return (
-    <div className="min-h-screen flex bg-[#f8fafc] dark:bg-[#141415] text-[#171717] dark:text-[#ededed]">
+    <div className="min-h-screen flex bg-[#f9f8ff] dark:bg-[#141415] text-[#171717] dark:text-[#ededed]">
       <ScrollToTop />
 
       {/* Desktop Sidebar */}

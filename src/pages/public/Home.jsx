@@ -33,7 +33,7 @@ const Home = () => {
   return (
     <div className="space-y-16 pb-20">
       {/* Operational Status Strip */}
-      <div className="bg-[#f8fafc] dark:bg-[#0f0f10] border-b border-zinc-900/[0.08] dark:border-white/[0.08] py-2.5 px-4 sm:px-6 lg:px-8 text-xs">
+      <div className="bg-[#f9f8ff] dark:bg-[#0f0f10] border-b border-zinc-900/[0.08] dark:border-white/[0.08] py-2.5 px-4 sm:px-6 lg:px-8 text-xs">
         <div className="max-w-[1440px] mx-auto flex items-center justify-between gap-6 overflow-x-auto whitespace-nowrap text-[#525252] dark:text-[#a1a1a6]">
           <div className="flex items-center gap-4">
             <span className="flex items-center gap-2 font-medium text-[#171717] dark:text-[#ededed]">
@@ -121,7 +121,7 @@ const Home = () => {
             </div>
 
             {/* Instrument Reticle Around Physical Trigger */}
-            <div className="py-6 relative flex items-center justify-center rounded-xl bg-[#f8fafc] dark:bg-[#141415] border border-zinc-900/[0.08] dark:border-white/[0.08]">
+            <div className="py-6 relative flex items-center justify-center rounded-xl bg-[#f9f8ff] dark:bg-[#141415] border border-zinc-900/[0.08] dark:border-white/[0.08]">
               <div className="w-60 h-60 rounded-full border border-dashed border-zinc-900/[0.08] dark:border-white/[0.08] flex items-center justify-center">
                 <SOSButton size="large" />
               </div>
