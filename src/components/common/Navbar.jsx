@@ -58,8 +58,8 @@ const Navbar = () => {
                   to={link.path}
                   className={`px-3 py-1.5 rounded-lg text-[13px] font-medium transition-colors duration-150 ${
                     isActive(link.path)
-                      ? 'bg-[#f4f4f5] dark:bg-[#232325] text-[#171717] dark:text-[#ededed]'
-                      : 'text-[#525252] dark:text-[#a1a1a6] hover:text-[#171717] dark:hover:text-[#ededed] hover:bg-[#f4f4f5]/60 dark:hover:bg-[#232325]/50'
+                      ? 'bg-[#171717] text-white dark:bg-[#232325] dark:text-[#ededed]'
+                      : 'text-[#525252] dark:text-[#a1a1a6] hover:text-[#171717] dark:hover:text-[#ededed] hover:bg-[#f4f4f5]/70 dark:hover:bg-[#232325]/50'
                   }`}
                 >
                   {link.name}
@@ -193,7 +193,7 @@ const Navbar = () => {
                 {location.pathname !== '/register' && (
                   <Link
                     to="/register"
-                    className="btn-solid h-9 px-3.5 text-xs"
+                    className="btn-danger h-9 px-3.5 text-xs"
                   >
                     {t('nav.getStarted')}
                   </Link>
@@ -218,25 +218,25 @@ const Navbar = () => {
       {mobileMenuOpen && (
         <div className="lg:hidden border-t border-zinc-900/[0.08] dark:border-white/[0.08] bg-[#ffffff] dark:bg-[#141415] px-4 py-3 space-y-1">
           {publicNavLinks.map((link) => (
-            <Link
-              key={link.path}
-              to={link.path}
-              onClick={() => setMobileMenuOpen(false)}
-              className={`block px-3 py-2 rounded-lg text-sm font-medium ${
-                isActive(link.path)
-                  ? 'bg-[#f4f4f5] dark:bg-[#232325] text-[#171717] dark:text-[#ededed]'
-                  : 'text-[#525252] dark:text-[#a1a1a6]'
-              }`}
-            >
-              {link.name}
-            </Link>
+              <Link
+                key={link.path}
+                to={link.path}
+                onClick={() => setMobileMenuOpen(false)}
+                className={`block px-3 py-2 rounded-lg text-sm font-medium ${
+                  isActive(link.path)
+                    ? 'bg-[#171717] text-white dark:bg-[#232325] dark:text-[#ededed]'
+                    : 'text-[#525252] dark:text-[#a1a1a6]'
+                }`}
+              >
+                {link.name}
+              </Link>
           ))}
           {!user && (
             <div className="pt-2 mt-2 border-t border-zinc-900/[0.08] dark:border-white/[0.08] flex items-center gap-2">
               <Link to="/login" onClick={() => setMobileMenuOpen(false)} className="btn-outline flex-1 h-9 text-xs">
                 {t('nav.signIn')}
               </Link>
-              <Link to="/register" onClick={() => setMobileMenuOpen(false)} className="btn-solid flex-1 h-9 text-xs">
+              <Link to="/register" onClick={() => setMobileMenuOpen(false)} className="btn-danger flex-1 h-9 text-xs">
                 {t('nav.getStarted')}
               </Link>
             </div>

@@ -4,8 +4,8 @@ const ThemeContext = createContext();
 
 export const ThemeProvider = ({ children }) => {
   const [darkMode, setDarkMode] = useState(() => {
-    const saved = localStorage.getItem('safehaven_dark_mode');
-    return saved !== null ? JSON.parse(saved) : true;
+    const saved = localStorage.getItem('safehaven_theme_v2');
+    return saved !== null ? JSON.parse(saved) : false;
   });
 
   useEffect(() => {
@@ -19,7 +19,7 @@ export const ThemeProvider = ({ children }) => {
       root.classList.add('light');
       root.style.colorScheme = 'light';
     }
-    localStorage.setItem('safehaven_dark_mode', JSON.stringify(darkMode));
+    localStorage.setItem('safehaven_theme_v2', JSON.stringify(darkMode));
   }, [darkMode]);
 
   const toggleDarkMode = () => setDarkMode(prev => !prev);

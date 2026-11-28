@@ -63,7 +63,7 @@ const AdminLogin = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#fafafa] dark:bg-[#141415] text-[#171717] dark:text-[#ededed] p-4">
+    <div className="min-h-screen flex items-center justify-center bg-[#f8fafc] dark:bg-[#141415] text-[#171717] dark:text-[#ededed] p-4">
       <div className="max-w-md w-full surface-panel p-8 space-y-6">
         <div className="space-y-2">
           <BrandMark name="SafeHaven" subtitle="Restricted dispatch access" />

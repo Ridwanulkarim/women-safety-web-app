@@ -8,13 +8,13 @@
     --font-heading: 'IBM Plex Sans', 'Inter', 'Hind Siliguri', -apple-system, BlinkMacSystemFont, sans-serif;
     --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
 
-    /* Graphite neutral ramp — Light */
-    --bg-deep: #f4f4f5;
-    --bg-page: #fafafa;
+    /* Clean White / Graphite neutral ramp — Light */
+    --bg-deep: #f8fafc;
+    --bg-page: #ffffff;
     --bg-card: #ffffff;
     --bg-raised: #f4f4f5;
-    --border-hairline: rgba(23, 23, 23, 0.08);
-    --border-strong: rgba(23, 23, 23, 0.14);
+    --border-hairline: rgba(15, 23, 42, 0.08);
+    --border-strong: rgba(15, 23, 42, 0.16);
     --text-primary: #171717;
     --text-secondary: #525252;
     --text-muted: #737373;
@@ -80,13 +80,13 @@ svg.dispatch-icon,
   stroke-width: 1.5;
 }
 
-/* Surface hierarchy: matte graphite / light paper steps with 8% hairlines */
+/* Surface hierarchy: crisp white in light mode, matte graphite in dark mode */
 .surface-card,
 .product-card {
   background-color: var(--bg-card);
   border: 1px solid var(--border-hairline);
   border-radius: 12px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05), 0 1px 2px rgba(15, 23, 42, 0.03);
   transition: border-color 160ms var(--ease-standard), background-color 160ms var(--ease-standard);
 }
 
@@ -99,7 +99,7 @@ svg.dispatch-icon,
   background-color: var(--bg-card);
   border: 1px solid var(--border-hairline);
   border-radius: 16px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05), 0 1px 3px rgba(15, 23, 42, 0.04);
   transition: border-color 160ms var(--ease-standard), background-color 160ms var(--ease-standard);
 }
 

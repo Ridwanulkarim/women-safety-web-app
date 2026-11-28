@@ -10,10 +10,10 @@ const LanguageToggle = () => {
       onClick={toggleLanguage}
       type="button"
       aria-label="Toggle language"
-      className="h-9 px-3 rounded-lg bg-[#f4f4f5] dark:bg-[#232325] text-[#171717] dark:text-[#ededed] border border-zinc-900/10 dark:border-white/10 hover:border-zinc-900/20 dark:hover:border-white/20 flex items-center gap-2 text-xs font-medium cursor-pointer transition-colors duration-150"
+      className="h-9 px-3 rounded-lg bg-[#fff1f2] dark:bg-[#232325] text-[#be123c] dark:text-[#ededed] border border-[#e11d48]/25 dark:border-white/10 hover:border-[#e11d48]/45 dark:hover:border-white/20 flex items-center gap-2 text-xs font-medium cursor-pointer transition-colors duration-150"
       title="Switch language"
     >
-      <FiGlobe className="w-4 h-4 text-[#525252] dark:text-[#a1a1a6] shrink-0 dispatch-icon" />
+      <FiGlobe className="w-4 h-4 text-[#e11d48] dark:text-[#a1a1a6] shrink-0 dispatch-icon" />
       <span className="hidden sm:inline">{language === 'en' ? 'English' : 'বাংলা'}</span>
       <span className="inline sm:hidden">{language === 'en' ? 'EN' : 'BN'}</span>
     </button>

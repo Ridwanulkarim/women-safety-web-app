@@ -63,7 +63,7 @@ const DashboardLayout = () => {
   const isActive = (path) => location.pathname === path;
 
   return (
-    <div className="min-h-screen flex bg-[#fafafa] dark:bg-[#141415] text-[#171717] dark:text-[#ededed]">
+    <div className="min-h-screen flex bg-[#f8fafc] dark:bg-[#141415] text-[#171717] dark:text-[#ededed]">
       <ScrollToTop />
 
       {/* Sidebar Desktop (256px Graphite Deep Surface) */}
@@ -100,7 +100,7 @@ const DashboardLayout = () => {
                 to={item.path}
                 className={`h-9 flex items-center justify-between px-2.5 rounded-lg text-[13px] font-medium transition-colors duration-150 ${
                   active
-                    ? 'bg-[#f4f4f5] dark:bg-[#232325] text-[#171717] dark:text-[#ededed] border border-zinc-900/[0.08] dark:border-white/[0.1]'
+                    ? 'bg-[#fff1f2] dark:bg-[#232325] text-[#be123c] dark:text-[#ededed] border border-[#e11d48]/20 dark:border-white/[0.1]'
                     : 'text-[#525252] dark:text-[#a1a1a6] hover:text-[#171717] dark:hover:text-[#ededed] hover:bg-[#f4f4f5]/60 dark:hover:bg-[#19191b]'
                 }`}
               >
